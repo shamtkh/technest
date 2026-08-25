@@ -162,8 +162,8 @@ export default function ProductCard({ product }) {
           {product.specs.ram !== '—' && <span className="shrink-0">· {product.specs.ram}</span>}
         </div>
 
-        <div className="mt-auto flex items-end justify-between pt-3">
-          <div className="min-w-0 shrink">
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-2 gap-y-2 pt-3">
+          <div>
             {product.oldPrice && (
               <div className="whitespace-nowrap font-mono-tabular text-xs text-steel line-through">
                 {formatPrice(product.oldPrice)}
