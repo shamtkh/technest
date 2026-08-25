@@ -104,6 +104,17 @@ export default function ProductCard({ product }) {
           </span>
         )}
 
+        {/* Quick view button */}
+        {!isAdmin && !cartItem && (
+          <span
+            aria-label={t('product.viewDetails')}
+            title={t('product.viewDetails')}
+            className="absolute right-3 top-3 z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-realistic transition-all duration-200 group-hover:bg-accent-dim group-hover:scale-105"
+          >
+            <FaBagShopping size={15} aria-hidden="true" />
+          </span>
+        )}
+
         {/* Out of stock overlay */}
         {product.stock === 0 && (
           <span className="absolute inset-0 flex items-center justify-center bg-ink/60 spec-strip uppercase text-white z-10">
@@ -174,44 +185,34 @@ export default function ProductCard({ product }) {
             </div>
           </div>
 
-          {!isAdmin && (
-            cartItem ? (
-              <div
-                className="flex h-9 items-center rounded-xl border border-line bg-paper p-0.5 shadow-inner"
-                onClick={(e) => e.preventDefault()}
+          {!isAdmin && cartItem && (
+            <div
+              className="flex h-9 items-center rounded-xl border border-line bg-paper p-0.5 shadow-inner"
+              onClick={(e) => e.preventDefault()}
+            >
+              <button
+                onClick={(e) => changeQuantity(e, 'decrement')}
+                className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-ink-soft shadow-2xs transition-all hover:bg-paper-dim hover:scale-105 active:scale-95 cursor-pointer"
+                aria-label="Kamaytirish"
               >
-                <button
-                  onClick={(e) => changeQuantity(e, 'decrement')}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-ink-soft shadow-2xs transition-all hover:bg-paper-dim hover:scale-105 active:scale-95 cursor-pointer"
-                  aria-label="Kamaytirish"
-                >
-                  {cartItem.qty === 1 ? (
-                    <FaTrashCan size={11} className="text-red-500" />
-                  ) : (
-                    <FaMinus size={10} />
-                  )}
-                </button>
-                <span className="min-w-7 px-1 text-center font-mono-tabular text-xs font-bold text-ink-soft">
-                  {cartItem.qty}
-                </span>
-                <button
-                  onClick={(e) => changeQuantity(e, 'increment')}
-                  disabled={cartItem.qty >= (cartItem.stock ?? 99)}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-ink-soft shadow-2xs transition-all hover:bg-paper-dim hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
-                  aria-label="Ko'paytirish"
-                >
-                  <FaPlus size={10} />
-                </button>
-              </div>
-            ) : (
-              <span
-                aria-label={t('product.viewDetails')}
-                title={t('product.viewDetails')}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-white shadow-xs transition-all duration-200 group-hover:bg-accent-dim group-hover:scale-105"
-              >
-                <FaBagShopping size={15} aria-hidden="true" />
+                {cartItem.qty === 1 ? (
+                  <FaTrashCan size={11} className="text-red-500" />
+                ) : (
+                  <FaMinus size={10} />
+                )}
+              </button>
+              <span className="min-w-7 px-1 text-center font-mono-tabular text-xs font-bold text-ink-soft">
+                {cartItem.qty}
               </span>
-            )
+              <button
+                onClick={(e) => changeQuantity(e, 'increment')}
+                disabled={cartItem.qty >= (cartItem.stock ?? 99)}
+                className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-ink-soft shadow-2xs transition-all hover:bg-paper-dim hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+                aria-label="Ko'paytirish"
+              >
+                <FaPlus size={10} />
+              </button>
+            </div>
           )}
         </div>
       </div>
