@@ -103,6 +103,12 @@ async function start() {
     res.status(201).json(safe)
   })
 
+  // ── GET /users — strip passwords before they ever leave the server ──
+  server.get('/users', (_req, res) => {
+    const users = router.db.get('users').value()
+    res.json(users.map(({ password: _, ...safe }) => safe))
+  })
+
   // ── POST /orders — custom: decrement variant stock ──
   server.post('/orders', (req, res) => {
     const body = req.body

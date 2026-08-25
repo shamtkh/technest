@@ -27,9 +27,12 @@ There is no `.env` requirement to run locally; `VITE_API_URL` optionally overrid
 - `POST /orders` — assigns id/status/createdAt, then decrements stock on the matching product **variant** (matched by `storage` + `color`) for each line item.
 - `PATCH /orders/:id` — updates order status.
 - `DELETE /orders/:id` — deletes the order and, if it was `pending`, restores the reserved variant stock.
-- Everything else (`GET/POST/PATCH/DELETE /products`, `/categories`, `/users`, `/messages`, etc.) falls through to json-server's default REST behavior, writing straight back to `db.json` on disk. The support-chat `messages` collection (see below) relies entirely on this default behavior — there's no custom route for it.
+- `GET /users` — strips `password` from every record server-side (unlike `/auth/*`, json-server's default `/users` route would otherwise leak plaintext passwords to anyone querying the API directly, not just through `src/api/api.js`'s client-side strip).
+- Everything else (`POST/PATCH/DELETE /users`, `GET/POST/PATCH/DELETE /products`, `/categories`, `/messages`, etc.) falls through to json-server's default REST behavior, writing straight back to `db.json` on disk. The support-chat `messages` collection (see below) relies entirely on this default behavior — there's no custom route for it.
 
 `server/middleware.cjs` contains an older/alternate implementation of the same auth+orders routes using raw `fs` read/write instead of `router.db`; it is not required by `server/index.cjs` and is currently dead code — don't assume it runs.
+
+**Production persistence.** Render's free tier wipes local disk on every restart/redeploy. If `DATABASE_URL` (a Postgres connection string, e.g. from Neon) is set, `server/index.cjs` restores `db.json` from a single JSONB row on boot and re-saves the whole file after every successful non-GET request, regardless of which route handled it. Without `DATABASE_URL` (local dev) this is a no-op. Admin-uploaded product images are base64 data URIs embedded directly in `db.json` (see `src/core/handlemageChange.js`), so this same snapshot covers them too — no separate file storage needed.
 
 **Product stock model.** A product's real stock lives in `product.variants[]` (each variant has `storage`, `color`, `hex`, `stock`). The top-level `product.stock` field in `db.json` is stale/unused for display — `src/api/api.js` always recomputes `stock` client-side as the sum of variant stocks (`computeStock`) before returning products to the app. When adding stock-related logic, operate on variants, not the top-level field.
 
