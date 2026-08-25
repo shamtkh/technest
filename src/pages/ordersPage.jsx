@@ -6,13 +6,13 @@ import { getMyOrdersThunk } from '../store/thunks/getMyOrdersThunk'
 import { formatPrice } from '../utils/format'
 
 const STATUS_CONFIG = {
-  pending:   { label: 'Kutilmoqda',    cls: 'status-pending',   icon: '⏳' },
-  accepted:  { label: 'Qabul qilindi', cls: 'status-accepted',  icon: '✅' },
-  transit:   { label: "Yo'lda",        cls: 'status-transit',   icon: '🚚' },
-  delivered: { label: 'Yetkazildi',    cls: 'status-delivered', icon: '🎉' },
+  pending:   { labelKey: 'statusPending', cls: 'status-pending',   icon: '⏳' },
+  accepted:  { labelKey: 'statusAccepted', cls: 'status-accepted',  icon: '✅' },
+  transit:   { labelKey: 'statusTransit', cls: 'status-transit',   icon: '🚚' },
+  delivered: { labelKey: 'statusDelivered', cls: 'status-delivered', icon: '🎉' },
   // legacy
-  new:        { label: 'Kutilmoqda',   cls: 'status-pending',   icon: '⏳' },
-  processing: { label: 'Jarayonda',    cls: 'status-accepted',  icon: '🔄' },
+  new:        { labelKey: 'statusPending', cls: 'status-pending',  icon: '⏳' },
+  processing: { labelKey: 'statusAccepted', cls: 'status-accepted',  icon: '🔄' },
 }
 
 export default function OrdersPage() {
@@ -70,7 +70,7 @@ export default function OrdersPage() {
                   </div>
                 </div>
                 <span className={`rounded-full px-3 py-1.5 spec-strip font-medium text-xs ${si.cls}`}>
-                  {si.icon} {si.label}
+                  {si.icon} {t(`admin.${si.labelKey}`)}
                 </span>
               </div>
 
@@ -78,7 +78,8 @@ export default function OrdersPage() {
               <div className="mt-4 flex items-center gap-1">
                 {['pending', 'accepted', 'transit', 'delivered'].map((s, idx, arr) => {
                   const statuses = ['pending', 'accepted', 'transit', 'delivered']
-                  const curIdx = statuses.indexOf(order.status === 'new' ? 'pending' : (order.status || 'pending'))
+                  const normalizedStatus = ['new', 'processing'].includes(order.status) ? 'pending' : (order.status || 'pending')
+                  const curIdx = statuses.indexOf(normalizedStatus)
                   const done = idx <= curIdx
                   return (
                     <div key={s} className="flex items-center flex-1">
@@ -100,10 +101,10 @@ export default function OrdersPage() {
                 })}
               </div>
               <div className="mt-1 flex justify-between spec-strip text-steel text-[10px]">
-                <span>Kutilmoqda</span>
-                <span>Qabul</span>
-                <span>Yo'lda</span>
-                <span>Yetkazildi</span>
+                <span>{t('admin.statusPending')}</span>
+                <span>{t('admin.statusAccepted')}</span>
+                <span>{t('admin.statusTransit')}</span>
+                <span>{t('admin.statusDelivered')}</span>
               </div>
 
               {/* Items */}
