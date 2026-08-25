@@ -313,7 +313,7 @@ export default function ProductPage() {
             {!isAdmin && (
               <div className="mt-6">
                 {cartItem ? (
-                  <div className="space-y-3">
+                  <div className="space-y-3 cart-actions-enter">
                     <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
                       <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
                         <FaCheck size={9} />
@@ -321,9 +321,9 @@ export default function ProductPage() {
                       <span>{t('product.inCart')}</span>
                     </div>
 
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="flex items-center gap-3">
                       {/* Quantity selector */}
-                      <div className="flex h-12 items-center justify-between rounded-xl border border-line bg-white px-2 shadow-xs sm:w-44 sm:justify-center">
+                      <div className="flex h-12 w-32 shrink-0 items-center justify-between rounded-xl border border-line bg-white px-2 shadow-xs sm:w-44 sm:justify-center">
                         <button
                           onClick={() => changeCartQuantity('decrement')}
                           className="flex h-9 w-9 items-center justify-center rounded-lg bg-paper text-ink-soft transition-all hover:bg-paper-dim active:scale-95 cursor-pointer"
@@ -351,10 +351,10 @@ export default function ProductPage() {
                       {/* Go to cart CTA button */}
                       <Link
                         to="/cart"
-                        className="group flex h-12 flex-1 items-center justify-center gap-2.5 rounded-xl bg-accent px-6 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-accent-dim hover:shadow active:scale-[0.99]"
+                        className="group flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-accent px-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-accent-dim hover:shadow active:scale-[0.99] sm:gap-2.5 sm:px-6"
                       >
                         <FaBagShopping size={16} aria-hidden="true" />
-                        <span>{t('product.goToCart')}</span>
+                        <span className="truncate">{t('product.goToCart')}</span>
                         <FaArrowRight size={13} className="transition-transform duration-200 group-hover:translate-x-1" />
                       </Link>
                     </div>

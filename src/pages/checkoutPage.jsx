@@ -7,11 +7,11 @@ import { clearCart } from '../store/slices/cartSlice'
 import { formatPrice } from '../utils/format'
 import { useToast } from '../hooks/useToast'
 
-const REQUIRED = (val) => (!val?.toString().trim() ? 'Maydon to\'ldirilishi shart' : null)
+const REQUIRED = (val, t) => (!val?.toString().trim() ? t('validation.required') : null)
 const PHONE_RE = /^\+?[\d\s\-()]{7,}$/
-const PHONE_RULE = (val) => (val && !PHONE_RE.test(val) ? 'To\'g\'ri telefon raqam kiriting' : null)
+const PHONE_RULE = (val, t) => (val && !PHONE_RE.test(val) ? t('validation.invalidPhone') : null)
 
-function validate(form) {
+function validate(form, t) {
   const errs = {}
   const checks = {
     fullName: [REQUIRED],
@@ -22,7 +22,7 @@ function validate(form) {
   }
   Object.entries(checks).forEach(([key, rules]) => {
     for (const rule of rules) {
-      const err = rule(form[key])
+      const err = rule(form[key], t)
       if (err) { errs[key] = err; break }
     }
   })
@@ -60,10 +60,10 @@ export default function CheckoutPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    const validationErrors = validate(form)
+    const validationErrors = validate(form, t)
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors)
-      showToast('Formadagi xatolarni to\'g\'rilang', 'error')
+      showToast(t('checkout.validationError'), 'error')
       return
     }
 
@@ -93,10 +93,10 @@ export default function CheckoutPage() {
         total: subtotal,
       }))
       dispatch(clearCart())
-      showToast('Buyurtmangiz muvaffaqiyatli qabul qilindi! ✓', 'success', 5000)
+      showToast(t('checkout.orderSuccess'), 'success', 5000)
       setPlaced(true)
     } catch {
-      showToast('Buyurtma berishda xato yuz berdi', 'error')
+      showToast(t('checkout.orderError'), 'error')
     }
     setPlacing(false)
   }
@@ -144,7 +144,7 @@ export default function CheckoutPage() {
                   className="input"
                   value={form.fullName}
                   onChange={(e) => set('fullName', e.target.value)}
-                  placeholder="To'liq ism va familiya"
+                  placeholder={t('checkout.fullNamePlaceholder')}
                 />
               </Field>
               <Field label={t('checkout.phone')} error={errors.phone}>
@@ -160,46 +160,46 @@ export default function CheckoutPage() {
 
           {/* Delivery Address */}
           <section>
-            <h3 className="mb-4 font-display text-sm font-semibold text-ink-soft">Yetkazib berish manzili</h3>
+            <h3 className="mb-4 font-display text-sm font-semibold text-ink-soft">{t('checkout.address')}</h3>
             <div className="space-y-3">
               <Field label={t('checkout.city')} error={errors.city}>
                 <input
                   className="input"
-                  placeholder="Shahar yoki tuman"
+                  placeholder={t('checkout.cityPlaceholder')}
                   value={form.city}
                   onChange={(e) => set('city', e.target.value)}
                 />
               </Field>
-              <Field label="Ko'cha nomi *" error={errors.street}>
+              <Field label={t('checkout.street')} error={errors.street}>
                 <input
                   className="input"
-                  placeholder="Masalan: Amir Temur ko'chasi"
+                  placeholder={t('checkout.streetPlaceholder')}
                   value={form.street}
                   onChange={(e) => set('street', e.target.value)}
                 />
               </Field>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Uy/bino raqami *" error={errors.house}>
+                <Field label={t('checkout.house')} error={errors.house}>
                   <input
                     className="input"
-                    placeholder="Masalan: 42"
+                    placeholder={t('checkout.housePlaceholder')}
                     value={form.house}
                     onChange={(e) => set('house', e.target.value)}
                   />
                 </Field>
-                <Field label="Kvartira (ixtiyoriy)">
+                <Field label={t('checkout.apartment')}>
                   <input
                     className="input"
-                    placeholder="Masalan: 15"
+                    placeholder={t('checkout.apartmentPlaceholder')}
                     value={form.apartment}
                     onChange={(e) => set('apartment', e.target.value)}
                   />
                 </Field>
               </div>
-              <Field label="Mo'ljal (ixtiyoriy)">
+              <Field label={t('checkout.landmark')}>
                 <input
                   className="input"
-                  placeholder="Masalan: Metro yonida, sariq bino"
+                  placeholder={t('checkout.landmarkPlaceholder')}
                   value={form.landmark}
                   onChange={(e) => set('landmark', e.target.value)}
                 />
@@ -235,7 +235,7 @@ export default function CheckoutPage() {
               <div
                 className="relative rounded-xl border border-line px-4 py-3 text-left text-sm font-medium cursor-not-allowed"
                 style={{ opacity: 0.5, backgroundColor: 'var(--color-paper-dim)' }}
-                title="Tez kunda"
+                title={t('checkout.comingSoon')}
               >
                 <div className="flex items-center gap-2 text-steel">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -248,7 +248,7 @@ export default function CheckoutPage() {
                   className="absolute -right-1.5 -top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold text-white"
                   style={{ background: 'var(--color-steel)' }}
                 >
-                  🔒 Tez kunda
+                  🔒 {t('checkout.comingSoon')}
                 </span>
               </div>
             </div>
@@ -265,7 +265,7 @@ export default function CheckoutPage() {
                   <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="2" strokeOpacity="0.3"/>
                   <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
-                Yuborilmoqda...
+                {t('checkout.submitting')}
               </span>
             ) : t('checkout.placeOrder')}
           </button>
