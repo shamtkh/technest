@@ -38,7 +38,7 @@ export default function GlassSelect({ value, onChange, options, className = '', 
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
       >
-        <span>{selected?.label}</span>
+        <span className="glass-select-value">{selected?.label}</span>
         <FaChevronDown className="glass-select-chevron" aria-hidden="true" />
       </button>
       {open && (

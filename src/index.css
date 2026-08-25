@@ -178,6 +178,8 @@ input:focus-visible { outline: none; }
   backdrop-filter: blur(16px);
   text-align: left;
 }
+.glass-select-value { min-width: 0; white-space: nowrap; }
+.glass-select.status-select { width: auto; min-width: 9rem; flex-shrink: 0; }
 .glass-select-trigger:hover:not(:disabled), .glass-select.is-open .glass-select-trigger {
   border-color: rgba(61, 127, 255, 0.72);
   box-shadow: 0 0 0 3px rgba(61, 127, 255, 0.11), inset 0 1px 0 rgba(255, 255, 255, 0.85);

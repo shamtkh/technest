@@ -41,7 +41,7 @@ export default function AdminDashboard() {
   const { showToast } = useToast()
   const { items: products, status: productStatus } = useSelector((s) => s.products)
   const { items: orders, newOrdersCount, status: ordersStatus } = useSelector((s) => s.orders)
-  const { allMessages, adminUnreadCount } = useSelector((s) => s.chat)
+  const { allMessages, adminUnreadCount, allStatus } = useSelector((s) => s.chat)
   const [users, setUsers] = useState([])
 
   const [tab, setTab] = useState('products') // 'products' | 'orders' | 'support'
@@ -82,6 +82,8 @@ export default function AdminDashboard() {
 
   // ── Notify admin of new support messages ──
   useEffect(() => {
+    if (allStatus !== 'succeeded') return
+
     const userMessageIds = new Set(allMessages.filter((m) => m.sender === 'user').map((m) => m.id))
 
     if (!knownMessageIds.current) {
@@ -95,7 +97,7 @@ export default function AdminDashboard() {
     }
 
     knownMessageIds.current = userMessageIds
-  }, [allMessages, showToast, t])
+  }, [allMessages, allStatus, showToast, t])
 
   // ── Notify admin of new orders ──
   useEffect(() => {
@@ -493,7 +495,7 @@ export default function AdminDashboard() {
                           disabled={statusUpdating === order.id}
                           onChange={(value) => handleStatusChange(order.id, value)}
                           options={ORDER_STATUSES.map((s) => ({ value: s.value, label: t(`admin.${s.labelKey}`) }))}
-                          className="w-auto min-w-36 text-xs"
+                          className="status-select min-w-36 text-xs"
                         />
                       </div>
                     </div>
