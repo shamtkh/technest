@@ -66,8 +66,6 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-3 spec-strip text-steel">{t('auth.demoHint')}</p>
-
       <p className="mt-6 text-center text-sm text-steel">
         {t('auth.noAccount')}{' '}
         <Link to="/register" className="font-medium text-accent hover:underline">{t('nav.register')}</Link>

@@ -135,7 +135,6 @@
     "registerBtn": "Sign up",
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
-    "demoHint": "Demo: admin@technest.uz / admin123",
     "invalidCredentials": "Invalid email or password",
     "emailTaken": "This email is already registered"
   },

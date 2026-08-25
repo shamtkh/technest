@@ -135,7 +135,6 @@
     "registerBtn": "Зарегистрироваться",
     "noAccount": "Нет аккаунта?",
     "haveAccount": "Уже есть аккаунт?",
-    "demoHint": "Демо: admin@technest.uz / admin123",
     "invalidCredentials": "Неверный email или пароль",
     "emailTaken": "Этот email уже зарегистрирован"
   },

@@ -135,7 +135,6 @@
     "registerBtn": "Ro'yxatdan o'tish",
     "noAccount": "Hisobingiz yo'qmi?",
     "haveAccount": "Hisobingiz bormi?",
-    "demoHint": "Demo: admin@technest.uz / admin123",
     "invalidCredentials": "Email yoki parol noto'g'ri",
     "emailTaken": "Bu email allaqachon ro'yxatdan o'tgan"
   },
