@@ -1,0 +1,1631 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "iPhone 15 Pro",
+      "brand": "Apple",
+      "category": "phones",
+      "price": 14200000,
+      "oldPrice": 15500000,
+      "rating": 4.5,
+      "reviews": 0,
+      "stock": 17,
+      "storage": [
+        "128GB",
+        "256GB",
+        "512GB"
+      ],
+      "colors": [
+        {
+          "name": "Titanium Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Titanium White",
+          "hex": "#e3e3e3"
+        },
+        {
+          "name": "Titanium Blue",
+          "hex": "#312b88"
+        },
+        {
+          "name": "TItanium",
+          "hex": "#808080"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "128GB",
+          "color": "Titanium Black",
+          "stock": 1,
+          "hex": "#000000"
+        },
+        {
+          "storage": "128GB",
+          "color": "Titanium White",
+          "stock": 3,
+          "hex": "#e3e3e3"
+        },
+        {
+          "storage": "128GB",
+          "color": "Titanium Blue",
+          "stock": 2,
+          "hex": "#292965"
+        },
+        {
+          "storage": "256GB",
+          "color": "Titanium Black",
+          "stock": 3,
+          "hex": "#000000"
+        },
+        {
+          "storage": "256GB",
+          "color": "Titanium White",
+          "stock": 2,
+          "hex": "#e3e3e3"
+        },
+        {
+          "storage": "256GB",
+          "color": "Titanium Blue",
+          "stock": 1,
+          "hex": "#323281"
+        },
+        {
+          "storage": "512GB",
+          "color": "Titanium Black",
+          "stock": 2,
+          "hex": "#000000"
+        },
+        {
+          "storage": "512GB",
+          "color": "Titanium White",
+          "stock": 1,
+          "hex": "#e3e3e3"
+        },
+        {
+          "storage": "512GB",
+          "color": "Titanium Blue",
+          "stock": 0,
+          "hex": "#312b88"
+        },
+        {
+          "storage": "128GB",
+          "color": "TItanium",
+          "hex": "#808080",
+          "stock": 2
+        }
+      ],
+      "images": [
+        "/products/product-1-1.webp",
+        "/products/product-1-2.webp",
+        "/products/product-1-3.webp",
+        "/products/product-1-4.webp"
+      ],
+      "specs": {
+        "display": "6.1\" OLED, 120Hz",
+        "chip": "A17 Pro",
+        "ram": "8GB",
+        "camera": "48MP + 12MP + 12MP",
+        "battery": "3274 mAh"
+      },
+      "description": {
+        "uz": "Titanium korpusli, A17 Pro chipli flagman smartfon. Pro darajadagi kamera tizimi va ProMotion ekran bilan.",
+        "ru": "Флагманский смартфон с титановым корпусом, чипом A17 Pro, профессиональной камерой и экраном ProMotion.",
+        "en": "A flagship smartphone with a titanium body, A17 Pro chip, professional camera system, and ProMotion display."
+      },
+      "featured": false
+    },
+    {
+      "id": 2,
+      "name": "Samsung Galaxy S24 Ultra",
+      "brand": "Samsung",
+      "category": "phones",
+      "price": 13800000,
+      "oldPrice": null,
+      "rating": 4.7,
+      "reviews": 189,
+      "stock": 24,
+      "storage": [
+        "256GB",
+        "512GB",
+        "1TB"
+      ],
+      "colors": [
+        {
+          "name": "Titanium Gray",
+          "hex": "#4b4d50"
+        },
+        {
+          "name": "Titanium Violet",
+          "hex": "#6a5b7a"
+        },
+        {
+          "name": "Titanium Yellow",
+          "hex": "#c9a84c"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "256GB",
+          "color": "Titanium Gray",
+          "stock": 3
+        },
+        {
+          "storage": "256GB",
+          "color": "Titanium Violet",
+          "stock": 3
+        },
+        {
+          "storage": "256GB",
+          "color": "Titanium Yellow",
+          "stock": 3
+        },
+        {
+          "storage": "512GB",
+          "color": "Titanium Gray",
+          "stock": 4
+        },
+        {
+          "storage": "512GB",
+          "color": "Titanium Violet",
+          "stock": 3
+        },
+        {
+          "storage": "512GB",
+          "color": "Titanium Yellow",
+          "stock": 2
+        },
+        {
+          "storage": "1TB",
+          "color": "Titanium Gray",
+          "stock": 2
+        },
+        {
+          "storage": "1TB",
+          "color": "Titanium Violet",
+          "stock": 1
+        },
+        {
+          "storage": "1TB",
+          "color": "Titanium Yellow",
+          "stock": 0
+        }
+      ],
+      "images": [
+        "/products/product-2-1.webp",
+        "/products/product-2-2.webp",
+        "/products/product-2-3.webp"
+      ],
+      "specs": {
+        "display": "6.8\" QHD+ AMOLED, 120Hz",
+        "chip": "Snapdragon 8 Gen 3",
+        "ram": "12GB",
+        "camera": "200MP + 50MP + 12MP + 10MP",
+        "battery": "5000 mAh"
+      },
+      "description": {
+        "uz": "S Pen bilan keladigan eng kuchli Galaxy. 200MP kamera va sun'iy intellekt asosidagi funksiyalar.",
+        "ru": "Самый мощный Galaxy с S Pen, камерой 200 Мп и функциями на основе искусственного интеллекта.",
+        "en": "The most powerful Galaxy with an S Pen, 200MP camera, and AI-powered features."
+      },
+      "featured": true
+    },
+    {
+      "id": 3,
+      "name": "Xiaomi 14",
+      "brand": "Xiaomi",
+      "category": "phones",
+      "price": 8200000,
+      "oldPrice": 8900000,
+      "rating": 4.5,
+      "reviews": 97,
+      "stock": 19,
+      "storage": [
+        "128GB",
+        "256GB"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#1c1c1e"
+        },
+        {
+          "name": "Jade Green",
+          "hex": "#5c7a63"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "128GB",
+          "color": "Black",
+          "stock": 5,
+          "hex": "#1c1c1e"
+        },
+        {
+          "storage": "128GB",
+          "color": "Jade Green",
+          "stock": 5,
+          "hex": "#5c7a63"
+        },
+        {
+          "storage": "256GB",
+          "color": "Black",
+          "stock": 5,
+          "hex": "#1c1c1e"
+        },
+        {
+          "storage": "256GB",
+          "color": "Jade Green",
+          "stock": 4,
+          "hex": "#5c7a63"
+        }
+      ],
+      "images": [
+        "/products/product-3-2.jpeg",
+        "/products/product-3-3.jpg"
+      ],
+      "specs": {
+        "display": "6.36\" AMOLED, 120Hz",
+        "chip": "Snapdragon 8 Gen 3",
+        "ram": "12GB",
+        "camera": "50MP Leica",
+        "battery": "4610 mAh"
+      },
+      "description": {
+        "uz": "Leica hamkorligidagi kamera va kompakt korpusda flagman quvvat.",
+        "ru": "Флагманская производительность в компактном корпусе и камера, созданная совместно с Leica.",
+        "en": "Flagship performance in a compact body with a camera co-engineered with Leica."
+      },
+      "featured": false
+    },
+    {
+      "id": 4,
+      "name": "iPhone 14",
+      "brand": "Apple",
+      "category": "phones",
+      "price": 9800000,
+      "oldPrice": 11200000,
+      "rating": 4.6,
+      "reviews": 312,
+      "stock": 22,
+      "storage": [
+        "128GB",
+        "256GB",
+        "512GB"
+      ],
+      "colors": [
+        {
+          "name": "Midnight",
+          "hex": "#1c1e26"
+        },
+        {
+          "name": "Starlight",
+          "hex": "#f5f0e8"
+        },
+        {
+          "name": "Blue",
+          "hex": "#3e5f8a"
+        },
+        {
+          "name": "Purple",
+          "hex": "#6b5b8a"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "128GB",
+          "color": "Midnight",
+          "stock": 3
+        },
+        {
+          "storage": "128GB",
+          "color": "Starlight",
+          "stock": 3
+        },
+        {
+          "storage": "128GB",
+          "color": "Blue",
+          "stock": 2
+        },
+        {
+          "storage": "128GB",
+          "color": "Purple",
+          "stock": 1
+        },
+        {
+          "storage": "256GB",
+          "color": "Midnight",
+          "stock": 3
+        },
+        {
+          "storage": "256GB",
+          "color": "Starlight",
+          "stock": 2
+        },
+        {
+          "storage": "256GB",
+          "color": "Blue",
+          "stock": 2
+        },
+        {
+          "storage": "256GB",
+          "color": "Purple",
+          "stock": 0
+        },
+        {
+          "storage": "512GB",
+          "color": "Midnight",
+          "stock": 1
+        },
+        {
+          "storage": "512GB",
+          "color": "Starlight",
+          "stock": 1
+        },
+        {
+          "storage": "512GB",
+          "color": "Blue",
+          "stock": 0
+        },
+        {
+          "storage": "512GB",
+          "color": "Purple",
+          "stock": 0
+        }
+      ],
+      "images": [
+        "/products/product-4-1.webp",
+        "/products/product-4-2.webp",
+        "/products/product-4-3.webp"
+      ],
+      "specs": {
+        "display": "6.1\" Super Retina XDR, 60Hz",
+        "chip": "A15 Bionic",
+        "ram": "6GB",
+        "camera": "12MP + 12MP",
+        "battery": "3279 mAh"
+      },
+      "description": {
+        "uz": "Ommabop iPhone seriyasining eng yaxshi vakili. Kuchli A15 chip va Crash Detection xavfsizlik funksiyasi.",
+        "ru": "Яркий представитель популярной серии iPhone с мощным чипом A15 и функцией безопасности Crash Detection.",
+        "en": "A standout from the popular iPhone lineup with a powerful A15 chip and Crash Detection safety feature."
+      },
+      "featured": false
+    },
+    {
+      "id": 5,
+      "name": "Google Pixel 8 Pro",
+      "brand": "Google",
+      "category": "phones",
+      "price": 11500000,
+      "oldPrice": 12800000,
+      "rating": 4.6,
+      "reviews": 78,
+      "stock": 15,
+      "storage": [
+        "128GB",
+        "256GB",
+        "1TB"
+      ],
+      "colors": [
+        {
+          "name": "Obsidian",
+          "hex": "#1a1a2e"
+        },
+        {
+          "name": "Porcelain",
+          "hex": "#f0ede6"
+        },
+        {
+          "name": "Bay",
+          "hex": "#4a7b9d"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "128GB",
+          "color": "Obsidian",
+          "stock": 0
+        },
+        {
+          "storage": "128GB",
+          "color": "Porcelain",
+          "stock": 2
+        },
+        {
+          "storage": "128GB",
+          "color": "Bay",
+          "stock": 3
+        },
+        {
+          "storage": "256GB",
+          "color": "Obsidian",
+          "stock": 2
+        },
+        {
+          "storage": "256GB",
+          "color": "Porcelain",
+          "stock": 2
+        },
+        {
+          "storage": "256GB",
+          "color": "Bay",
+          "stock": 1
+        },
+        {
+          "storage": "1TB",
+          "color": "Obsidian",
+          "stock": 1
+        },
+        {
+          "storage": "1TB",
+          "color": "Porcelain",
+          "stock": 1
+        },
+        {
+          "storage": "1TB",
+          "color": "Bay",
+          "stock": 0
+        }
+      ],
+      "images": [
+        "/products/product-5-1.webp",
+        "/products/product-5-2.webp",
+        "/products/product-5-3.webp"
+      ],
+      "specs": {
+        "display": "6.7\" LTPO OLED, 120Hz",
+        "chip": "Google Tensor G3",
+        "ram": "12GB",
+        "camera": "50MP + 48MP + 48MP",
+        "battery": "5050 mAh"
+      },
+      "description": {
+        "uz": "Google AI kuchi bilan jihozlangan flagman. Magic Eraser va Best Take kabi kuchli AI funksiyalar.",
+        "ru": "Флагман на базе Google AI с мощными функциями вроде Magic Eraser и Best Take.",
+        "en": "A Google AI-powered flagship with advanced features such as Magic Eraser and Best Take."
+      },
+      "featured": true
+    },
+    {
+      "id": 6,
+      "name": "MacBook Pro 14\" M3",
+      "brand": "Apple",
+      "category": "laptops",
+      "price": 24500000,
+      "oldPrice": null,
+      "rating": 4.9,
+      "reviews": 132,
+      "stock": 9,
+      "storage": [
+        "512GB",
+        "1TB"
+      ],
+      "colors": [
+        {
+          "name": "Space Black",
+          "hex": "#1b1b1d"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e3e4e6"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "512GB",
+          "color": "Space Black",
+          "stock": 1
+        },
+        {
+          "storage": "512GB",
+          "color": "Silver",
+          "stock": 2
+        },
+        {
+          "storage": "1TB",
+          "color": "Space Black",
+          "stock": 2
+        },
+        {
+          "storage": "1TB",
+          "color": "Silver",
+          "stock": 2
+        }
+      ],
+      "images": [
+        "/products/product-6-1.webp",
+        "/products/product-6-2.webp",
+        "/products/product-6-3.webp",
+        "/products/product-6-4.webp"
+      ],
+      "specs": {
+        "display": "14.2\" Liquid Retina XDR",
+        "chip": "Apple M3 Pro",
+        "ram": "18GB",
+        "camera": "1080p FaceTime HD",
+        "battery": "18 soatgacha"
+      },
+      "description": {
+        "uz": "Professional darajadagi ish yuklamalari uchun kuchli va sokin noutbuk.",
+        "ru": "Мощный и тихий ноутбук для профессиональных рабочих задач.",
+        "en": "A powerful and quiet laptop for professional workloads."
+      },
+      "featured": true
+    },
+    {
+      "id": 7,
+      "name": "MacBook Air 15\" M2",
+      "brand": "Apple",
+      "category": "laptops",
+      "price": 18900000,
+      "oldPrice": 20500000,
+      "rating": 4.8,
+      "reviews": 198,
+      "stock": 14,
+      "storage": [
+        "256GB",
+        "512GB"
+      ],
+      "colors": [
+        {
+          "name": "Midnight",
+          "hex": "#1c1e26"
+        },
+        {
+          "name": "Starlight",
+          "hex": "#e8e4d9"
+        },
+        {
+          "name": "Space Gray",
+          "hex": "#6e6e73"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "256GB",
+          "color": "Midnight",
+          "stock": 1
+        },
+        {
+          "storage": "256GB",
+          "color": "Starlight",
+          "stock": 2
+        },
+        {
+          "storage": "256GB",
+          "color": "Space Gray",
+          "stock": 2
+        },
+        {
+          "storage": "512GB",
+          "color": "Midnight",
+          "stock": 3
+        },
+        {
+          "storage": "512GB",
+          "color": "Starlight",
+          "stock": 2
+        },
+        {
+          "storage": "512GB",
+          "color": "Space Gray",
+          "stock": 2
+        }
+      ],
+      "images": [
+        "/products/product-6-1.webp",
+        "/products/product-6-2.webp",
+        "/products/product-6-3.webp"
+      ],
+      "specs": {
+        "display": "15.3\" Liquid Retina",
+        "chip": "Apple M2",
+        "ram": "8GB",
+        "camera": "1080p FaceTime HD",
+        "battery": "18 soatgacha"
+      },
+      "description": {
+        "uz": "Eng yupqa va engil 15 dyuymli noutbuk. M2 chip quvvati va to'liq kun batareya ishlashi.",
+        "ru": "Тонкий и лёгкий 15-дюймовый ноутбук с мощностью чипа M2 и автономностью на весь день.",
+        "en": "A thin and light 15-inch laptop with M2 power and all-day battery life."
+      },
+      "featured": false
+    },
+    {
+      "id": 8,
+      "name": "ASUS ROG Zephyrus G14",
+      "brand": "ASUS",
+      "category": "laptops",
+      "price": 19800000,
+      "oldPrice": 21200000,
+      "rating": 4.6,
+      "reviews": 76,
+      "stock": 12,
+      "storage": [
+        "512GB",
+        "1TB"
+      ],
+      "colors": [
+        {
+          "name": "Eclipse Gray",
+          "hex": "#3a3b3f"
+        },
+        {
+          "name": "Platinum White",
+          "hex": "#f0f0f0"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "512GB",
+          "color": "Eclipse Gray",
+          "stock": 3
+        },
+        {
+          "storage": "512GB",
+          "color": "Platinum White",
+          "stock": 3
+        },
+        {
+          "storage": "1TB",
+          "color": "Eclipse Gray",
+          "stock": 3
+        },
+        {
+          "storage": "1TB",
+          "color": "Platinum White",
+          "stock": 2
+        }
+      ],
+      "images": [
+        "/products/product-7-1.jpg",
+        "/products/product-7-2.png",
+        "/products/product-7-3.png"
+      ],
+      "specs": {
+        "display": "14\" QHD+, 165Hz",
+        "chip": "Ryzen 9 8945HS",
+        "ram": "32GB",
+        "camera": "RTX 4060 8GB",
+        "battery": "76Wh"
+      },
+      "description": {
+        "uz": "O'yin va yaratuvchilik uchun mo'ljallangan kuchli va yengil noutbuk.",
+        "ru": "Мощный и лёгкий ноутбук для игр и творческих задач.",
+        "en": "A powerful and lightweight laptop designed for gaming and creative work."
+      },
+      "featured": false
+    },
+    {
+      "id": 9,
+      "name": "Dell XPS 13",
+      "brand": "Dell",
+      "category": "laptops",
+      "price": 16400000,
+      "oldPrice": null,
+      "rating": 4.4,
+      "reviews": 58,
+      "stock": 15,
+      "storage": [
+        "512GB",
+        "1TB"
+      ],
+      "colors": [
+        {
+          "name": "Platinum",
+          "hex": "#c9cacc"
+        },
+        {
+          "name": "Graphite",
+          "hex": "#2e2f31"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "512GB",
+          "color": "Platinum",
+          "stock": 3
+        },
+        {
+          "storage": "512GB",
+          "color": "Graphite",
+          "stock": 4
+        },
+        {
+          "storage": "1TB",
+          "color": "Platinum",
+          "stock": 4
+        },
+        {
+          "storage": "1TB",
+          "color": "Graphite",
+          "stock": 3
+        }
+      ],
+      "images": [
+        "/products/product-8-1.jpg",
+        "/products/product-8-2.webp",
+        "/products/product-8-3.jpg"
+      ],
+      "specs": {
+        "display": "13.4\" FHD+ InfinityEdge",
+        "chip": "Intel Core Ultra 7",
+        "ram": "16GB",
+        "camera": "720p HD",
+        "battery": "12 soatgacha"
+      },
+      "description": {
+        "uz": "Ultra-yupqa korpusda kundalik ish uchun ishonchli hamroh.",
+        "ru": "Надёжный помощник для повседневных задач в ультратонком корпусе.",
+        "en": "A reliable everyday companion in an ultra-thin body."
+      },
+      "featured": false
+    },
+    {
+      "id": 10,
+      "name": "Lenovo ThinkPad X1 Carbon",
+      "brand": "Lenovo",
+      "category": "laptops",
+      "price": 21300000,
+      "oldPrice": 23000000,
+      "rating": 4.7,
+      "reviews": 94,
+      "stock": 8,
+      "storage": [
+        "512GB",
+        "1TB",
+        "2TB"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#1a1a1a"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "512GB",
+          "color": "Black",
+          "stock": 2
+        },
+        {
+          "storage": "1TB",
+          "color": "Black",
+          "stock": 3
+        },
+        {
+          "storage": "2TB",
+          "color": "Black",
+          "stock": 2
+        }
+      ],
+      "images": [
+        "/products/product-9-1.png",
+        "/products/product-9-2.png",
+        "/products/product-9-3.avif"
+      ],
+      "specs": {
+        "display": "14\" IPS, 2.8K 120Hz",
+        "chip": "Intel Core i7-1365U",
+        "ram": "32GB",
+        "camera": "1080p IR",
+        "battery": "15 soatgacha"
+      },
+      "description": {
+        "uz": "Biznes sinfi noutbuk. Harbiy sinf bardoshliligi va uzun batareya muddati.",
+        "ru": "Ноутбук бизнес-класса с военной прочностью и длительным временем автономной работы.",
+        "en": "A business-class laptop with military-grade durability and long battery life."
+      },
+      "featured": false
+    },
+    {
+      "id": 12,
+      "name": "Apple Watch Ultra 2",
+      "brand": "Apple",
+      "category": "watches",
+      "price": 8900000,
+      "oldPrice": null,
+      "rating": 4.8,
+      "reviews": 67,
+      "stock": 10,
+      "storage": [
+        "49mm"
+      ],
+      "colors": [
+        {
+          "name": "Natural Titanium",
+          "hex": "#a8a9ad"
+        },
+        {
+          "name": "Black Titanium",
+          "hex": "#2d2d2d"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "49mm",
+          "color": "Natural Titanium",
+          "stock": 5
+        },
+        {
+          "storage": "49mm",
+          "color": "Black Titanium",
+          "stock": 4
+        }
+      ],
+      "images": [
+        "/products/product-11-1.webp",
+        "/products/product-11-2.png",
+        "/products/product-11-3.webp"
+      ],
+      "specs": {
+        "display": "49mm Always-On Retina",
+        "chip": "S9 SiP",
+        "ram": "1GB",
+        "camera": "—",
+        "battery": "60 soatgacha"
+      },
+      "description": {
+        "uz": "Ekstremal sport va sayohat uchun eng kuchli Apple Watch. 100m suv o'tkazmasligi.",
+        "ru": "Самые выносливые Apple Watch для экстремального спорта и путешествий с водозащитой до 100 м.",
+        "en": "The toughest Apple Watch for extreme sports and travel, water-resistant to 100 meters."
+      },
+      "featured": false
+    },
+    {
+      "id": 13,
+      "name": "Samsung Galaxy Watch 6",
+      "brand": "Samsung",
+      "category": "watches",
+      "price": 3900000,
+      "oldPrice": null,
+      "rating": 4.5,
+      "reviews": 64,
+      "stock": 21,
+      "storage": [
+        "40mm",
+        "44mm"
+      ],
+      "colors": [
+        {
+          "name": "Graphite",
+          "hex": "#2b2b2d"
+        },
+        {
+          "name": "Gold",
+          "hex": "#cdb48a"
+        },
+        {
+          "name": "Silver",
+          "hex": "#d4d4d4"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "40mm",
+          "color": "Graphite",
+          "stock": 3
+        },
+        {
+          "storage": "40mm",
+          "color": "Gold",
+          "stock": 3
+        },
+        {
+          "storage": "40mm",
+          "color": "Silver",
+          "stock": 3
+        },
+        {
+          "storage": "44mm",
+          "color": "Graphite",
+          "stock": 4
+        },
+        {
+          "storage": "44mm",
+          "color": "Gold",
+          "stock": 4
+        },
+        {
+          "storage": "44mm",
+          "color": "Silver",
+          "stock": 3
+        }
+      ],
+      "images": [
+        "/products/product-12-1.webp",
+        "/products/product-12-2.jpg",
+        "/products/product-12-3.webp"
+      ],
+      "specs": {
+        "display": "1.5\" Super AMOLED",
+        "chip": "Exynos W930",
+        "ram": "2GB",
+        "camera": "—",
+        "battery": "40 soatgacha"
+      },
+      "description": {
+        "uz": "Aylanuvchi safir ramka va batafsil sog'liq tahlili.",
+        "ru": "Вращающийся сапфировый безель и подробный анализ состояния здоровья.",
+        "en": "A rotating sapphire bezel with detailed health analysis."
+      },
+      "featured": false
+    },
+    {
+      "id": 14,
+      "name": "AirPods Pro 2",
+      "brand": "Apple",
+      "category": "accessories",
+      "price": 3100000,
+      "oldPrice": 3400000,
+      "rating": 4.8,
+      "reviews": 301,
+      "stock": 45,
+      "storage": [
+        "Standart"
+      ],
+      "colors": [
+        {
+          "name": "White",
+          "hex": "#f2f2f2"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "Standart",
+          "color": "White",
+          "stock": 44
+        }
+      ],
+      "images": [
+        "/products/product-13-1.webp",
+        "/products/product-13-2.webp",
+        "/products/product-13-3.png"
+      ],
+      "specs": {
+        "display": "—",
+        "chip": "H2",
+        "ram": "—",
+        "camera": "—",
+        "battery": "6 soat + 30 soat keys"
+      },
+      "description": {
+        "uz": "Faol shovqin bostirish va shaffof rejim bilan simsiz quloqchinlar.",
+        "ru": "Беспроводные наушники с активным шумоподавлением и прозрачным режимом.",
+        "en": "Wireless earbuds with active noise cancellation and transparency mode."
+      },
+      "featured": true
+    },
+    {
+      "id": 15,
+      "name": "Sony WH-1000XM5",
+      "brand": "Sony",
+      "category": "accessories",
+      "price": 4600000,
+      "oldPrice": null,
+      "rating": 4.9,
+      "reviews": 88,
+      "stock": 16,
+      "storage": [
+        "Standart"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#141414"
+        },
+        {
+          "name": "Silver",
+          "hex": "#d8d6cf"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "Standart",
+          "color": "Black",
+          "stock": 8
+        },
+        {
+          "storage": "Standart",
+          "color": "Silver",
+          "stock": 7
+        }
+      ],
+      "images": [
+        "/products/product-14-1.jpg",
+        "/products/product-14-2.webp",
+        "/products/product-14-3.webp",
+        "/products/product-14-4.webp"
+      ],
+      "specs": {
+        "display": "—",
+        "chip": "V1 Processor",
+        "ram": "—",
+        "camera": "—",
+        "battery": "30 soat"
+      },
+      "description": {
+        "uz": "Sanoatdagi eng yaxshi shovqin bostirish texnologiyasiga ega quloqchin.",
+        "ru": "Наушники с одной из лучших в отрасли технологий шумоподавления.",
+        "en": "Headphones with industry-leading noise cancellation technology."
+      },
+      "featured": false
+    },
+    {
+      "id": 16,
+      "name": "Anker 737 Power Bank",
+      "brand": "Anker",
+      "category": "accessories",
+      "price": 980000,
+      "oldPrice": 1150000,
+      "rating": 4.6,
+      "reviews": 52,
+      "stock": 60,
+      "storage": [
+        "24000mAh"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#1c1c1c"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "24000mAh",
+          "color": "Black",
+          "stock": 59
+        }
+      ],
+      "images": [
+        "/products/product-15-1.webp",
+        "/products/product-15-2.jpg"
+      ],
+      "specs": {
+        "display": "LED indikator",
+        "chip": "GaN II",
+        "ram": "—",
+        "camera": "—",
+        "battery": "24000 mAh"
+      },
+      "description": {
+        "uz": "140W tezkor quvvatlash bilan yuqori sig'imli quvvat banki.",
+        "ru": "Повербанк большой ёмкости с быстрой зарядкой мощностью 140 Вт.",
+        "en": "A high-capacity power bank with 140W fast charging."
+      },
+      "featured": false
+    },
+    {
+      "id": 17,
+      "name": "Logitech MX Master 3S",
+      "brand": "Logitech",
+      "category": "accessories",
+      "price": 780000,
+      "oldPrice": null,
+      "rating": 4.7,
+      "reviews": 40,
+      "stock": 38,
+      "storage": [
+        "Standart"
+      ],
+      "colors": [
+        {
+          "name": "Graphite",
+          "hex": "#2b2c2e"
+        },
+        {
+          "name": "Pale Gray",
+          "hex": "#cfd0cf"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "Standart",
+          "color": "Graphite",
+          "stock": 19
+        },
+        {
+          "storage": "Standart",
+          "color": "Pale Gray",
+          "stock": 18
+        }
+      ],
+      "images": [
+        "/products/product-16-1.jpeg",
+        "/products/product-16-2.jpg",
+        "/products/product-16-3.webp",
+        "/products/product-16-4.png"
+      ],
+      "specs": {
+        "display": "—",
+        "chip": "Darkfield 8K DPI",
+        "ram": "—",
+        "camera": "—",
+        "battery": "70 kungacha"
+      },
+      "description": {
+        "uz": "Aniq va sokin bosiluvchi professional simsiz sichqoncha.",
+        "ru": "Профессиональная беспроводная мышь с точным и тихим нажатием.",
+        "en": "A professional wireless mouse with precise tracking and quiet clicks."
+      },
+      "featured": false
+    },
+    {
+      "id": 18,
+      "name": "iPad Pro 12.9\" M2",
+      "brand": "Apple",
+      "category": "accessories",
+      "price": 17800000,
+      "oldPrice": 19500000,
+      "rating": 4.8,
+      "reviews": 156,
+      "stock": 11,
+      "storage": [
+        "128GB",
+        "256GB",
+        "512GB",
+        "1TB"
+      ],
+      "colors": [
+        {
+          "name": "Space Gray",
+          "hex": "#6e6e73"
+        },
+        {
+          "name": "Silver",
+          "hex": "#e0e0e5"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "128GB",
+          "color": "Space Gray",
+          "stock": 1
+        },
+        {
+          "storage": "128GB",
+          "color": "Silver",
+          "stock": 2
+        },
+        {
+          "storage": "256GB",
+          "color": "Space Gray",
+          "stock": 2
+        },
+        {
+          "storage": "256GB",
+          "color": "Silver",
+          "stock": 1
+        },
+        {
+          "storage": "512GB",
+          "color": "Space Gray",
+          "stock": 2
+        },
+        {
+          "storage": "512GB",
+          "color": "Silver",
+          "stock": 1
+        },
+        {
+          "storage": "1TB",
+          "color": "Space Gray",
+          "stock": 1
+        },
+        {
+          "storage": "1TB",
+          "color": "Silver",
+          "stock": 0
+        }
+      ],
+      "images": [
+        "/products/product-17-1.webp",
+        "/products/product-17-2.webp"
+      ],
+      "specs": {
+        "display": "12.9\" Liquid Retina XDR",
+        "chip": "Apple M2",
+        "ram": "8GB",
+        "camera": "12MP + 10MP Ultra Wide",
+        "battery": "10 soatgacha"
+      },
+      "description": {
+        "uz": "Eng kuchli iPad. ProMotion texnologiyasi va M2 chip bilan yaratuvchilik uchun ideal.",
+        "ru": "Самый мощный iPad с технологией ProMotion и чипом M2, идеально подходящий для творчества.",
+        "en": "The most powerful iPad, ideal for creative work with ProMotion technology and the M2 chip."
+      },
+      "featured": true
+    },
+    {
+      "id": 19,
+      "name": "OnePlus 12",
+      "brand": "OnePlus",
+      "category": "phones",
+      "price": 9200000,
+      "oldPrice": 10400000,
+      "rating": 4.5,
+      "reviews": 112,
+      "stock": 28,
+      "storage": [
+        "256GB",
+        "512GB"
+      ],
+      "colors": [
+        {
+          "name": "Silky Black",
+          "hex": "#1c1c1e"
+        },
+        {
+          "name": "Flowy Emerald",
+          "hex": "#1a4a3a"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "256GB",
+          "color": "Silky Black",
+          "stock": 7
+        },
+        {
+          "storage": "256GB",
+          "color": "Flowy Emerald",
+          "stock": 7
+        },
+        {
+          "storage": "512GB",
+          "color": "Silky Black",
+          "stock": 7
+        },
+        {
+          "storage": "512GB",
+          "color": "Flowy Emerald",
+          "stock": 6
+        }
+      ],
+      "images": [
+        "/products/product-18-1.jpg",
+        "/products/product-18-2.png",
+        "/products/product-18-3.webp"
+      ],
+      "specs": {
+        "display": "6.82\" LTPO AMOLED, 120Hz",
+        "chip": "Snapdragon 8 Gen 3",
+        "ram": "16GB",
+        "camera": "50MP Hasselblad",
+        "battery": "5400 mAh"
+      },
+      "description": {
+        "uz": "100W tezkor quvvatlash va Hasselblad kamera bilan flagship o'ldiruvchi.",
+        "ru": "Флагманский смартфон с быстрой зарядкой 100 Вт и камерой Hasselblad.",
+        "en": "A flagship killer with 100W fast charging and a Hasselblad camera."
+      },
+      "featured": false
+    },
+    {
+      "id": 20,
+      "name": "Garmin Fenix 7 Pro",
+      "brand": "Garmin",
+      "category": "watches",
+      "price": 7200000,
+      "oldPrice": 8000000,
+      "rating": 4.6,
+      "reviews": 43,
+      "stock": 12,
+      "storage": [
+        "47mm"
+      ],
+      "colors": [
+        {
+          "name": "Carbon Gray",
+          "hex": "#3a3a3c"
+        },
+        {
+          "name": "Silver",
+          "hex": "#c8c8cc"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "47mm",
+          "color": "Carbon Gray",
+          "stock": 6
+        },
+        {
+          "storage": "47mm",
+          "color": "Silver",
+          "stock": 5
+        }
+      ],
+      "images": [
+        "/products/product-19-1.jpg",
+        "/products/product-19-2.jpg"
+      ],
+      "specs": {
+        "display": "1.3\" MIP",
+        "chip": "GPS Multi-Band",
+        "ram": "—",
+        "camera": "—",
+        "battery": "22 kungacha"
+      },
+      "description": {
+        "uz": "Triatlon va tog' alpinizmi uchun professional sport soat. Multi-band GPS va solar quvvatlash.",
+        "ru": "Профессиональные спортивные часы для триатлона и альпинизма с многодиапазонным GPS и солнечной зарядкой.",
+        "en": "A professional sports watch for triathlon and mountaineering with multi-band GPS and solar charging."
+      },
+      "featured": false
+    },
+    {
+      "id": 21,
+      "name": "Samsung Galaxy Buds2 Pro",
+      "brand": "Samsung",
+      "category": "accessories",
+      "price": 1850000,
+      "oldPrice": 2200000,
+      "rating": 4.5,
+      "reviews": 87,
+      "stock": 33,
+      "storage": [
+        "Standart"
+      ],
+      "colors": [
+        {
+          "name": "Graphite",
+          "hex": "#2b2c2e"
+        },
+        {
+          "name": "White",
+          "hex": "#f5f5f5"
+        },
+        {
+          "name": "Bora Purple",
+          "hex": "#7b5ea7"
+        }
+      ],
+      "variants": [
+        {
+          "storage": "Standart",
+          "color": "Graphite",
+          "stock": 11
+        },
+        {
+          "storage": "Standart",
+          "color": "White",
+          "stock": 11
+        },
+        {
+          "storage": "Standart",
+          "color": "Bora Purple",
+          "stock": 10
+        }
+      ],
+      "images": [
+        "/products/product-20-1.webp",
+        "/products/product-20-2.webp",
+        "/products/product-20-3.jpg",
+        "/products/product-20-4.webp"
+      ],
+      "specs": {
+        "display": "—",
+        "chip": "Exynos W920",
+        "ram": "—",
+        "camera": "—",
+        "battery": "5 soat + 18 soat keys"
+      },
+      "description": {
+        "uz": "Hi-Fi 24-bit audio va faol shovqin bostirish bilan premium quloqchinlar.",
+        "ru": "Премиальные наушники с Hi-Fi 24-битным звуком и активным шумоподавлением.",
+        "en": "Premium earbuds with Hi-Fi 24-bit audio and active noise cancellation."
+      },
+      "featured": false
+    }
+  ],
+  "categories": [
+    {
+      "id": "phones",
+      "labelKey": "categories.phones"
+    },
+    {
+      "id": "laptops",
+      "labelKey": "categories.laptops"
+    },
+    {
+      "id": "accessories",
+      "labelKey": "categories.accessories"
+    },
+    {
+      "id": "watches",
+      "labelKey": "categories.watches"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin User",
+      "email": "admin@technest.uz",
+      "password": "admin123",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "name": "Aziz Karimov",
+      "email": "aziz@example.com",
+      "password": "aziz1234",
+      "role": "customer"
+    },
+    {
+      "id": 3,
+      "name": "test",
+      "email": "test@gmail.com",
+      "password": "123456",
+      "role": "customer"
+    },
+    {
+      "id": 4,
+      "name": "qw",
+      "email": "qw@gmail.com",
+      "password": "123456",
+      "role": "customer"
+    },
+    {
+      "id": 5,
+      "name": "bexruz",
+      "email": "bexruz@gmail.com",
+      "password": "bexruz123",
+      "role": "admin"
+    },
+    {
+      "id": 6,
+      "name": "test",
+      "email": "test@mail.ru",
+      "password": "123456",
+      "role": "customer"
+    }
+  ],
+  "orders": [
+    {
+      "userId": 3,
+      "contact": {
+        "fullName": "test",
+        "phone": "+998970004525",
+        "city": "Toshkent",
+        "address": "Yunusobod, 28 dom, kv. 84 ",
+        "street": "Yunusobod",
+        "house": "28 dom",
+        "apartment": "84 ",
+        "landmark": "",
+        "payment": "cash"
+      },
+      "items": [
+        {
+          "productId": 5,
+          "name": "Google Pixel 8 Pro",
+          "qty": 1,
+          "price": 11500000,
+          "storage": "128GB",
+          "color": "Obsidian"
+        },
+        {
+          "productId": 6,
+          "name": "MacBook Pro 14\" M3",
+          "qty": 1,
+          "price": 24500000,
+          "storage": "512GB",
+          "color": "Space Black"
+        },
+        {
+          "productId": 7,
+          "name": "MacBook Air 15\" M2",
+          "qty": 1,
+          "price": 18900000,
+          "storage": "256GB",
+          "color": "Midnight"
+        }
+      ],
+      "total": 54900000,
+      "id": 1,
+      "status": "delivered",
+      "createdAt": "2026-08-20T10:56:26.280Z",
+      "updatedAt": "2026-08-20T11:04:06.421Z"
+    },
+    {
+      "userId": 3,
+      "contact": {
+        "fullName": "test",
+        "phone": "+998970004525",
+        "city": "TOshkent",
+        "address": "1234, 123, kv. 12312",
+        "street": "1234",
+        "house": "123",
+        "apartment": "12312",
+        "landmark": "",
+        "payment": "cash"
+      },
+      "items": [
+        {
+          "productId": 1,
+          "name": "iPhone 15 Pro",
+          "qty": 1,
+          "price": 14200000,
+          "storage": "128GB",
+          "color": "Titanium Black"
+        },
+        {
+          "productId": 2,
+          "name": "Samsung Galaxy S24 Ultra",
+          "qty": 1,
+          "price": 13800000,
+          "storage": "256GB",
+          "color": "Titanium Gray"
+        },
+        {
+          "productId": 3,
+          "name": "Xiaomi 14",
+          "qty": 1,
+          "price": 8200000,
+          "storage": "128GB",
+          "color": "Black"
+        },
+        {
+          "productId": 5,
+          "name": "Google Pixel 8 Pro",
+          "qty": 1,
+          "price": 11500000,
+          "storage": "128GB",
+          "color": "Obsidian"
+        }
+      ],
+      "total": 47700000,
+      "id": 2,
+      "status": "delivered",
+      "createdAt": "2026-08-20T15:59:26.435Z",
+      "updatedAt": "2026-08-24T07:37:37.115Z"
+    },
+    {
+      "userId": 6,
+      "contact": {
+        "fullName": "test",
+        "phone": "+998950990990",
+        "city": "toshekt",
+        "address": "svadfv, 23, kv. 3, fsdafa",
+        "street": "svadfv",
+        "house": "23",
+        "apartment": "3",
+        "landmark": "fsdafa",
+        "payment": "cash"
+      },
+      "items": [
+        {
+          "productId": 1,
+          "name": "iPhone 15 Pro",
+          "qty": 17,
+          "price": 14200000,
+          "storage": "128GB",
+          "color": "Titanium Black"
+        }
+      ],
+      "total": 241400000,
+      "id": 3,
+      "status": "pending",
+      "createdAt": "2026-08-25T10:38:12.135Z"
+    }
+  ],
+  "messages": [
+    {
+      "userId": 3,
+      "userName": "test",
+      "sender": "user",
+      "text": "salom",
+      "createdAt": "2026-08-25T10:17:32.533Z",
+      "id": 1
+    },
+    {
+      "userId": 3,
+      "userName": "test",
+      "sender": "user",
+      "text": "нмаааааа гааааааап",
+      "createdAt": "2026-08-25T11:11:41.456Z",
+      "id": 2
+    }
+  ]
+}
