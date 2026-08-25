@@ -34,6 +34,7 @@ const EMPTY_FORM = {
   name: '', brand: '', category: 'phones', price: '', oldPrice: '',
   stock: '', storage: '', description: { uz: '', ru: '', en: '' }, images: [], variants: [], specs: null,
 }
+const SEEN_MESSAGES_KEY = 'technest_admin_seen_messages'
 
 export default function AdminDashboard() {
   const { t, i18n } = useTranslation()
@@ -48,6 +49,8 @@ export default function AdminDashboard() {
   const [activeConversationId, setActiveConversationId] = useState(null)
   const [replyText, setReplyText] = useState('')
   const knownMessageIds = useRef(null)
+  const seenMessageIds = useRef(new Set(JSON.parse(localStorage.getItem(SEEN_MESSAGES_KEY) || '[]')))
+  const hasSeenMessageStore = useRef(localStorage.getItem(SEEN_MESSAGES_KEY) !== null)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [editingProduct, setEditingProduct] = useState(null)
@@ -88,16 +91,35 @@ export default function AdminDashboard() {
 
     if (!knownMessageIds.current) {
       knownMessageIds.current = userMessageIds
+      if (!hasSeenMessageStore.current) {
+        seenMessageIds.current = userMessageIds
+        localStorage.setItem(SEEN_MESSAGES_KEY, JSON.stringify([...userMessageIds]))
+        hasSeenMessageStore.current = true
+      } else {
+        const unseenMessages = [...userMessageIds].filter((id) => !seenMessageIds.current.has(id))
+        if (unseenMessages.length > 0) {
+          showToast(`💬 ${unseenMessages.length} ${t('admin.newMessageToast')}`, 'info', 5000)
+        }
+      }
       return
     }
 
-    const newMessages = [...userMessageIds].filter((id) => !knownMessageIds.current.has(id)).length
+    const newMessages = [...userMessageIds].filter(
+      (id) => !knownMessageIds.current.has(id) && !seenMessageIds.current.has(id)
+    ).length
     if (newMessages > 0) {
       showToast(`💬 ${newMessages} ${t('admin.newMessageToast')}`, 'info', 5000)
     }
 
     knownMessageIds.current = userMessageIds
   }, [allMessages, allStatus, showToast, t])
+
+  function openConversation(conversation) {
+    const viewedIds = conversation.messages.filter((message) => message.sender === 'user').map((message) => message.id)
+    viewedIds.forEach((id) => seenMessageIds.current.add(id))
+    localStorage.setItem(SEEN_MESSAGES_KEY, JSON.stringify([...seenMessageIds.current]))
+    setActiveConversationId(conversation.userId)
+  }
 
   // ── Notify admin of new orders ──
   useEffect(() => {
@@ -548,7 +570,7 @@ export default function AdminDashboard() {
               {conversations.map((conv) => (
                 <button
                   key={conv.userId}
-                  onClick={() => setActiveConversationId(conv.userId)}
+                  onClick={() => openConversation(conv)}
                   className="w-full rounded-2xl border border-line bg-white p-4 text-left hover:border-accent"
                   style={{ transition: 'border-color 0.2s ease' }}
                 >
