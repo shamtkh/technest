@@ -167,6 +167,37 @@ input:focus-visible { outline: none; }
   contain: layout style;
 }
 
+.admin-product-modal {
+  height: min(90vh, 56rem);
+  max-height: calc(100dvh - 1rem);
+}
+
+.admin-product-form {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.admin-form-scroll {
+  min-height: 0;
+  flex: 1;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+@media (max-width: 639px) {
+  .admin-product-modal {
+    height: calc(100dvh - 1rem);
+    max-height: calc(100dvh - 1rem);
+  }
+
+  .admin-form-actions {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 .glass-select {
   position: relative;
   width: 100%;

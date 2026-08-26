@@ -90,6 +90,13 @@ export default function AdminDashboard() {
     return () => clearInterval(pollRef.current)
   }, [dispatch])
 
+  useEffect(() => {
+    if (!modalOpen) return undefined
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
+  }, [modalOpen])
+
   // ── Notify admin of new support messages ──
   useEffect(() => {
     if (allStatus !== 'succeeded') return
@@ -659,12 +666,13 @@ export default function AdminDashboard() {
 
       {/* ── Product Create/Edit Modal ── */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-ink/60 p-2 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:items-center sm:p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
-          <div onClick={(e) => e.stopPropagation()} className="flex max-h-[calc(100dvh-0.5rem)] w-full max-w-lg flex-col rounded-2xl bg-white p-4 modal-enter sm:max-h-[90vh] sm:p-6">
+        <div className="admin-modal-overlay fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-ink/60 p-2 sm:p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
+          <div onClick={(e) => e.stopPropagation()} className="admin-product-modal flex w-full max-w-lg flex-col rounded-2xl bg-white p-4 modal-enter sm:p-6">
             <h3 className="mb-4 font-display text-lg font-semibold text-ink-soft">
               {editingId ? t('admin.editProduct') : t('admin.addProduct')}
             </h3>
-            <form onSubmit={handleSubmit} className="min-h-0 space-y-3 overflow-y-auto overscroll-contain pr-1">
+            <form id="product-editor-form" onSubmit={handleSubmit} className="admin-product-form min-h-0">
+              <div className="admin-form-scroll space-y-3 overflow-y-auto overscroll-contain pr-1">
               <Field label={t('admin.name')} error={errors.name}>
                 <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input" />
               </Field>
@@ -774,7 +782,8 @@ export default function AdminDashboard() {
                   </div>
                 )}
               </Field>
-              <div className="sticky bottom-0 flex justify-end gap-2 bg-white pt-3">
+              </div>
+              <div className="admin-form-actions flex shrink-0 justify-end gap-2 bg-white pt-3">
                 <button type="button" onClick={() => setModalOpen(false)} className="btn-glass rounded-full border border-line px-4 py-2 text-sm font-medium">
                   {t('admin.cancel')}
                 </button>
