@@ -12,7 +12,7 @@ export default function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <img src={logo} alt={t('brand')} className="h-16 w-56 object-contain object-left" />
+              <img src={logo} alt={t('brand')} className="h-20 w-72 object-contain object-left" />
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-steel">{t('footer.about')}</p>
           </div>
