@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { createOrderThunk } from '../store/thunks/ordersThunk'
+import { getProductsThunk } from '../store/thunks/getProductsThunk'
 import { clearCart } from '../store/slices/cartSlice'
 import { formatPrice } from '../utils/format'
 import { useToast } from '../hooks/useToast'
@@ -93,6 +94,7 @@ export default function CheckoutPage() {
         total: subtotal,
       }))
       dispatch(clearCart())
+      dispatch(getProductsThunk())
       showToast(t('checkout.orderSuccess'), 'success', 5000)
       setPlaced(true)
     } catch {

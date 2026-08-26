@@ -52,6 +52,32 @@ async function start() {
 
   const server = jsonServer.create()
   const router = jsonServer.router(dbPath)
+
+  // Migrate products created before variant support. Their stock did not get
+  // decremented by older orders, so subtract existing order quantities once.
+  const existingOrders = router.db.get('orders').value()
+  router.db.get('products').value().forEach((product) => {
+    if (product.variants?.length) return
+
+    const orderedQuantity = existingOrders.reduce((sum, order) => (
+      sum + (order.items || [])
+        .filter((item) => Number(item.productId) === Number(product.id))
+        .reduce((itemSum, item) => itemSum + (Number(item.qty) || 0), 0)
+    ), 0)
+    const stock = Math.max(0, (Number(product.stock) || 0) - orderedQuantity)
+    const variant = {
+      storage: product.storage?.[0] || 'Standart',
+      color: product.colors?.[0]?.name || '',
+      stock,
+    }
+
+    router.db
+      .get('products')
+      .find({ id: product.id })
+      .assign({ variants: [variant], stock })
+      .write()
+  })
+
   // json-server's defaults() serves static files from ./public by default, which
   // would shadow API resources sharing a name with a folder in there (e.g. the
   // public/products/ image folder colliding with the /products API route).
