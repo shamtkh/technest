@@ -21,9 +21,9 @@ async function request(url, options = {}) {
 // compute total stock from variants
 function computeStock(product) {
   if (product.variants && product.variants.length > 0) {
-    return product.variants.reduce((sum, v) => sum + (v.stock || 0), 0)
+    return product.variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0)
   }
-  return product.stock || 0
+  return Number(product.stock) || 0
 }
 
 export const api = {
@@ -39,17 +39,19 @@ export const api = {
   },
 
   async createProduct(payload) {
-    return request('/products', {
+    const product = await request('/products', {
       method: 'POST',
       body: JSON.stringify(payload),
     })
+    return { ...product, stock: computeStock(product) }
   },
 
   async updateProduct(id, payload) {
-    return request(`/products/${id}`, {
+    const product = await request(`/products/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
     })
+    return { ...product, stock: computeStock(product) }
   },
 
   async deleteProduct(id) {

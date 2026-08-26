@@ -74,6 +74,46 @@ async function start() {
     next()
   })
 
+  function normalizeProductPayload(payload) {
+    const product = { ...payload }
+    const storage = Array.isArray(product.storage) && product.storage.length
+      ? product.storage
+      : ['Standart']
+    const variants = Array.isArray(product.variants) ? product.variants.filter(Boolean) : []
+
+    if (!variants.length) {
+      product.variants = [{ storage: storage[0], color: '', stock: Number(product.stock) || 0 }]
+    } else {
+      product.variants = variants.map((variant) => ({
+        ...variant,
+        storage: variant.storage || storage[0],
+        color: variant.color || '',
+        stock: Math.max(0, Number(variant.stock) || 0),
+      }))
+    }
+    product.storage = storage
+    product.stock = product.variants.reduce((sum, variant) => sum + variant.stock, 0)
+    return product
+  }
+
+  server.post('/products', (req, res) => {
+    const product = normalizeProductPayload(req.body)
+    const products = router.db.get('products').value()
+    const nextId = products.length ? Math.max(...products.map((item) => Number(item.id) || 0)) + 1 : 1
+    const record = { ...product, id: nextId }
+    router.db.get('products').push(record).write()
+    res.status(201).json(record)
+  })
+
+  server.patch('/products/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const current = router.db.get('products').find({ id }).value()
+    if (!current) return res.status(404).json({ error: 'Product not found' })
+    const record = normalizeProductPayload({ ...current, ...req.body })
+    router.db.get('products').find({ id }).assign(record).write()
+    res.json(router.db.get('products').find({ id }).value())
+  })
+
   // ── POST /auth/login ──
   server.post('/auth/login', (req, res) => {
     const { email, password } = req.body
@@ -126,9 +166,9 @@ async function start() {
     if (record.items && record.items.length) {
       record.items.forEach((item) => {
         const product = router.db.get('products').find({ id: item.productId }).value()
-        if (product && product.variants) {
+        if (product && product.variants?.length) {
           const variantIdx = product.variants.findIndex(
-            (v) => v.storage === item.storage && v.color === item.color
+            (v) => v.storage === (item.storage || 'Standart') && v.color === (item.color || '')
           )
           if (variantIdx !== -1) {
             const newStock = Math.max(0, product.variants[variantIdx].stock - item.qty)
@@ -140,6 +180,9 @@ async function start() {
               .assign({ stock: newStock })
               .write()
           }
+        } else if (product) {
+          const newStock = Math.max(0, (Number(product.stock) || 0) - Number(item.qty || 0))
+          router.db.get('products').find({ id: item.productId }).assign({ stock: newStock }).write()
         }
       })
     }
@@ -175,10 +218,19 @@ async function start() {
     if (order.status === 'pending' && order.items?.length) {
       order.items.forEach((item) => {
         const product = router.db.get('products').find({ id: item.productId }).value()
-        if (!product?.variants) return
+        if (!product) return
+
+        if (!product.variants?.length) {
+          router.db
+            .get('products')
+            .find({ id: item.productId })
+            .assign({ stock: (Number(product.stock) || 0) + Number(item.qty || 0) })
+            .write()
+          return
+        }
 
         const variantIdx = product.variants.findIndex(
-          (variant) => variant.storage === item.storage && variant.color === item.color
+          (variant) => variant.storage === (item.storage || 'Standart') && variant.color === (item.color || '')
         )
         if (variantIdx === -1) return
 

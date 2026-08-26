@@ -85,6 +85,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     pollRef.current = setInterval(() => {
       dispatch(getAllOrdersThunk())
+      dispatch(getProductsThunk())
       dispatch(getAllMessagesThunk())
     }, 12000)
     return () => clearInterval(pollRef.current)
