@@ -670,8 +670,8 @@ export default function AdminDashboard() {
 
       {/* ── Product Create/Edit Modal ── */}
       {modalOpen && (
-        <div className="admin-modal-overlay fixed inset-x-0 bottom-0 top-[5.75rem] z-[100] flex items-start justify-center overflow-hidden bg-ink/60 p-0 sm:inset-0 sm:items-center sm:p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
-          <div onClick={(e) => e.stopPropagation()} className="admin-product-modal mt-0 flex w-full max-w-2xl flex-col rounded-2xl bg-white p-5 modal-enter sm:mt-0 sm:p-7">
+        <div className="admin-modal-overlay fixed inset-0 z-[100] flex items-start justify-center overflow-hidden bg-ink/60 p-0 sm:items-center sm:p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
+          <div onClick={(e) => e.stopPropagation()} className="admin-product-modal mt-[5.75rem] flex w-full max-w-2xl flex-col rounded-2xl bg-white p-5 modal-enter sm:mt-0 sm:p-7">
             <h3 className="mb-4 shrink-0 bg-white pb-1 font-display text-lg font-semibold text-ink-soft">
               {editingId ? t('admin.editProduct') : t('admin.addProduct')}
             </h3>

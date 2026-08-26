@@ -171,6 +171,11 @@ input:focus-visible { outline: none; }
   display: none;
 }
 
+.product-editor-open header {
+  position: relative;
+  z-index: 110;
+}
+
 .admin-product-modal {
   height: min(86vh, 52rem);
   max-height: calc(100dvh - 2rem);
