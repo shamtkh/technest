@@ -667,7 +667,7 @@ export default function AdminDashboard() {
       {/* ── Product Create/Edit Modal ── */}
       {modalOpen && (
         <div className="admin-modal-overlay fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-ink/60 p-2 sm:p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
-          <div onClick={(e) => e.stopPropagation()} className="admin-product-modal flex w-full max-w-lg flex-col rounded-2xl bg-white p-4 modal-enter sm:p-6">
+          <div onClick={(e) => e.stopPropagation()} className="admin-product-modal flex w-full max-w-2xl flex-col rounded-2xl bg-white p-5 modal-enter sm:p-7">
             <h3 className="mb-4 font-display text-lg font-semibold text-ink-soft">
               {editingId ? t('admin.editProduct') : t('admin.addProduct')}
             </h3>
@@ -709,9 +709,9 @@ export default function AdminDashboard() {
                 </div>
                 <div className="space-y-2">
                   {form.variants.map((variant, index) => (
-                    <div key={index} className="grid grid-cols-[1fr_1fr_3rem_5rem_2rem] gap-2">
-                      <input className="input" placeholder="128GB" value={variant.storage} onChange={(e) => updateVariant(index, { storage: e.target.value })} />
-                      <input className="input" placeholder="Titanium" value={variant.color} onChange={(e) => updateVariant(index, { color: e.target.value })} />
+                    <div key={index} className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_3rem_minmax(4rem,0.65fr)_2rem] gap-2">
+                      <input className="input min-w-0" placeholder="128GB" value={variant.storage} onChange={(e) => updateVariant(index, { storage: e.target.value })} />
+                      <input className="input min-w-0" placeholder="Titanium" value={variant.color} onChange={(e) => updateVariant(index, { color: e.target.value })} />
                       <input
                         className="variant-color-picker"
                         type="color"
@@ -720,7 +720,7 @@ export default function AdminDashboard() {
                         aria-label={`Цвет ${variant.color || index + 1}`}
                         title="Выбрать цвет"
                       />
-                      <input className="input" type="number" min="0" value={variant.stock} onChange={(e) => updateVariant(index, { stock: Number(e.target.value) })} />
+                      <input className="input min-w-0" type="number" min="0" value={variant.stock} onChange={(e) => updateVariant(index, { stock: Number(e.target.value) })} />
                       <button type="button" onClick={() => setForm({ ...form, variants: form.variants.filter((_, i) => i !== index) })} className="text-danger" aria-label="Variantni o'chirish">×</button>
                     </div>
                   ))}

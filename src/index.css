@@ -168,8 +168,9 @@ input:focus-visible { outline: none; }
 }
 
 .admin-product-modal {
-  height: min(90vh, 56rem);
-  max-height: calc(100dvh - 1rem);
+  height: min(86vh, 52rem);
+  max-height: calc(100dvh - 2rem);
+  box-shadow: var(--shadow-realistic-lg);
 }
 
 .admin-product-form {
@@ -185,12 +186,14 @@ input:focus-visible { outline: none; }
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable;
+  padding-bottom: 0.25rem;
 }
 
 @media (max-width: 639px) {
   .admin-product-modal {
     height: calc(100dvh - 1rem);
     max-height: calc(100dvh - 1rem);
+    padding: 1.25rem;
   }
 
   .admin-form-actions {
