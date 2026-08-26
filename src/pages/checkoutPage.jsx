@@ -92,7 +92,7 @@ export default function CheckoutPage() {
           color: i.color,
         })),
         total: subtotal,
-      }))
+      })).unwrap()
       dispatch(clearCart())
       dispatch(getProductsThunk())
       showToast(t('checkout.orderSuccess'), 'success', 5000)

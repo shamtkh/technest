@@ -284,7 +284,8 @@ export default function AdminDashboard() {
 
   async function handleStatusChange(orderId, status) {
     setStatusUpdating(orderId)
-    await dispatch(updateOrderStatusThunk({ orderId, status }))
+    await dispatch(updateOrderStatusThunk({ orderId, status })).unwrap()
+    await dispatch(getProductsThunk())
     setStatusUpdating(null)
     const lbl = t(`admin.status${status[0].toUpperCase()}${status.slice(1)}`)
     showToast(`Buyurtma #${orderId} holati: ${lbl}`, 'success')

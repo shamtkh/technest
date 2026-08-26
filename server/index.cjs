@@ -122,6 +122,17 @@ async function start() {
     return product
   }
 
+  function findProduct(productId) {
+    return router.db.get('products').value().find((product) => Number(product.id) === Number(productId))
+  }
+
+  function getOrderVariant(product, item) {
+    if (!product?.variants?.length) return null
+    const storage = item.storage || product.storage?.[0] || 'Standart'
+    const color = item.color || ''
+    return product.variants.find((variant) => variant.storage === storage && variant.color === color)
+  }
+
   server.post('/products', (req, res) => {
     const product = normalizeProductPayload(req.body)
     const products = router.db.get('products').value()
@@ -179,7 +190,21 @@ async function start() {
   server.post('/orders', (req, res) => {
     const body = req.body
     const orders = router.db.get('orders').value()
-    const nextId = orders.length ? Math.max(...orders.map((o) => o.id)) + 1 : 1
+    const nextId = orders.length ? Math.max(...orders.map((order) => Number(order.id) || 0)) + 1 : 1
+
+    for (const item of body.items || []) {
+      const product = findProduct(item.productId)
+      const requestedQuantity = Number(item.qty) || 0
+      if (!product || requestedQuantity <= 0) {
+        return res.status(400).json({ error: 'INVALID_ORDER_ITEM' })
+      }
+
+      const variant = getOrderVariant(product, item)
+      const availableStock = variant ? Number(variant.stock) || 0 : Number(product.stock) || 0
+      if (requestedQuantity > availableStock) {
+        return res.status(409).json({ error: 'INSUFFICIENT_STOCK' })
+      }
+    }
 
     const record = {
       ...body,
@@ -191,16 +216,15 @@ async function start() {
     // decrement variant stock in memory + disk via lowdb
     if (record.items && record.items.length) {
       record.items.forEach((item) => {
-        const product = router.db.get('products').find({ id: item.productId }).value()
+        const product = findProduct(item.productId)
         if (product && product.variants?.length) {
-          const variantIdx = product.variants.findIndex(
-            (v) => v.storage === (item.storage || 'Standart') && v.color === (item.color || '')
-          )
+          const variant = getOrderVariant(product, item)
+          const variantIdx = variant ? product.variants.indexOf(variant) : -1
           if (variantIdx !== -1) {
-            const newStock = Math.max(0, product.variants[variantIdx].stock - item.qty)
+            const newStock = Math.max(0, (Number(product.variants[variantIdx].stock) || 0) - Number(item.qty || 0))
             router.db
               .get('products')
-              .find({ id: item.productId })
+              .find((entry) => Number(entry.id) === Number(item.productId))
               .get('variants')
               .nth(variantIdx)
               .assign({ stock: newStock })
@@ -208,7 +232,12 @@ async function start() {
           }
         } else if (product) {
           const newStock = Math.max(0, (Number(product.stock) || 0) - Number(item.qty || 0))
-          router.db.get('products').find({ id: item.productId }).assign({ stock: newStock }).write()
+          router.db.get('products').find((entry) => Number(entry.id) === Number(item.productId)).assign({ stock: newStock }).write()
+        }
+        const updatedProduct = findProduct(item.productId)
+        if (updatedProduct?.variants?.length) {
+          const totalStock = updatedProduct.variants.reduce((sum, variant) => sum + (Number(variant.stock) || 0), 0)
+          router.db.get('products').find((entry) => Number(entry.id) === Number(item.productId)).assign({ stock: totalStock }).write()
         }
       })
     }
