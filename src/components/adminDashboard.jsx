@@ -95,9 +95,17 @@ export default function AdminDashboard() {
     const previousOverflow = document.body.style.overflow
     document.body.classList.add('product-editor-open')
     document.body.style.overflow = 'hidden'
+    const header = document.querySelector('header')
+    const updateHeaderHeight = () => {
+      document.documentElement.style.setProperty('--admin-header-height', `${header?.getBoundingClientRect().height || 0}px`)
+    }
+    updateHeaderHeight()
+    window.addEventListener('resize', updateHeaderHeight)
     return () => {
+      window.removeEventListener('resize', updateHeaderHeight)
       document.body.classList.remove('product-editor-open')
       document.body.style.overflow = previousOverflow
+      document.documentElement.style.removeProperty('--admin-header-height')
     }
   }, [modalOpen])
 
@@ -671,7 +679,7 @@ export default function AdminDashboard() {
       {/* ── Product Create/Edit Modal ── */}
       {modalOpen && (
         <div className="admin-modal-overlay fixed inset-0 z-[100] flex items-start justify-center overflow-hidden bg-ink/60 p-0 sm:items-center sm:p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
-          <div onClick={(e) => e.stopPropagation()} className="admin-product-modal mt-[5.75rem] flex w-full max-w-2xl flex-col rounded-2xl bg-white p-5 modal-enter sm:mt-0 sm:p-7">
+          <div onClick={(e) => e.stopPropagation()} className="admin-product-modal flex w-full max-w-2xl flex-col rounded-2xl bg-white p-5 modal-enter sm:p-7">
             <h3 className="mb-4 shrink-0 bg-white pb-1 font-display text-lg font-semibold text-ink-soft">
               {editingId ? t('admin.editProduct') : t('admin.addProduct')}
             </h3>
