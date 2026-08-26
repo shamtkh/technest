@@ -32,7 +32,14 @@ const ORDER_STATUSES = [
 
 const EMPTY_FORM = {
   name: '', brand: '', category: 'phones', price: '', oldPrice: '',
-  stock: '', storage: '', description: { uz: '', ru: '', en: '' }, images: [], variants: [], specs: null,
+  stock: '', storage: '', description: { uz: '', ru: '', en: '' }, images: [], variants: [],
+  specs: [
+    { key: 'display', value: '' },
+    { key: 'chip', value: '' },
+    { key: 'ram', value: '' },
+    { key: 'camera', value: '' },
+    { key: 'battery', value: '' },
+  ],
 }
 const SEEN_MESSAGES_KEY = 'technest_admin_seen_messages'
 
@@ -205,7 +212,7 @@ export default function AdminDashboard() {
       price: product.price, oldPrice: product.oldPrice || '', stock: product.stock,
       storage: (product.storage || []).join(', '), description: descriptions,
       images: product.images || [],
-      specs: product.specs || null,
+      specs: normalizeSpecs(product.specs),
       variants: (product.variants || []).map((variant) => ({
         ...variant,
         hex: variant.hex || product.colors?.find((color) => color.name === variant.color)?.hex || '#1c1c1e',
@@ -229,7 +236,11 @@ export default function AdminDashboard() {
       variants: form.variants,
       description: form.description,
       images: form.images.length ? form.images : [getProductFallbackImage(form)],
-      specs: form.specs || { display: '—', chip: '—', ram: '—', camera: '—', battery: '—' },
+      specs: form.specs.reduce((result, spec) => {
+        const key = spec.key.trim()
+        if (key) result[key] = spec.value.trim() || '—'
+        return result
+      }, {}),
       rating: editingProduct?.rating ?? 4.5,
       reviews: editingProduct?.reviews ?? 0,
       featured: editingProduct?.featured ?? false,
@@ -289,6 +300,10 @@ export default function AdminDashboard() {
 
   function updateVariant(index, changes) {
     setForm((prev) => ({ ...prev, variants: prev.variants.map((variant, i) => i === index ? { ...variant, ...changes } : variant) }))
+  }
+
+  function updateSpec(index, changes) {
+    setForm((prev) => ({ ...prev, specs: prev.specs.map((spec, i) => i === index ? { ...spec, ...changes } : spec) }))
   }
 
   function removeImage(index) {
@@ -392,7 +407,7 @@ export default function AdminDashboard() {
             </button>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-line bg-white">
+          <div className="admin-list-surface overflow-x-auto rounded-2xl border border-line bg-white">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
                 <tr className="border-b border-line spec-strip uppercase text-steel">
@@ -441,7 +456,7 @@ export default function AdminDashboard() {
               </tbody>
             </table>
           </div>
-          <section className="mt-6 rounded-2xl border border-line bg-white p-5">
+          <section className="admin-list-surface mt-6 rounded-2xl border border-line bg-white p-5">
             <h2 className="mb-4 font-display text-lg font-semibold text-ink-soft">{t('admin.users')}</h2>
             <div className="divide-y divide-line">
               {users.map((registeredUser) => (
@@ -644,12 +659,12 @@ export default function AdminDashboard() {
 
       {/* ── Product Create/Edit Modal ── */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
-          <div onClick={(e) => e.stopPropagation()} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 modal-enter">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-ink/60 p-2 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:items-center sm:p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
+          <div onClick={(e) => e.stopPropagation()} className="flex max-h-[calc(100dvh-0.5rem)] w-full max-w-lg flex-col rounded-2xl bg-white p-4 modal-enter sm:max-h-[90vh] sm:p-6">
             <h3 className="mb-4 font-display text-lg font-semibold text-ink-soft">
               {editingId ? t('admin.editProduct') : t('admin.addProduct')}
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="min-h-0 space-y-3 overflow-y-auto overscroll-contain pr-1">
               <Field label={t('admin.name')} error={errors.name}>
                 <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input" />
               </Field>
@@ -703,6 +718,23 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               </div>
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-medium text-steel">{t('admin.specifications')}</span>
+                  <button type="button" onClick={() => setForm({ ...form, specs: [...form.specs, { key: '', value: '' }] })} className="text-xs font-semibold text-accent">
+                    + {t('admin.addSpecification')}
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {form.specs.map((spec, index) => (
+                    <div key={index} className="grid grid-cols-[1fr_1.4fr_2rem] gap-2">
+                      <input className="input" placeholder={t('admin.specificationName')} value={spec.key} onChange={(e) => updateSpec(index, { key: e.target.value })} />
+                      <input className="input" placeholder={t('admin.specificationValue')} value={spec.value} onChange={(e) => updateSpec(index, { value: e.target.value })} />
+                      <button type="button" onClick={() => setForm({ ...form, specs: form.specs.filter((_, i) => i !== index) })} className="text-danger" aria-label={t('admin.removeSpecification')}>×</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <Field label={t('product.description')}>
                 <div className="space-y-2">
                   {orderedDescriptionLanguages.map((language) => (
@@ -742,7 +774,7 @@ export default function AdminDashboard() {
                   </div>
                 )}
               </Field>
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="sticky bottom-0 flex justify-end gap-2 bg-white pt-3">
                 <button type="button" onClick={() => setModalOpen(false)} className="btn-glass rounded-full border border-line px-4 py-2 text-sm font-medium">
                   {t('admin.cancel')}
                 </button>
@@ -816,4 +848,12 @@ function Field({ label, error, children }) {
       {error && <span className="mt-1 block text-xs text-danger">{error}</span>}
     </label>
   )
+}
+
+function normalizeSpecs(specs) {
+  if (Array.isArray(specs)) return specs.map((spec) => ({ key: spec.key || '', value: spec.value || '' }))
+  if (specs && typeof specs === 'object') {
+    return Object.entries(specs).map(([key, value]) => ({ key, value: String(value ?? '') }))
+  }
+  return EMPTY_FORM.specs.map((spec) => ({ ...spec }))
 }

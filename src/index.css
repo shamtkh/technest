@@ -157,6 +157,16 @@ input:focus-visible { outline: none; }
 }
 .admin-image-remove:hover { background: #dc2626; }
 
+.admin-list-surface {
+  contain: layout paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 420px;
+}
+
+.admin-list-surface table {
+  contain: layout style;
+}
+
 .glass-select {
   position: relative;
   width: 100%;

@@ -376,19 +376,16 @@ export default function ProductPage() {
             <div className="mt-8 rounded-2xl border border-line bg-white p-5">
               <h3 className="mb-3 font-display text-sm font-semibold text-ink-soft">{t('product.specs')}</h3>
               <dl className="grid grid-cols-2 gap-y-2 spec-strip">
-                {[
-                  [t('product.display'), product.specs.display],
-                  [t('product.chip'), product.specs.chip],
-                  [t('product.ram'), product.specs.ram],
-                  [t('product.camera'), product.specs.camera],
-                  [t('product.battery'), product.specs.battery],
-                  [t('product.brand'), product.brand],
-                ].map(([label, value]) => (
-                  <div key={label} className="contents">
-                    <dt className="text-steel">{label}</dt>
+                {Object.entries(product.specs || {}).map(([key, value]) => (
+                  <div key={key} className="contents">
+                    <dt className="text-steel">{t(`product.${key}`, { defaultValue: key })}</dt>
                     <dd className="text-ink-soft">{value}</dd>
                   </div>
                 ))}
+                <div className="contents">
+                  <dt className="text-steel">{t('product.brand')}</dt>
+                  <dd className="text-ink-soft">{product.brand}</dd>
+                </div>
               </dl>
             </div>
           </div>
