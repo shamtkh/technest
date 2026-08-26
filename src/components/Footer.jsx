@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import logo from '../assets/technest-logo.jpg'
-import BrandLogo from './BrandLogo'
+import logo from '../assets/technest-logo-footer.png'
 import { FaTelegram, FaPhone } from 'react-icons/fa6'
 
 export default function Footer() {
@@ -13,7 +12,7 @@ export default function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <BrandLogo src={logo} alt={t('brand')} className="h-10 w-36 object-cover object-center grayscale invert brightness-150 contrast-125" />
+              <img src={logo} alt={t('brand')} className="h-10 w-36 object-contain object-left" />
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-steel">{t('footer.about')}</p>
           </div>

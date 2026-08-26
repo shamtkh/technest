@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import SearchBar from './searchBar'
 import { logout } from '../store/slices/authSlice'
 import { FaBell, FaHouse, FaMagnifyingGlass, FaBagShopping, FaTableCellsLarge, FaClipboardList, FaUser } from 'react-icons/fa6'
-import logo from '../assets/technest-logo.jpg'
+import logo from '../assets/technest-logo-navbar.png'
 import BrandLogo from './BrandLogo'
 
 const LANGS = [
