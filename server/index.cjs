@@ -56,6 +56,7 @@ async function start() {
   // Migrate products created before variant support. Their stock did not get
   // decremented by older orders, so subtract existing order quantities once.
   const existingOrders = router.db.get('orders').value()
+  let migratedProducts = false
   router.db.get('products').value().forEach((product) => {
     if (product.variants?.length) return
 
@@ -76,7 +77,9 @@ async function start() {
       .find({ id: product.id })
       .assign({ variants: [variant], stock })
       .write()
+    migratedProducts = true
   })
+  if (migratedProducts) await backupToCloud()
 
   // json-server's defaults() serves static files from ./public by default, which
   // would shadow API resources sharing a name with a folder in there (e.g. the
