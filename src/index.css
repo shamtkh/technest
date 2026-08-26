@@ -368,7 +368,7 @@ input:focus-visible { outline: none; }
 
 @media (min-width: 1024px) {
   .mobile-navbar-logo { transform: none; }
-  .mobile-navbar-brand { margin-left: 0; }
+  .mobile-navbar-brand { margin-left: 4px; }
   .mobile-navbar-drawer-logo { margin-left: 0; }
 }
 
