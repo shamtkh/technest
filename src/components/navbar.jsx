@@ -53,7 +53,7 @@ export default function Navbar() {
       <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <BrandLogo src={logo} alt={t('brand')} className="h-10 w-36 object-cover object-center" />
+          <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-logo h-10 w-36 object-cover object-center" />
         </Link>
 
         <nav className="hidden items-center gap-6 lg:flex">
@@ -186,7 +186,7 @@ export default function Navbar() {
         <div className="mobile-drawer-backdrop lg:hidden" onClick={() => setMobileOpen(false)}>
           <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
             <div className="mobile-drawer-header">
-              <BrandLogo src={logo} alt={t('brand')} className="h-9 w-32 object-cover object-center" />
+              <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-logo h-9 w-32 object-cover object-center" />
               <button type="button" className="navbar-icon flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white group" onClick={() => setMobileOpen(false)} aria-label="Close menu">
                 <span aria-hidden="true" className="block text-lg font-medium transition-transform duration-300 group-hover:rotate-90">×</span>
               </button>
