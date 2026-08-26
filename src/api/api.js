@@ -120,6 +120,13 @@ export const api = {
     })
   },
 
+  async markMessageRead(messageId) {
+    return request(`/messages/${messageId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ readAt: new Date().toISOString() }),
+    })
+  },
+
   async getUsers() {
     const users = await request('/users')
     return users.map((user) => {

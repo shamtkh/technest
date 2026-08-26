@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { getMyMessagesThunk } from '../thunks/getMyMessagesThunk'
 import { getAllMessagesThunk } from '../thunks/getAllMessagesThunk'
 import { sendMessageThunk } from '../thunks/sendMessageThunk'
+import { markMessageReadThunk } from '../thunks/markMessageReadThunk'
 
 const initialState = {
   myMessages: [],
@@ -85,6 +86,11 @@ const chatSlice = createSlice({
         const msg = action.payload
         if (msg.sender === 'user') state.myMessages.push(msg)
         else state.allMessages.push(msg)
+      })
+      .addCase(markMessageReadThunk.fulfilled, (state, action) => {
+        const updated = action.payload
+        const message = state.myMessages.find((item) => item.id === updated.id)
+        if (message) Object.assign(message, updated)
       })
   },
 })

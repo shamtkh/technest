@@ -254,7 +254,8 @@
     "chatPlaceholder": "Type your message...",
     "send": "Send",
     "newMessageToast": "New message from support",
-    "messageRead": "Message read"
+    "messageRead": "Message read",
+    "messageSent": "Message sent"
   },
   "footer": {
     "about": "TechNest — selling genuine electronics in Uzbekistan since 2019.",

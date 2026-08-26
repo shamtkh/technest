@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { getMyMessagesThunk } from '../store/thunks/getMyMessagesThunk'
 import { sendMessageThunk } from '../store/thunks/sendMessageThunk'
 import { markMyMessagesRead } from '../store/slices/chatSlice'
+import { markMessageReadThunk } from '../store/thunks/markMessageReadThunk'
 import { useToast } from '../hooks/useToast'
 import { FaHeadset, FaXmark, FaTelegram, FaPhone, FaPaperPlane, FaCommentDots, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 
@@ -86,6 +87,9 @@ export default function SupportWidget() {
     setView('chat')
     const adminMessageIds = messages.filter((message) => message.sender === 'admin').map((message) => message.id)
     localStorage.setItem(`technest_seen_support_${user.id}`, JSON.stringify(adminMessageIds))
+    messages
+      .filter((message) => message.sender === 'admin' && !message.readAt)
+      .forEach((message) => dispatch(markMessageReadThunk(message.id)))
     dispatch(markMyMessagesRead())
   }
 

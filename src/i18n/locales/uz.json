@@ -254,7 +254,8 @@
     "chatPlaceholder": "Xabaringizni yozing...",
     "send": "Yuborish",
     "newMessageToast": "Yordam xizmatidan yangi xabar",
-    "messageRead": "Xabar o'qildi"
+    "messageRead": "Xabar o'qildi",
+    "messageSent": "Xabar yuborildi"
   },
   "footer": {
     "about": "TechNest — 2019 yildan buyon O'zbekistonda original elektronika sotuvchisi.",

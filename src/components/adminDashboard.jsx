@@ -673,6 +673,11 @@ export default function AdminDashboard() {
                   >
                     {m.text}
                   </div>
+                        {m.sender === 'admin' && (
+                          <span className="mr-2 mt-0.5 text-[11px] font-semibold tracking-[-2px] text-accent" aria-label={m.readAt ? t('support.messageRead') : t('support.messageSent')}>
+                            {m.readAt ? '✓✓' : '✓'}
+                          </span>
+                        )}
                 </div>
               ))}
             </div>
