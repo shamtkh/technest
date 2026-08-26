@@ -252,7 +252,9 @@
     "chatLoginRequired": "Sign in to message the admin",
     "chatEmpty": "No messages yet. Say hi!",
     "chatPlaceholder": "Type your message...",
-    "send": "Send"
+    "send": "Send",
+    "newMessageToast": "New message from support",
+    "messageRead": "Message read"
   },
   "footer": {
     "about": "TechNest — selling genuine electronics in Uzbekistan since 2019.",

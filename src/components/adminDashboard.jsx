@@ -184,16 +184,27 @@ export default function AdminDashboard() {
   const conversations = useMemo(() => {
     const byUser = new Map()
     for (const message of allMessages) {
-      if (!byUser.has(message.userId)) byUser.set(message.userId, [])
-      byUser.get(message.userId).push(message)
+      const userKey = String(message.userId)
+      if (!byUser.has(userKey)) byUser.set(userKey, [])
+      byUser.get(userKey).push(message)
     }
+    users.filter((registeredUser) => registeredUser.role !== 'admin').forEach((registeredUser) => {
+      const userKey = String(registeredUser.id)
+      if (!byUser.has(userKey)) byUser.set(userKey, [])
+    })
     return [...byUser.entries()]
       .map(([userId, msgs]) => {
         const sorted = [...msgs].sort((a, b) => a.id - b.id)
-        return { userId, userName: sorted[sorted.length - 1].userName, messages: sorted, lastMessage: sorted[sorted.length - 1] }
+        const registeredUser = users.find((user) => String(user.id) === userId)
+        return {
+          userId: registeredUser?.id ?? userId,
+          userName: sorted[sorted.length - 1]?.userName || registeredUser?.name || t('admin.noName'),
+          messages: sorted,
+          lastMessage: sorted[sorted.length - 1],
+        }
       })
-      .sort((a, b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt))
-  }, [allMessages])
+      .sort((a, b) => new Date(b.lastMessage?.createdAt || 0) - new Date(a.lastMessage?.createdAt || 0))
+  }, [allMessages, t, users])
 
   const activeConversation = conversations.find((c) => c.userId === activeConversationId) || null
 
@@ -615,12 +626,16 @@ export default function AdminDashboard() {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-display text-sm font-semibold text-ink-soft">{conv.userName}</span>
-                    <span className="spec-strip shrink-0 text-steel">
-                      {new Date(conv.lastMessage.createdAt).toLocaleString(i18n.language)}
-                    </span>
+                    {conv.lastMessage && (
+                      <span className="spec-strip shrink-0 text-steel">
+                        {new Date(conv.lastMessage.createdAt).toLocaleString(i18n.language)}
+                      </span>
+                    )}
                   </div>
                   <p className="mt-1 truncate text-sm text-steel">
-                    {conv.lastMessage.sender === 'admin' ? `${t('admin.you')}: ` : ''}{conv.lastMessage.text}
+                    {conv.lastMessage
+                      ? `${conv.lastMessage.sender === 'admin' ? `${t('admin.you')}: ` : ''}${conv.lastMessage.text}`
+                      : t('support.chatEmpty')}
                   </p>
                 </button>
               ))}

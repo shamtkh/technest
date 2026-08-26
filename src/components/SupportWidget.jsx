@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { getMyMessagesThunk } from '../store/thunks/getMyMessagesThunk'
 import { sendMessageThunk } from '../store/thunks/sendMessageThunk'
-import { resetMyUnreadCount } from '../store/slices/chatSlice'
+import { markMyMessagesRead } from '../store/slices/chatSlice'
+import { useToast } from '../hooks/useToast'
 import { FaHeadset, FaXmark, FaTelegram, FaPhone, FaPaperPlane, FaCommentDots, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 
 const TELEGRAM_HANDLE = '@TkhrVv1'
@@ -15,6 +16,7 @@ const PHONE_HREF = 'tel:+998970004525'
 export default function SupportWidget() {
   const { t } = useTranslation()
   const dispatch = useDispatch()
+  const { showToast } = useToast()
   const user = useSelector((s) => s.auth.user)
   const messages = useSelector((s) => s.chat.myMessages)
   const unreadCount = useSelector((s) => s.chat.myUnreadCount)
@@ -25,6 +27,7 @@ export default function SupportWidget() {
   const [text, setText] = useState('')
   const rootRef = useRef(null)
   const listRef = useRef(null)
+  const lastNotifiedUnread = useRef(null)
 
   useEffect(() => {
     if (!user || isAdmin) return
@@ -34,10 +37,32 @@ export default function SupportWidget() {
   }, [user, isAdmin, dispatch])
 
   useEffect(() => {
+    if (!user || isAdmin || unreadCount === undefined) return
+    if (lastNotifiedUnread.current === null) {
+      lastNotifiedUnread.current = unreadCount
+      if (unreadCount > 0 && !(open && view === 'chat')) {
+        showToast(`💬 ${t('support.newMessageToast')}`, 'info', 5000)
+      }
+      return
+    }
+    if (unreadCount > lastNotifiedUnread.current && !(open && view === 'chat')) {
+      showToast(`💬 ${t('support.newMessageToast')}`, 'info', 5000)
+    }
+    lastNotifiedUnread.current = unreadCount
+  }, [isAdmin, open, showToast, t, unreadCount, user, view])
+
+  useEffect(() => {
     if (open && view === 'chat' && listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight
     }
   }, [open, view, messages])
+
+  useEffect(() => {
+    if (!user || isAdmin || !open || view !== 'chat') return
+    const adminMessageIds = messages.filter((message) => message.sender === 'admin').map((message) => message.id)
+    localStorage.setItem(`technest_seen_support_${user.id}`, JSON.stringify(adminMessageIds))
+    if (unreadCount > 0) dispatch(markMyMessagesRead())
+  }, [dispatch, isAdmin, messages, open, unreadCount, user, view])
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -59,7 +84,9 @@ export default function SupportWidget() {
 
   function openChat() {
     setView('chat')
-    dispatch(resetMyUnreadCount())
+    const adminMessageIds = messages.filter((message) => message.sender === 'admin').map((message) => message.id)
+    localStorage.setItem(`technest_seen_support_${user.id}`, JSON.stringify(adminMessageIds))
+    dispatch(markMyMessagesRead())
   }
 
   function handleSend(e) {
@@ -153,12 +180,19 @@ export default function SupportWidget() {
                   )}
                   {messages.map((m) => (
                     <div key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div
-                        className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm leading-snug ${
-                          m.sender === 'user' ? 'bg-accent text-white' : 'bg-paper-dim text-ink-soft'
-                        }`}
-                      >
-                        {m.text}
+                      <div className="flex max-w-[80%] flex-col items-end">
+                        <div
+                          className={`rounded-2xl px-3 py-2 text-sm leading-snug ${
+                            m.sender === 'user' ? 'bg-accent text-white' : 'bg-paper-dim text-ink-soft'
+                          }`}
+                        >
+                          {m.text}
+                        </div>
+                        {m.sender === 'user' && (
+                          <span className="mr-2 mt-0.5 text-[11px] font-semibold tracking-[-2px] text-accent" aria-label={t('support.messageRead')}>
+                            ✓✓
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}

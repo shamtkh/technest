@@ -17,11 +17,22 @@ const initialState = {
   allInitialized: false,
 }
 
+function getSeenMessageIds(userId) {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(`technest_seen_support_${userId}`) || '[]'))
+  } catch {
+    return new Set()
+  }
+}
+
 const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
     resetMyUnreadCount(state) {
+      state.myUnreadCount = 0
+    },
+    markMyMessagesRead(state) {
       state.myUnreadCount = 0
     },
     resetAdminUnreadCount(state) {
@@ -36,16 +47,13 @@ const chatSlice = createSlice({
       })
       .addCase(getMyMessagesThunk.fulfilled, (state, action) => {
         state.myStatus = 'succeeded'
-        const previousIds = new Set(state.myMessages.map((m) => m.id))
         state.myMessages = action.payload
-        if (!state.myInitialized) {
-          state.myInitialized = true
-        } else {
-          const newAdminReplies = action.payload.filter(
-            (m) => m.sender === 'admin' && !previousIds.has(m.id)
-          ).length
-          if (newAdminReplies > 0) state.myUnreadCount += newAdminReplies
-        }
+        const userId = action.payload[0]?.userId
+        const seenIds = userId === undefined ? new Set() : getSeenMessageIds(userId)
+        state.myUnreadCount = action.payload.filter(
+          (message) => message.sender === 'admin' && !seenIds.has(message.id)
+        ).length
+        state.myInitialized = true
       })
       .addCase(getMyMessagesThunk.rejected, (state, action) => {
         state.myStatus = 'failed'
@@ -81,5 +89,5 @@ const chatSlice = createSlice({
   },
 })
 
-export const { resetMyUnreadCount, resetAdminUnreadCount } = chatSlice.actions
+export const { resetMyUnreadCount, markMyMessagesRead, resetAdminUnreadCount } = chatSlice.actions
 export default chatSlice.reducer
