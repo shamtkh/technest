@@ -11,6 +11,7 @@ import { deleteOrderThunk } from '../store/thunks/deleteOrderThunk'
 import { resetNewOrdersCount } from '../store/slices/ordersSlice'
 import { getAllMessagesThunk } from '../store/thunks/getAllMessagesThunk'
 import { sendMessageThunk } from '../store/thunks/sendMessageThunk'
+import { clearConversationThunk } from '../store/thunks/clearConversationThunk'
 import { resetAdminUnreadCount } from '../store/slices/chatSlice'
 import { validateProductForm } from '../validations/createProductValidate'
 import { handleImageChange } from '../core/handlemageChange'
@@ -67,6 +68,7 @@ export default function AdminDashboard() {
   const [deletingOrderId, setDeletingOrderId] = useState(null)
   const [selectedStat, setSelectedStat] = useState(null)
   const [statusUpdating, setStatusUpdating] = useState(null)
+  const [clearingConversation, setClearingConversation] = useState(false)
   const [orderSearch, setOrderSearch] = useState('')
   const pollRef = useRef(null)
   const knownOrderIds = useRef(null)
@@ -331,6 +333,15 @@ export default function AdminDashboard() {
       text: trimmed,
     }))
     setReplyText('')
+  }
+
+  async function handleClearConversation() {
+    if (!activeConversation || !window.confirm(t('admin.confirmClearChat'))) return
+    setClearingConversation(true)
+    await dispatch(clearConversationThunk(activeConversation.userId)).unwrap()
+    setActiveConversationId(null)
+    setClearingConversation(false)
+    showToast(t('admin.chatCleared'), 'success')
   }
 
   function updateVariant(index, changes) {
@@ -654,30 +665,40 @@ export default function AdminDashboard() {
           >
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <h3 className="font-display text-base font-semibold text-ink-soft">{activeConversation.userName}</h3>
-              <button
-                type="button"
-                onClick={() => setActiveConversationId(null)}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-line text-steel hover:text-ink-soft"
-                aria-label={t('common.close')}
-              >
-                <FaXmark size={14} aria-hidden="true" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button type="button" onClick={handleClearConversation} disabled={clearingConversation} className="rounded-full border border-danger px-3 py-1.5 text-xs font-medium text-danger hover:bg-red-50 disabled:opacity-50">
+                  {t('admin.clearChat')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveConversationId(null)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-line text-steel hover:text-ink-soft"
+                  aria-label={t('common.close')}
+                >
+                  <FaXmark size={14} aria-hidden="true" />
+                </button>
+              </div>
             </div>
             <div className="flex-1 space-y-2 overflow-y-auto p-4">
               {activeConversation.messages.map((m) => (
                 <div key={m.id} className={`flex ${m.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm leading-snug ${
+                  <div className="flex max-w-[80%] flex-col">
+                    <div
+                    className={`rounded-2xl px-3 py-2 text-sm leading-snug ${
                       m.sender === 'admin' ? 'bg-accent text-white' : 'bg-paper-dim text-ink-soft'
                     }`}
                   >
                     {m.text}
-                  </div>
+                    </div>
                         {m.sender === 'admin' && (
                           <span className="mr-2 mt-0.5 text-[11px] font-semibold tracking-[-2px] text-accent" aria-label={m.readAt ? t('support.messageRead') : t('support.messageSent')}>
                             {m.readAt ? '✓✓' : '✓'}
                           </span>
                         )}
+                        <span className={`mt-0.5 text-[10px] ${m.sender === 'admin' ? 'self-end text-accent/70' : 'text-steel'}`}>
+                          {new Date(m.createdAt).toLocaleString(i18n.language, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                  </div>
                 </div>
               ))}
             </div>

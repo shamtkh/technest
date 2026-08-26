@@ -306,6 +306,13 @@ async function start() {
     res.status(204).end()
   })
 
+  // Clear one shared support conversation for both the admin and customer.
+  server.delete('/messages/user/:userId', (req, res) => {
+    const userId = Number(req.params.userId)
+    router.db.get('messages').remove((message) => Number(message.userId) === userId).write()
+    res.status(204).end()
+  })
+
   server.use(router)
 
   const PORT = process.env.PORT || 3001

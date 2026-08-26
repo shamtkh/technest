@@ -255,7 +255,10 @@
     "send": "Yuborish",
     "newMessageToast": "Yordam xizmatidan yangi xabar",
     "messageRead": "Xabar o'qildi",
-    "messageSent": "Xabar yuborildi"
+    "messageSent": "Xabar yuborildi",
+    "clearChat": "Chatni tozalash",
+    "confirmClearChat": "Bu foydalanuvchi bilan barcha yozishmalar tozalansinmi?",
+    "chatCleared": "Yozishmalar tozalandi"
   },
   "footer": {
     "about": "TechNest — 2019 yildan buyon O'zbekistonda original elektronika sotuvchisi.",

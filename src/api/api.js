@@ -127,6 +127,10 @@ export const api = {
     })
   },
 
+  async clearConversation(userId) {
+    await request(`/messages/user/${userId}`, { method: 'DELETE' })
+  },
+
   async getUsers() {
     const users = await request('/users')
     return users.map((user) => {

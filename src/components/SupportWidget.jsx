@@ -15,7 +15,7 @@ const PHONE_DISPLAY = '+998 97 000 45 25'
 const PHONE_HREF = 'tel:+998970004525'
 
 export default function SupportWidget() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
   const { showToast } = useToast()
   const user = useSelector((s) => s.auth.user)
@@ -29,6 +29,12 @@ export default function SupportWidget() {
   const rootRef = useRef(null)
   const listRef = useRef(null)
   const lastNotifiedUnread = useRef(null)
+
+  function formatMessageTime(createdAt) {
+    return new Date(createdAt).toLocaleString(i18n.language, {
+      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+    })
+  }
 
   useEffect(() => {
     if (!user || isAdmin) return
@@ -197,6 +203,9 @@ export default function SupportWidget() {
                             ✓✓
                           </span>
                         )}
+                        <span className={`mt-0.5 text-[10px] ${m.sender === 'user' ? 'mr-2 text-accent/70' : 'ml-2 text-steel'}`}>
+                          {formatMessageTime(m.createdAt)}
+                        </span>
                       </div>
                     </div>
                   ))}

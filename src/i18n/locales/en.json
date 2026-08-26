@@ -255,7 +255,10 @@
     "send": "Send",
     "newMessageToast": "New message from support",
     "messageRead": "Message read",
-    "messageSent": "Message sent"
+    "messageSent": "Message sent",
+    "clearChat": "Clear chat",
+    "confirmClearChat": "Clear the entire conversation with this user?",
+    "chatCleared": "Conversation cleared"
   },
   "footer": {
     "about": "TechNest — selling genuine electronics in Uzbekistan since 2019.",

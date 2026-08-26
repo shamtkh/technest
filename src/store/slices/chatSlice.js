@@ -3,6 +3,7 @@ import { getMyMessagesThunk } from '../thunks/getMyMessagesThunk'
 import { getAllMessagesThunk } from '../thunks/getAllMessagesThunk'
 import { sendMessageThunk } from '../thunks/sendMessageThunk'
 import { markMessageReadThunk } from '../thunks/markMessageReadThunk'
+import { clearConversationThunk } from '../thunks/clearConversationThunk'
 
 const initialState = {
   myMessages: [],
@@ -91,6 +92,11 @@ const chatSlice = createSlice({
         const updated = action.payload
         const message = state.myMessages.find((item) => item.id === updated.id)
         if (message) Object.assign(message, updated)
+      })
+      .addCase(clearConversationThunk.fulfilled, (state, action) => {
+        const userId = String(action.payload)
+        state.myMessages = state.myMessages.filter((message) => String(message.userId) !== userId)
+        state.allMessages = state.allMessages.filter((message) => String(message.userId) !== userId)
       })
   },
 })
