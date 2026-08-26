@@ -226,7 +226,7 @@ export default function SupportWidget() {
       >
         {open ? <FaXmark size={20} aria-hidden="true" /> : <FaHeadset size={22} aria-hidden="true" />}
         {!open && unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1 font-mono-tabular text-[10px] font-semibold text-white">
+          <span className="absolute right-0 top-0 z-10 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-danger px-1 font-mono-tabular text-[10px] font-semibold leading-none text-white shadow-sm">
             {unreadCount}
           </span>
         )}
