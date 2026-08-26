@@ -167,6 +167,10 @@ input:focus-visible { outline: none; }
   contain: layout style;
 }
 
+.product-editor-open .mobile-tab-bar {
+  display: none;
+}
+
 .admin-product-modal {
   height: min(86vh, 52rem);
   max-height: calc(100dvh - 2rem);
