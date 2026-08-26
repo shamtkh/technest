@@ -69,7 +69,7 @@ export default function AdminDashboard() {
   const [statusUpdating, setStatusUpdating] = useState(null)
   const [orderSearch, setOrderSearch] = useState('')
   const pollRef = useRef(null)
-  const knownPendingOrderIds = useRef(null)
+  const knownOrderIds = useRef(null)
 
   // ── Initial data loads ──
   useEffect(() => {
@@ -88,7 +88,12 @@ export default function AdminDashboard() {
       dispatch(getProductsThunk())
       dispatch(getAllMessagesThunk())
     }, 12000)
-    return () => clearInterval(pollRef.current)
+    const refreshOnFocus = () => dispatch(getAllOrdersThunk())
+    window.addEventListener('focus', refreshOnFocus)
+    return () => {
+      clearInterval(pollRef.current)
+      window.removeEventListener('focus', refreshOnFocus)
+    }
   }, [dispatch])
 
   useEffect(() => {
@@ -152,21 +157,19 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (ordersStatus !== 'succeeded') return
 
-    const pendingOrderIds = new Set(
-      orders.filter((order) => order.status === 'pending').map((order) => order.id)
-    )
+    const orderIds = new Set(orders.map((order) => String(order.id)))
 
-    if (!knownPendingOrderIds.current) {
-      knownPendingOrderIds.current = pendingOrderIds
+    if (!knownOrderIds.current) {
+      knownOrderIds.current = orderIds
       return
     }
 
-    const newPendingOrders = [...pendingOrderIds].filter((id) => !knownPendingOrderIds.current.has(id)).length
-    if (newPendingOrders > 0) {
-      showToast(`🔔 ${newPendingOrders} ${t('admin.newOrdersToast')}`, 'info', 5000)
+    const newOrders = [...orderIds].filter((id) => !knownOrderIds.current.has(id)).length
+    if (newOrders > 0) {
+      showToast(`🔔 ${newOrders} ${t('admin.newOrdersToast')}`, 'info', 5000)
     }
 
-    knownPendingOrderIds.current = pendingOrderIds
+    knownOrderIds.current = orderIds
   }, [orders, ordersStatus, showToast, t])
 
   const stats = useMemo(() => {
