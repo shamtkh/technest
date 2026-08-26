@@ -279,6 +279,7 @@
     "currency": "UZS",
     "loading": "Loading...",
     "error": "Something went wrong",
+    "retry": "Try again",
     "close": "Close",
     "back": "Back",
     "forbidden": "Access denied",

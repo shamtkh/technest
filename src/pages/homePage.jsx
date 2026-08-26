@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { getProductsThunk } from '../store/thunks/getProductsThunk'
 import ProductCard from '../components/ProductCard'
 import PageTransition from '../components/PageTransition'
+import { HomePageSkeleton } from '../components/Skeleton'
 
 const CATEGORY_IMAGES = {
   phones: '/HomePageImg.jpg',
@@ -23,6 +24,11 @@ export default function HomePage() {
   }, [status, dispatch])
 
   const featured = items.filter((p) => p.featured).slice(0, 4)
+
+  if (status === 'loading' && items.length === 0) return <HomePageSkeleton />
+  if (status === 'failed' && items.length === 0) {
+    return <div className="mx-auto max-w-7xl px-4 py-24 text-center text-steel"><p>{t('common.error')}</p><button onClick={() => dispatch(getProductsThunk())} className="mt-4 rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">{t('common.retry')}</button></div>
+  }
 
   return (
     <PageTransition>

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { getMyOrdersThunk } from '../store/thunks/getMyOrdersThunk'
 import { formatPrice } from '../utils/format'
+import { OrdersSkeleton, Skeleton } from '../components/Skeleton'
 
 const STATUS_CONFIG = {
   pending:   { labelKey: 'statusPending', cls: 'status-pending',   icon: '⏳' },
@@ -26,11 +27,11 @@ export default function OrdersPage() {
   }, [user, dispatch])
 
   if (status === 'loading') {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center text-steel page-enter">
-        {t('common.loading')}
-      </div>
-    )
+    return <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8 page-enter"><Skeleton className="mb-6 h-8 w-40" /><OrdersSkeleton /></div>
+  }
+
+  if (status === 'failed') {
+    return <div className="mx-auto max-w-3xl px-4 py-24 text-center text-steel page-enter"><p>{t('common.error')}</p><button onClick={() => user && dispatch(getMyOrdersThunk(user.id))} className="mt-4 rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">{t('common.retry')}</button></div>
   }
 
   if (status === 'succeeded' && items.length === 0) {

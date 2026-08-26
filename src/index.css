@@ -27,6 +27,27 @@
   --shadow-realistic-lg: 0 2px 4px rgba(15, 18, 26, 0.08), 0 24px 48px -16px rgba(15, 18, 26, 0.24);
 }
 
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.45rem;
+  background: rgba(136, 145, 163, 0.16);
+}
+.skeleton::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.48), transparent);
+  transform: translateX(-100%);
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+@keyframes skeleton-shimmer {
+  to { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after { animation: none; }
+}
+
 html {
   scroll-behavior: smooth;
 }

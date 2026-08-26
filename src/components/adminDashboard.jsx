@@ -21,6 +21,7 @@ import { getProductFallbackImage } from '../utils/productImages'
 import GlassSelect from './GlassSelect'
 import api from '../api/api'
 import { FaBoxOpen, FaBoxesStacked, FaChartLine, FaClock, FaDollarSign, FaTriangleExclamation, FaUsers, FaXmark, FaPaperPlane, FaHeadset } from 'react-icons/fa6'
+import { AdminDashboardSkeleton } from './Skeleton'
 
 const CATEGORIES = ['phones', 'laptops', 'accessories', 'watches']
 
@@ -232,6 +233,10 @@ export default function AdminDashboard() {
     ...descriptionLanguages.filter((language) => language.code === i18n.language),
     ...descriptionLanguages.filter((language) => language.code !== i18n.language),
   ]
+
+  if (productStatus === 'loading' && ordersStatus === 'loading' && products.length === 0 && orders.length === 0) {
+    return <AdminDashboardSkeleton />
+  }
 
   function openCreate() {
     setEditingId(null); setEditingProduct(null); setForm(EMPTY_FORM); setErrors({}); setModalOpen(true)

@@ -10,6 +10,7 @@ import { useToast } from '../hooks/useToast'
 import { formatPrice } from '../utils/format'
 import { getProductFallbackImage, getProductImages } from '../utils/productImages'
 import { FaArrowRight, FaBagShopping, FaCheck, FaMinus, FaPlus, FaTrashCan } from 'react-icons/fa6'
+import { ProductDetailSkeleton } from '../components/Skeleton'
 
 export default function ProductPage() {
   const { id } = useParams()
@@ -29,6 +30,7 @@ export default function ProductPage() {
   const [storage, setStorage] = useState('')
   const [color, setColor] = useState('')
   const [loadedProductId, setLoadedProductId] = useState(null)
+  const [loadedImages, setLoadedImages] = useState({})
 
   useEffect(() => {
     if (status === 'idle') dispatch(getProductsThunk())
@@ -39,6 +41,7 @@ export default function ProductPage() {
     setStorage(product.storage?.[0] || '')
     setColor(product.colors?.[0]?.name || '')
     setActiveImage(0)
+    setLoadedImages({})
   }
 
   // ── Keyboard navigation for gallery ──
@@ -63,11 +66,11 @@ export default function ProductPage() {
   )
 
   if (status === 'loading' && !product) {
-    return (
-      <PageTransition>
-        <div className="mx-auto max-w-7xl px-4 py-20 text-center text-steel">{t('common.loading')}</div>
-      </PageTransition>
-    )
+    return <PageTransition><ProductDetailSkeleton /></PageTransition>
+  }
+
+  if (status === 'failed' && !product) {
+    return <PageTransition><div className="mx-auto max-w-7xl px-4 py-24 text-center text-steel"><p>{t('common.error')}</p><button onClick={() => dispatch(getProductsThunk())} className="mt-4 rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">{t('common.retry')}</button></div></PageTransition>
   }
 
   if (!product) {
@@ -130,15 +133,17 @@ export default function ProductPage() {
               onKeyDown={handleKeyDown}
               aria-label="Product gallery"
             >
+              {!loadedImages[activeImage] && <div className="absolute inset-0 z-[1] bg-paper-dim"><span className="skeleton absolute inset-0 rounded-none" aria-hidden="true" /></div>}
               {images.map((img, idx) => (
                 <img
                   key={idx}
                   src={img}
                   alt={`${product.name} ${idx + 1}`}
-                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = getProductFallbackImage(product) }}
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = getProductFallbackImage(product); setLoadedImages((loaded) => ({ ...loaded, [idx]: true })) }}
+                  onLoad={() => setLoadedImages((loaded) => ({ ...loaded, [idx]: true }))}
                   className="absolute inset-0 h-full w-full object-contain p-4"
                   style={{
-                    opacity: idx === activeImage ? 1 : 0,
+                    opacity: idx === activeImage && loadedImages[idx] ? 1 : 0,
                     transform: idx === activeImage ? 'scale(1)' : 'scale(1.02)',
                     transition: 'opacity 0.4s ease, transform 0.4s ease',
                   }}

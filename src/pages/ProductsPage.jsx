@@ -6,6 +6,7 @@ import { getProductsThunk } from '../store/thunks/getProductsThunk'
 import ProductCard from '../components/ProductCard'
 import PageTransition from '../components/PageTransition'
 import GlassSelect from '../components/GlassSelect'
+import { ProductGridSkeleton, Skeleton } from '../components/Skeleton'
 
 const CATEGORIES = ['phones', 'laptops', 'accessories', 'watches']
 
@@ -61,6 +62,13 @@ export default function ProductsPage() {
     { value: 'priceDesc', label: t('products.sortPriceDesc') },
     { value: 'rating', label: t('products.sortRating') },
   ]
+
+  if (status === 'loading' && items.length === 0) {
+    return <PageTransition><div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"><div className="mb-6"><Skeleton className="h-8 w-48" /><Skeleton className="mt-2 h-3 w-28" /></div><div className="grid gap-8 lg:grid-cols-[240px_1fr]"><Skeleton className="hidden h-80 rounded-2xl lg:block" /><ProductGridSkeleton /></div></div></PageTransition>
+  }
+  if (status === 'failed' && items.length === 0) {
+    return <PageTransition><div className="mx-auto max-w-7xl px-4 py-24 text-center text-steel"><p>{t('common.error')}</p><button onClick={() => dispatch(getProductsThunk())} className="mt-4 rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">{t('common.retry')}</button></div></PageTransition>
+  }
 
   return (
     <PageTransition>

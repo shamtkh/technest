@@ -14,6 +14,7 @@ export default function ProductCard({ product }) {
   const cartItems = useSelector((s) => s.cart.items)
 
   const [activeImage, setActiveImage] = useState(0)
+  const [loadedImages, setLoadedImages] = useState({})
   const [isDragging, setIsDragging] = useState(false)
   const dragStart = useRef(null)
   const isAdmin = user?.role === 'admin'
@@ -80,17 +81,19 @@ export default function ProductCard({ product }) {
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
       >
+        {!loadedImages[activeImage] && <div className="absolute inset-0 z-[1] bg-paper-dim"><span className="skeleton absolute inset-0 rounded-none" aria-hidden="true" /></div>}
         {images.map((img, idx) => (
           <img
             key={idx}
             src={img}
             alt={product.name}
             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = getProductFallbackImage(product) }}
+            onLoad={() => setLoadedImages((loaded) => ({ ...loaded, [idx]: true }))}
             loading="lazy"
             draggable={false}
             className="absolute inset-0 h-full w-full object-contain p-3"
             style={{
-              opacity: idx === activeImage ? 1 : 0,
+              opacity: idx === activeImage && loadedImages[idx] ? 1 : 0,
               transition: 'opacity 0.35s ease',
               pointerEvents: 'none',
             }}
