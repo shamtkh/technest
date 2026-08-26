@@ -200,9 +200,10 @@ input:focus-visible { outline: none; }
 
 @media (max-width: 639px) {
   .admin-product-modal {
-    height: calc(100dvh - var(--admin-header-height, 5.75rem));
-    max-height: calc(100dvh - var(--admin-header-height, 5.75rem));
-    margin-top: var(--admin-header-height, 5.75rem);
+    width: min(100%, 34rem);
+    height: min(78dvh, 42rem);
+    max-height: calc(100dvh - 2rem);
+    margin-top: 0;
     padding: 1.25rem;
   }
 
