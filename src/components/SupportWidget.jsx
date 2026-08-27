@@ -7,7 +7,7 @@ import { sendMessageThunk } from '../store/thunks/sendMessageThunk'
 import { markMyMessagesRead } from '../store/slices/chatSlice'
 import { markMessageReadThunk } from '../store/thunks/markMessageReadThunk'
 import { useToast } from '../hooks/useToast'
-import { FaXmark, FaTelegram, FaPhone, FaPaperPlane, FaCommentDots, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
+import { FaXmark, FaTelegram, FaPhone, FaPaperPlane, FaCommentDots, FaHeadset, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 
 const TELEGRAM_HANDLE = '@TkhrVv1'
 const TELEGRAM_URL = 'https://t.me/TkhrVv1'
@@ -128,13 +128,6 @@ export default function SupportWidget() {
             <div className="flex-1 spec-strip font-bold uppercase tracking-wide text-ink-soft">
               {view === 'chat' ? t('support.chatTitle') : t('support.title')}
             </div>
-            <button
-              onClick={() => setOpen(false)}
-              aria-label={t('common.close')}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-steel hover:text-ink-soft"
-            >
-              <FaXmark size={15} aria-hidden="true" />
-            </button>
           </div>
 
           {view === 'menu' && (
@@ -235,14 +228,10 @@ export default function SupportWidget() {
       <button
         onClick={toggleOpen}
         aria-label={t('support.title')}
-        className="support-widget-button btn-glass relative flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-realistic-lg hover:bg-accent-dim"
+        className="support-widget-button relative flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-realistic-lg hover:bg-accent-dim"
       >
         {open && <FaXmark size={20} aria-hidden="true" />}
-        {!open && unreadCount > 0 && (
-          <span className="support-unread-badge absolute z-10 flex items-center justify-center rounded-full bg-danger px-1 font-mono-tabular text-[10px] font-semibold leading-none text-white">
-            {unreadCount}
-          </span>
-        )}
+        {!open && <FaHeadset size={21} aria-hidden="true" />}
       </button>
     </div>
   )
