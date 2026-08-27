@@ -235,7 +235,7 @@ export default function SupportWidget() {
       <button
         onClick={toggleOpen}
         aria-label={t('support.title')}
-        className="btn-glass relative flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-realistic-lg hover:bg-accent-dim"
+        className="support-widget-button btn-glass relative flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-realistic-lg hover:bg-accent-dim"
       >
         {open ? <FaXmark size={20} aria-hidden="true" /> : <FaHeadset size={22} aria-hidden="true" />}
         {!open && unreadCount > 0 && (
