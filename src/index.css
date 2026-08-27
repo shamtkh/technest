@@ -198,6 +198,14 @@ input:focus-visible { outline: none; }
   box-shadow: var(--shadow-realistic-lg);
 }
 
+.admin-support-modal {
+  min-height: 0;
+  box-shadow: var(--shadow-realistic-lg);
+}
+.admin-support-modal > .flex-1 {
+  min-height: 0;
+}
+
 .admin-product-form {
   display: flex;
   min-height: 0;
@@ -257,15 +265,26 @@ input:focus-visible { outline: none; }
 .confirm-dialog-confirm.is-danger:hover { background: #dc4147; }
 
 .support-unread-badge {
-  right: -0.3rem;
-  top: -0.35rem;
+  right: -0.55rem;
+  top: -0.55rem;
   min-width: 1.35rem;
   height: 1.35rem;
-  border: 3px solid var(--color-paper);
+  border: 3px solid white;
   box-shadow: 0 3px 10px rgba(255, 90, 95, 0.32);
+  transform: translate(0, 0);
 }
 
 @media (max-width: 639px) {
+  .admin-support-overlay {
+    align-items: flex-start;
+    padding-top: calc(var(--admin-header-height, 4.25rem) + 0.5rem);
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+  .admin-support-modal {
+    height: min(calc(100dvh - var(--admin-header-height, 4.25rem) - 6rem), 42rem);
+    max-height: calc(100dvh - var(--admin-header-height, 4.25rem) - 6rem) !important;
+    border-radius: 1.35rem;
+  }
   .admin-modal-overlay {
     align-items: flex-start;
     padding-top: calc(var(--admin-header-height, 4.25rem) + 0.5rem);

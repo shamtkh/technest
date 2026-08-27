@@ -668,10 +668,10 @@ export default function AdminDashboard() {
 
       {/* ── Support conversation modal ── */}
       {activeConversation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setActiveConversationId(null)}>
+        <div className="admin-support-overlay fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setActiveConversationId(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
-            className="flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white modal-enter"
+            className="admin-support-modal flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white modal-enter"
             style={{ maxHeight: '80vh' }}
           >
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
