@@ -159,13 +159,6 @@ export default function AdminDashboard() {
     setActiveConversationId(conversation.userId)
   }
 
-  useEffect(() => {
-    if (!activeConversationId || !supportMessagesRef.current) return
-    requestAnimationFrame(() => {
-      if (supportMessagesRef.current) supportMessagesRef.current.scrollTop = supportMessagesRef.current.scrollHeight
-    })
-  }, [activeConversationId, activeConversation?.messages])
-
   // ── Notify admin of new orders ──
   useEffect(() => {
     if (ordersStatus !== 'succeeded') return
@@ -220,6 +213,13 @@ export default function AdminDashboard() {
   }, [allMessages, t, users])
 
   const activeConversation = conversations.find((c) => c.userId === activeConversationId) || null
+
+  useEffect(() => {
+    if (!activeConversationId || !supportMessagesRef.current) return
+    requestAnimationFrame(() => {
+      if (supportMessagesRef.current) supportMessagesRef.current.scrollTop = supportMessagesRef.current.scrollHeight
+    })
+  }, [activeConversationId, activeConversation?.messages])
 
   const filteredOrders = useMemo(() => {
     if (!orderSearch) return orders
