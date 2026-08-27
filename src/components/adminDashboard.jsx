@@ -58,6 +58,7 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState('products') // 'products' | 'orders' | 'support'
   const [activeConversationId, setActiveConversationId] = useState(null)
   const [replyText, setReplyText] = useState('')
+  const supportMessagesRef = useRef(null)
   const knownMessageIds = useRef(null)
   const seenMessageIds = useRef(new Set(JSON.parse(localStorage.getItem(SEEN_MESSAGES_KEY) || '[]')))
   const hasSeenMessageStore = useRef(localStorage.getItem(SEEN_MESSAGES_KEY) !== null)
@@ -157,6 +158,13 @@ export default function AdminDashboard() {
     localStorage.setItem(SEEN_MESSAGES_KEY, JSON.stringify([...seenMessageIds.current]))
     setActiveConversationId(conversation.userId)
   }
+
+  useEffect(() => {
+    if (!activeConversationId || !supportMessagesRef.current) return
+    requestAnimationFrame(() => {
+      if (supportMessagesRef.current) supportMessagesRef.current.scrollTop = supportMessagesRef.current.scrollHeight
+    })
+  }, [activeConversationId, activeConversation?.messages])
 
   // ── Notify admin of new orders ──
   useEffect(() => {
@@ -690,7 +698,7 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </div>
-            <div className="flex-1 space-y-2 overflow-y-auto p-4">
+            <div ref={supportMessagesRef} className="admin-support-messages flex-1 space-y-2 overflow-y-auto p-4">
               {activeConversation.messages.map((m) => (
                 <div key={m.id} className={`flex ${m.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
                   <div className="flex max-w-[80%] flex-col">

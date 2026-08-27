@@ -205,6 +205,11 @@ input:focus-visible { outline: none; }
 .admin-support-modal > .flex-1 {
   min-height: 0;
 }
+.admin-support-messages {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
 
 .admin-product-form {
   display: flex;
@@ -279,13 +284,14 @@ input:focus-visible { outline: none; }
 
 @media (max-width: 639px) {
   .admin-support-overlay {
-    align-items: flex-start;
-    padding-top: calc(var(--admin-header-height, 4.25rem) + 0.5rem);
-    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    top: 4.5rem;
+    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    align-items: stretch;
+    padding: 0.5rem;
   }
   .admin-support-modal {
-    height: min(calc(100dvh - var(--admin-header-height, 4.25rem) - 6rem), 42rem);
-    max-height: calc(100dvh - var(--admin-header-height, 4.25rem) - 6rem) !important;
+    height: 100%;
+    max-height: none !important;
     border-radius: 1.35rem;
   }
   .admin-modal-overlay {
