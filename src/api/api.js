@@ -128,7 +128,8 @@ export const api = {
   },
 
   async clearConversation(userId) {
-    await request(`/messages/user/${userId}`, { method: 'DELETE' })
+    const messages = await request(`/messages?userId=${encodeURIComponent(userId)}`)
+    await Promise.all(messages.map((message) => request(`/messages/${message.id}`, { method: 'DELETE' })))
   },
 
   async getUsers() {

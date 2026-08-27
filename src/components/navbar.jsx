@@ -74,7 +74,9 @@ export default function Navbar() {
               {LANGS.map((l) => (
                 <button
                   key={l.code}
+                  type="button"
                   onClick={() => changeLang(l.code)}
+                  aria-pressed={i18n.language === l.code}
                   className={`language-option ${i18n.language === l.code ? 'is-active' : ''}`}
                 >
                   {l.label}
@@ -258,7 +260,9 @@ export default function Navbar() {
               {LANGS.map((l) => (
                 <button
                   key={l.code}
+                  type="button"
                   onClick={() => changeLang(l.code)}
+                  aria-pressed={i18n.language === l.code}
                   className={`language-option ${i18n.language === l.code ? 'is-active' : ''}`}
                 >
                   {l.label}
