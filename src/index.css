@@ -281,6 +281,12 @@ input:focus-visible { outline: none; }
 .support-widget-button {
   overflow: visible;
 }
+.support-widget-button::after {
+  opacity: 0;
+}
+.support-widget-button:hover:not(:disabled)::after {
+  opacity: 1;
+}
 
 @media (max-width: 639px) {
   .admin-support-overlay {
