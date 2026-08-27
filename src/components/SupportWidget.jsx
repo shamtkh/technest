@@ -7,7 +7,7 @@ import { sendMessageThunk } from '../store/thunks/sendMessageThunk'
 import { markMyMessagesRead } from '../store/slices/chatSlice'
 import { markMessageReadThunk } from '../store/thunks/markMessageReadThunk'
 import { useToast } from '../hooks/useToast'
-import { FaHeadset, FaXmark, FaTelegram, FaPhone, FaPaperPlane, FaCommentDots, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
+import { FaXmark, FaTelegram, FaPhone, FaPaperPlane, FaCommentDots, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 
 const TELEGRAM_HANDLE = '@TkhrVv1'
 const TELEGRAM_URL = 'https://t.me/TkhrVv1'
@@ -237,7 +237,7 @@ export default function SupportWidget() {
         aria-label={t('support.title')}
         className="support-widget-button btn-glass relative flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-realistic-lg hover:bg-accent-dim"
       >
-        {open ? <FaXmark size={20} aria-hidden="true" /> : <FaHeadset size={22} aria-hidden="true" />}
+        {open && <FaXmark size={20} aria-hidden="true" />}
         {!open && unreadCount > 0 && (
           <span className="support-unread-badge absolute z-10 flex items-center justify-center rounded-full bg-danger px-1 font-mono-tabular text-[10px] font-semibold leading-none text-white">
             {unreadCount}
