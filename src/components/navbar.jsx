@@ -7,6 +7,7 @@ import { logout } from '../store/slices/authSlice'
 import { FaBell, FaHouse, FaMagnifyingGlass, FaBagShopping, FaTableCellsLarge, FaClipboardList, FaUser } from 'react-icons/fa6'
 import logo from '../assets/technest-logo-navbar.png'
 import BrandLogo from './BrandLogo'
+import ConfirmDialog from './ConfirmDialog'
 
 const LANGS = [
   { code: 'uz', label: "UZ" },
@@ -36,6 +37,7 @@ export default function Navbar() {
   function confirmLogout() {
     dispatch(logout())
     setUserMenuOpen(false)
+    setMobileOpen(false)
     setLogoutConfirmOpen(false)
     navigate('/')
   }
@@ -300,15 +302,14 @@ export default function Navbar() {
       </nav>
 
       {logoutConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/50 p-4 sm:items-center" onClick={() => setLogoutConfirmOpen(false)}>
-          <div className="w-full max-w-sm rounded-2xl bg-white p-5 text-center shadow-realistic-lg" onClick={(event) => event.stopPropagation()}>
-            <p className="font-display text-lg font-semibold text-ink-soft">Вы уверены, что хотите выйти?</p>
-            <div className="mt-4 flex justify-center gap-2">
-              <button onClick={() => setLogoutConfirmOpen(false)} className="rounded-full border border-line px-4 py-2 text-sm">Отмена</button>
-              <button onClick={confirmLogout} className="rounded-full bg-danger px-4 py-2 text-sm text-white">Выйти</button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title={t('nav.logoutConfirmTitle')}
+          message={t('nav.logoutConfirmMessage')}
+          confirmLabel={t('nav.logout')}
+          cancelLabel={t('admin.cancel')}
+          onConfirm={confirmLogout}
+          onCancel={() => setLogoutConfirmOpen(false)}
+        />
       )}
     </>
   )

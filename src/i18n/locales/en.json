@@ -10,6 +10,8 @@
     "login": "Sign in",
     "register": "Sign up",
     "logout": "Sign out",
+    "logoutConfirmTitle": "Sign out of your account?",
+    "logoutConfirmMessage": "Are you sure you want to end your current session?",
     "searchPlaceholder": "Search phones, laptops, accessories..."
   },
   "categories": {

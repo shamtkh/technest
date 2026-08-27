@@ -10,6 +10,8 @@
     "login": "Kirish",
     "register": "Ro'yxatdan o'tish",
     "logout": "Chiqish",
+    "logoutConfirmTitle": "Hisobdan chiqilsinmi?",
+    "logoutConfirmMessage": "Joriy sessiyani yakunlashni xohlaysizmi?",
     "searchPlaceholder": "Telefon, noutbuk, aksessuar qidirish..."
   },
   "categories": {

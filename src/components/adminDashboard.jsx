@@ -22,6 +22,7 @@ import GlassSelect from './GlassSelect'
 import api from '../api/api'
 import { FaBoxOpen, FaBoxesStacked, FaChartLine, FaClock, FaDollarSign, FaTriangleExclamation, FaUsers, FaXmark, FaPaperPlane, FaHeadset } from 'react-icons/fa6'
 import { AdminDashboardSkeleton } from './Skeleton'
+import ConfirmDialog from './ConfirmDialog'
 
 const CATEGORIES = ['phones', 'laptops', 'accessories', 'watches']
 
@@ -70,6 +71,7 @@ export default function AdminDashboard() {
   const [selectedStat, setSelectedStat] = useState(null)
   const [statusUpdating, setStatusUpdating] = useState(null)
   const [clearingConversation, setClearingConversation] = useState(false)
+  const [clearConversationConfirmOpen, setClearConversationConfirmOpen] = useState(false)
   const [orderSearch, setOrderSearch] = useState('')
   const pollRef = useRef(null)
   const knownOrderIds = useRef(null)
@@ -341,12 +343,16 @@ export default function AdminDashboard() {
   }
 
   async function handleClearConversation() {
-    if (!activeConversation || !window.confirm(t('admin.confirmClearChat'))) return
+    if (!activeConversation) return
     setClearingConversation(true)
-    await dispatch(clearConversationThunk(activeConversation.userId)).unwrap()
-    setActiveConversationId(null)
-    setClearingConversation(false)
-    showToast(t('admin.chatCleared'), 'success')
+    try {
+      await dispatch(clearConversationThunk(activeConversation.userId)).unwrap()
+      setActiveConversationId(null)
+      setClearConversationConfirmOpen(false)
+      showToast(t('admin.chatCleared'), 'success')
+    } finally {
+      setClearingConversation(false)
+    }
   }
 
   function updateVariant(index, changes) {
@@ -671,7 +677,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <h3 className="font-display text-base font-semibold text-ink-soft">{activeConversation.userName}</h3>
               <div className="flex items-center gap-2">
-                <button type="button" onClick={handleClearConversation} disabled={clearingConversation} className="rounded-full border border-danger px-3 py-1.5 text-xs font-medium text-danger hover:bg-red-50 disabled:opacity-50">
+                <button type="button" onClick={() => setClearConversationConfirmOpen(true)} disabled={clearingConversation} className="clear-chat-button rounded-full px-3 py-1.5 text-xs font-semibold disabled:opacity-50">
                   {t('admin.clearChat')}
                 </button>
                 <button
@@ -725,6 +731,17 @@ export default function AdminDashboard() {
             </form>
           </div>
         </div>
+      )}
+
+      {clearConversationConfirmOpen && activeConversation && (
+        <ConfirmDialog
+          title={t('admin.clearChat')}
+          message={t('admin.confirmClearChat')}
+          confirmLabel={t('admin.confirm')}
+          cancelLabel={t('admin.cancel')}
+          onConfirm={handleClearConversation}
+          onCancel={() => setClearConversationConfirmOpen(false)}
+        />
       )}
 
       {/* ── Product Create/Edit Modal ── */}

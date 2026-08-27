@@ -97,6 +97,8 @@ const chatSlice = createSlice({
         const userId = String(action.payload)
         state.myMessages = state.myMessages.filter((message) => String(message.userId) !== userId)
         state.allMessages = state.allMessages.filter((message) => String(message.userId) !== userId)
+        state.myUnreadCount = 0
+        state.adminUnreadCount = 0
       })
   },
 })

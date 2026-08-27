@@ -10,6 +10,8 @@
     "login": "Войти",
     "register": "Регистрация",
     "logout": "Выйти",
+    "logoutConfirmTitle": "Выйти из аккаунта?",
+    "logoutConfirmMessage": "Вы уверены, что хотите завершить текущий сеанс?",
     "searchPlaceholder": "Поиск телефонов, ноутбуков, аксессуаров..."
   },
   "categories": {
