@@ -743,8 +743,8 @@ export default function AdminDashboard() {
 
       {clearConversationConfirmOpen && activeConversation && (
         <ConfirmDialog
-          title={t('admin.clearChat')}
-          message={t('admin.confirmClearChat')}
+          title={t('support.clearChat')}
+          message={t('support.confirmClearChat')}
           confirmLabel={t('admin.confirm')}
           cancelLabel={t('admin.cancel')}
           onConfirm={handleClearConversation}

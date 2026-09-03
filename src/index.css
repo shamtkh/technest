@@ -595,7 +595,7 @@ button, a {
 button:active:not(:disabled) {
   transform: scale(0.95);
 }
-button:hover:not(:disabled) { transform: scale(1.03); }
+button:hover:not(:disabled):not(.glass-select-trigger):not(.glass-select-option) { transform: scale(1.03); }
 
 .site-header { animation: headerIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
 @keyframes headerIn {
