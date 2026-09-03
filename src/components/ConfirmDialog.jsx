@@ -1,6 +1,18 @@
+import { useEffect } from 'react'
 import { FaTriangleExclamation } from 'react-icons/fa6'
 
 export default function ConfirmDialog({ title, message, confirmLabel, cancelLabel, onConfirm, onCancel, danger = true }) {
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.classList.add('confirm-dialog-open')
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.classList.remove('confirm-dialog-open')
+      document.body.style.overflow = previousOverflow
+    }
+  }, [])
+
   return (
     <div className="confirm-dialog-overlay fixed inset-0 z-[120] flex items-center justify-center bg-ink/55 p-4" onClick={onCancel}>
       <div className="confirm-dialog-panel w-full max-w-md rounded-[1.75rem] p-6 text-center sm:p-8" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="confirm-dialog-title">

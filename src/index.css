@@ -193,6 +193,14 @@ input:focus-visible { outline: none; }
 .product-editor-open .mobile-tab-bar {
   display: none;
 }
+body.admin-modal-open {
+  overscroll-behavior: none;
+}
+.admin-support-overlay,
+.admin-modal-overlay,
+.confirm-dialog-overlay {
+  overscroll-behavior: contain;
+}
 
 .admin-product-modal {
   height: min(86vh, 52rem);

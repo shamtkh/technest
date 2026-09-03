@@ -103,23 +103,36 @@ export default function AdminDashboard() {
   }, [dispatch])
 
   useEffect(() => {
-    if (!modalOpen) return undefined
+    const hasOpenOverlay = modalOpen || activeConversationId !== null || clearConversationConfirmOpen || deletingId !== null || deletingOrderId !== null
+    if (!hasOpenOverlay) return undefined
+
     const previousOverflow = document.body.style.overflow
-    document.body.classList.add('product-editor-open')
+    const wasEditorOpen = document.body.classList.contains('product-editor-open')
+    document.body.classList.add('admin-modal-open')
+    if (modalOpen) document.body.classList.add('product-editor-open')
     document.body.style.overflow = 'hidden'
-    const header = document.querySelector('header')
-    const updateHeaderHeight = () => {
-      document.documentElement.style.setProperty('--admin-header-height', `${header?.getBoundingClientRect().height || 0}px`)
+
+    if (modalOpen) {
+      const header = document.querySelector('header')
+      const updateHeaderHeight = () => {
+        document.documentElement.style.setProperty('--admin-header-height', `${header?.getBoundingClientRect().height || 0}px`)
+      }
+      updateHeaderHeight()
+      window.addEventListener('resize', updateHeaderHeight)
+      return () => {
+        window.removeEventListener('resize', updateHeaderHeight)
+        document.body.classList.remove('admin-modal-open')
+        if (!wasEditorOpen) document.body.classList.remove('product-editor-open')
+        document.body.style.overflow = previousOverflow
+        document.documentElement.style.removeProperty('--admin-header-height')
+      }
     }
-    updateHeaderHeight()
-    window.addEventListener('resize', updateHeaderHeight)
+
     return () => {
-      window.removeEventListener('resize', updateHeaderHeight)
-      document.body.classList.remove('product-editor-open')
+      document.body.classList.remove('admin-modal-open')
       document.body.style.overflow = previousOverflow
-      document.documentElement.style.removeProperty('--admin-header-height')
     }
-  }, [modalOpen])
+  }, [activeConversationId, clearConversationConfirmOpen, deletingId, deletingOrderId, modalOpen])
 
   // ── Notify admin of new support messages ──
   useEffect(() => {
