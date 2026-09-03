@@ -652,7 +652,6 @@ export default function AdminDashboard() {
                   key={conv.userId}
                   onClick={() => openConversation(conv)}
                   className="support-conversation-row w-full rounded-2xl border border-line bg-white p-4 text-left"
-                  style={{ transition: 'border-color 0.2s ease' }}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-display text-sm font-semibold text-ink-soft">{conv.userName}</span>

@@ -214,7 +214,7 @@ input:focus-visible { outline: none; }
 }
 
 .support-conversation-row {
-  transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 .support-conversation-row:hover {
   border-color: rgba(61, 127, 255, 0.42);
@@ -244,7 +244,7 @@ input:focus-visible { outline: none; }
   background: rgba(255, 255, 255, 0.52);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 5px 14px rgba(255, 90, 95, 0.08);
   backdrop-filter: blur(14px);
-  transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .clear-chat-button:hover {
   border-color: rgba(255, 90, 95, 0.72);
@@ -595,7 +595,7 @@ button, a {
 button:active:not(:disabled) {
   transform: scale(0.95);
 }
-button:hover:not(:disabled):not(.glass-select-trigger):not(.glass-select-option) { transform: scale(1.03); }
+button:hover:not(:disabled):not(.glass-select-trigger):not(.glass-select-option):not(.support-conversation-row):not(.clear-chat-button) { transform: scale(1.03); }
 
 .site-header { animation: headerIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
 @keyframes headerIn {
