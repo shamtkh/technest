@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { FaTriangleExclamation } from 'react-icons/fa6'
 
 export default function ConfirmDialog({ title, message, confirmLabel, cancelLabel, onConfirm, onCancel, danger = true }) {
@@ -13,7 +14,7 @@ export default function ConfirmDialog({ title, message, confirmLabel, cancelLabe
     }
   }, [])
 
-  return (
+  return createPortal((
     <div className="confirm-dialog-overlay fixed inset-0 z-[120] flex items-center justify-center bg-ink/55 p-4" onClick={onCancel}>
       <div className="confirm-dialog-panel w-full max-w-md rounded-[1.75rem] p-6 text-center sm:p-8" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="confirm-dialog-title">
         <div className={`confirm-dialog-icon mx-auto mb-4 ${danger ? 'is-danger' : ''}`}>
@@ -27,5 +28,5 @@ export default function ConfirmDialog({ title, message, confirmLabel, cancelLabe
         </div>
       </div>
     </div>
-  )
+  ), document.body)
 }

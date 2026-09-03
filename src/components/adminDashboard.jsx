@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { getProductsThunk } from '../store/thunks/getProductsThunk'
@@ -688,7 +689,8 @@ export default function AdminDashboard() {
 
       {/* ── Support conversation modal ── */}
       {activeConversation && (
-        <div className="admin-support-overlay fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setActiveConversationId(null)}>
+        <ModalPortal>
+          <div className="admin-support-overlay fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setActiveConversationId(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
             className="admin-support-modal flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white modal-enter"
@@ -750,7 +752,8 @@ export default function AdminDashboard() {
               </button>
             </form>
           </div>
-        </div>
+          </div>
+        </ModalPortal>
       )}
 
       {clearConversationConfirmOpen && activeConversation && (
@@ -766,7 +769,8 @@ export default function AdminDashboard() {
 
       {/* ── Product Create/Edit Modal ── */}
       {modalOpen && (
-        <div className="admin-modal-overlay fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-ink/60 p-2 sm:p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
+        <ModalPortal>
+          <div className="admin-modal-overlay fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-ink/60 p-2 sm:p-4 modal-overlay-enter" onClick={() => setModalOpen(false)}>
           <div onClick={(e) => e.stopPropagation()} className="admin-product-modal flex w-full max-w-2xl flex-col rounded-2xl bg-white p-5 modal-enter sm:p-7">
             <h3 className="mb-4 shrink-0 bg-white pb-1 font-display text-lg font-semibold text-ink-soft">
               {editingId ? t('admin.editProduct') : t('admin.addProduct')}
@@ -893,12 +897,14 @@ export default function AdminDashboard() {
               </div>
             </form>
           </div>
-        </div>
+          </div>
+        </ModalPortal>
       )}
 
       {/* ── Delete confirm ── */}
       {deletingId !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setDeletingId(null)}>
+        <ModalPortal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setDeletingId(null)}>
           <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-2xl bg-white p-6 text-center modal-enter">
             <p className="mb-5 text-sm text-ink-soft">{t('admin.confirmDelete')}</p>
             <div className="flex justify-center gap-2">
@@ -910,10 +916,12 @@ export default function AdminDashboard() {
               </button>
             </div>
           </div>
-        </div>
+          </div>
+        </ModalPortal>
       )}
       {deletingOrderId !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setDeletingOrderId(null)}>
+        <ModalPortal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setDeletingOrderId(null)}>
           <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-2xl bg-white p-6 text-center modal-enter">
             <p className="mb-2 font-display text-lg font-semibold text-ink-soft">{t('admin.deleteOrderConfirm')}</p>
             <p className="mb-5 text-sm text-steel">{t('admin.deleteOrderHint')}</p>
@@ -922,10 +930,12 @@ export default function AdminDashboard() {
               <button onClick={() => handleOrderDelete(deletingOrderId)} className="rounded-full bg-danger px-4 py-2 text-sm font-medium text-white">{t('admin.confirm')}</button>
             </div>
           </div>
-        </div>
+          </div>
+        </ModalPortal>
       )}
       {selectedStatData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setSelectedStat(null)}>
+        <ModalPortal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setSelectedStat(null)}>
           <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-realistic-lg modal-enter">
             <div className="flex items-start justify-between gap-4">
               <h2 className="font-display text-xl font-bold text-ink-soft">{selectedStatData.title}</h2>
@@ -943,10 +953,15 @@ export default function AdminDashboard() {
               )}
             </div>
           </div>
-        </div>
+          </div>
+        </ModalPortal>
       )}
     </div>
   )
+}
+
+function ModalPortal({ children }) {
+  return createPortal(children, document.body)
 }
 
 function Field({ label, error, children }) {
