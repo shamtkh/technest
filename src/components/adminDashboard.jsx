@@ -105,7 +105,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const hasOpenOverlay = modalOpen || activeConversationId !== null || clearConversationConfirmOpen || deletingId !== null || deletingOrderId !== null
-    if (!hasOpenOverlay) return undefined
+    if (!hasOpenOverlay) {
+      document.body.classList.remove('admin-modal-open', 'product-editor-open')
+      if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
+      return undefined
+    }
 
     const wasEditorOpen = document.body.classList.contains('product-editor-open')
     document.body.classList.add('admin-modal-open')
@@ -122,12 +126,14 @@ export default function AdminDashboard() {
         window.removeEventListener('resize', updateHeaderHeight)
         document.body.classList.remove('admin-modal-open')
         if (!wasEditorOpen) document.body.classList.remove('product-editor-open')
+        if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
         document.documentElement.style.removeProperty('--admin-header-height')
       }
     }
 
     return () => {
       document.body.classList.remove('admin-modal-open')
+      if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
     }
   }, [activeConversationId, clearConversationConfirmOpen, deletingId, deletingOrderId, modalOpen])
 
