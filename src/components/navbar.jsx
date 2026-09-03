@@ -52,7 +52,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
+      <header className="site-header sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/" className="mobile-navbar-brand flex items-center gap-2 shrink-0">
           <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-logo h-10 w-36 object-cover object-center lg:h-12 lg:w-44" />

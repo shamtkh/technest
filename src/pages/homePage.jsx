@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { getProductsThunk } from '../store/thunks/getProductsThunk'
 import ProductCard from '../components/ProductCard'
 import PageTransition from '../components/PageTransition'
+import Reveal from '../components/Reveal'
 import { HomePageSkeleton } from '../components/Skeleton'
 
 const CATEGORY_IMAGES = {
@@ -84,27 +85,23 @@ export default function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <Reveal as="section" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <h2 className="mb-6 font-display text-2xl font-bold text-ink-soft">{t('home.categoriesTitle')}</h2>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {Object.entries(CATEGORY_IMAGES).map(([cat, img]) => (
-            <Link
-              key={cat}
-              to={`/products?category=${cat}`}
-              className="group relative aspect-[4/5] overflow-hidden rounded-2xl"
-            >
-              <img src={img} alt={t(`categories.${cat}`)} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/0" />
-              <span className="absolute bottom-4 left-4 font-display text-lg font-semibold text-white">
-                {t(`categories.${cat}`)}
-              </span>
-            </Link>
+            <Reveal key={cat} delay={Object.keys(CATEGORY_IMAGES).indexOf(cat) * 55}>
+              <Link to={`/products?category=${cat}`} className="group relative block aspect-[4/5] overflow-hidden rounded-2xl">
+                <img src={img} alt={t(`categories.${cat}`)} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/0" />
+                <span className="absolute bottom-4 left-4 font-display text-lg font-semibold text-white">{t(`categories.${cat}`)}</span>
+              </Link>
+            </Reveal>
           ))}
         </div>
-      </section>
+      </Reveal>
 
       {/* Featured */}
-      <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+      <Reveal as="section" className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-end justify-between">
           <div>
             <h2 className="font-display text-2xl font-bold text-ink-soft">{t('home.featuredTitle')}</h2>
@@ -115,27 +112,29 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {featured.map((p) => <ProductCard key={p.id} product={p} />)}
+          {featured.map((p, index) => <Reveal key={p.id} delay={index * 65}><ProductCard product={p} /></Reveal>)}
         </div>
-      </section>
+      </Reveal>
 
       {/* Why us */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <Reveal as="section" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <h2 className="mb-8 font-display text-2xl font-bold text-ink-soft">{t('home.whyTitle')}</h2>
         <div className="grid gap-6 sm:grid-cols-3">
           {[
             { icon: '01', title: t('home.why1Title'), text: t('home.why1Text') },
             { icon: '02', title: t('home.why2Title'), text: t('home.why2Text') },
             { icon: '03', title: t('home.why3Title'), text: t('home.why3Text') },
-          ].map((f) => (
-            <div key={f.icon} className="rounded-2xl border border-line bg-white p-6">
+          ].map((f, index) => (
+            <Reveal key={f.icon} delay={index * 65}>
+            <div className="rounded-2xl border border-line bg-white p-6">
               <div className="spec-strip text-accent">{f.icon}</div>
               <h3 className="mt-3 font-display text-lg font-semibold text-ink-soft">{f.title}</h3>
               <p className="mt-2 text-sm text-steel">{f.text}</p>
             </div>
+            </Reveal>
           ))}
         </div>
-      </section>
+      </Reveal>
     </div>
     </PageTransition>
   )

@@ -88,6 +88,8 @@ h1, h2, h3, h4, .font-display {
   box-shadow: var(--shadow-realistic-lg);
   border-color: var(--color-steel);
 }
+.card-realistic img { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease; }
+.card-realistic:hover img { transform: scale(1.025); }
 
 .sheen {
   position: relative;
@@ -362,6 +364,7 @@ input:focus-visible { outline: none; }
   backdrop-filter: blur(22px) saturate(145%);
   animation: glassSelectIn 0.18s ease-out both;
 }
+.glass-select.is-closing .glass-select-menu { animation: glassSelectOut 0.18s ease-in both; pointer-events: none; }
 .glass-select-option {
   display: flex;
   width: 100%;
@@ -380,6 +383,10 @@ input:focus-visible { outline: none; }
 @keyframes glassSelectIn {
   from { opacity: 0; transform: translateY(-0.35rem) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes glassSelectOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-0.35rem) scale(0.98); }
 }
 
 .cart-actions-enter {
@@ -579,6 +586,21 @@ button, a {
 button:active:not(:disabled) {
   transform: scale(0.95);
 }
+button:hover:not(:disabled) { transform: scale(1.03); }
+
+.site-header { animation: headerIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes headerIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.scroll-reveal.is-visible { opacity: 1; transform: translateY(0); }
 
 /* ── Keyframe Animations ── */
 @keyframes fadeInUp {
@@ -647,6 +669,26 @@ button:active:not(:disabled) {
 /* ── Page Transitions ── */
 .page-enter {
   animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.page-transition {
+  width: 100%;
+  will-change: opacity, transform;
+}
+.page-transition.page-enter {
+  animation: pageEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.page-transition.page-exit {
+  animation: pageExit 0.16s ease-in both;
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pageExit {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-4px); }
 }
 
 .admin-page-enter {
@@ -732,4 +774,5 @@ button:active:not(:disabled) {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+  .scroll-reveal { opacity: 1; transform: none; }
 }
