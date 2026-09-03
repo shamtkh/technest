@@ -651,7 +651,7 @@ export default function AdminDashboard() {
                 <button
                   key={conv.userId}
                   onClick={() => openConversation(conv)}
-                  className="w-full rounded-2xl border border-line bg-white p-4 text-left hover:border-accent"
+                  className="support-conversation-row w-full rounded-2xl border border-line bg-white p-4 text-left"
                   style={{ transition: 'border-color 0.2s ease' }}
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -686,7 +686,7 @@ export default function AdminDashboard() {
               <h3 className="font-display text-base font-semibold text-ink-soft">{activeConversation.userName}</h3>
               <div className="flex items-center gap-2">
                 <button type="button" onClick={() => setClearConversationConfirmOpen(true)} disabled={clearingConversation} className="clear-chat-button rounded-full px-3 py-1.5 text-xs font-semibold disabled:opacity-50">
-                  {t('admin.clearChat')}
+                  {t('support.clearChat')}
                 </button>
                 <button
                   type="button"
