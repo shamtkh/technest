@@ -193,7 +193,9 @@ input:focus-visible { outline: none; }
 .product-editor-open .mobile-tab-bar {
   display: none;
 }
-body.admin-modal-open {
+body.admin-modal-open,
+body.confirm-dialog-open {
+  overflow: hidden;
   overscroll-behavior: none;
 }
 .admin-support-overlay,
