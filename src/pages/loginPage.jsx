@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -15,6 +15,10 @@ export default function LoginPage() {
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    dispatch(clearAuthError())
+  }, [dispatch])
 
   async function handleSubmit(e) {
     e.preventDefault()
