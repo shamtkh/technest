@@ -1480,6 +1480,13 @@
       "email": "test@mail.ru",
       "password": "123456",
       "role": "customer"
+    },
+    {
+      "id": 7,
+      "name": "TechNest Demo",
+      "email": "demo@technest.uz",
+      "password": "TechNestDemo2026!",
+      "role": "demo"
     }
   ],
   "orders": [
@@ -1627,5 +1634,6 @@
       "createdAt": "2026-08-25T11:11:41.456Z",
       "id": 2
     }
-  ]
+  ],
+  "demoOrders": []
 }

@@ -1,6 +1,10 @@
 {
   "brand": "TechNest",
   "tagline": "Ishonchli texnologiyalar do'koni",
+  "demo": {
+    "badge": "Demo rejimi",
+    "notice": "Demo akkaunt: buyurtmalar sinov uchun, haqiqiy qoldiq va buyurtmalarga ta'sir qilmaydi."
+  },
   "nav": {
     "home": "Bosh sahifa",
     "products": "Katalog",

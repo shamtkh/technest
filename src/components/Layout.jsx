@@ -4,8 +4,12 @@ import Navbar from './navbar'
 import Footer from './Footer'
 import SupportWidget from './SupportWidget'
 import PageTransition from './PageTransition'
+import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 export default function Layout() {
+  const { t } = useTranslation()
+  const isDemo = useSelector((state) => state.auth.user?.role === 'demo')
   const location = useLocation()
   const outlet = useOutlet()
   const [displayedPage, setDisplayedPage] = useState({ key: location.key, outlet })
@@ -28,6 +32,12 @@ export default function Layout() {
   return (
     <div className="flex min-h-screen flex-col bg-paper">
       <Navbar />
+      {isDemo && (
+        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs font-semibold tracking-wide text-amber-900">
+          <span className="mr-2 rounded-full bg-amber-200 px-2 py-1 text-[10px] font-bold uppercase text-amber-950">{t('demo.badge')}</span>
+          {t('demo.notice')}
+        </div>
+      )}
       <main className="flex-1 pb-20 lg:pb-0">
         <PageTransition key={displayedPage.key} phase={phase}>
           {displayedPage.outlet}

@@ -7,6 +7,7 @@
     "dev": "concurrently --kill-others-on-fail --names client,server \"vite\" \"node server/index.cjs\"",
     "dev:client": "vite",
     "dev:server": "node server/index.cjs",
+    "seed:demo": "node server/seedDemo.cjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",

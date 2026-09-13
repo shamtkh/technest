@@ -1,6 +1,10 @@
 {
   "brand": "TechNest",
   "tagline": "Trusted technology store",
+  "demo": {
+    "badge": "Demo mode",
+    "notice": "Demo account: orders are test-only and do not affect real stock or orders."
+  },
   "nav": {
     "home": "Home",
     "products": "Catalog",

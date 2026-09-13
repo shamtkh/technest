@@ -2,6 +2,7 @@ const jsonServer = require('json-server')
 const path = require('path')
 const fs = require('fs')
 const { Pool } = require('pg')
+const { ensureDemoUser } = require('./demoUser.cjs')
 
 const dbPath = path.join(__dirname, '..', 'src', 'data', 'db.json')
 
@@ -52,6 +53,7 @@ async function start() {
 
   const server = jsonServer.create()
   const router = jsonServer.router(dbPath)
+  const demoUser = ensureDemoUser(router)
 
   // Migrate products created before variant support. Their stock did not get
   // decremented by older orders, so subtract existing order quantities once.
@@ -183,6 +185,15 @@ async function start() {
     res.status(201).json(safe)
   })
 
+  // Demo orders live outside the real orders collection and never reserve stock.
+  server.get('/orders', (req, res, next) => {
+    if (String(req.query.userId) !== String(demoUser.id)) return next()
+    const demoOrders = router.db.get('demoOrders').value()
+      .filter((order) => String(order.userId) === String(demoUser.id))
+      .sort((a, b) => Number(b.id) - Number(a.id))
+    res.json(demoOrders)
+  })
+
   // ── GET /users — strip passwords before they ever leave the server ──
   server.get('/users', (_req, res) => {
     const users = router.db.get('users').value()
@@ -192,8 +203,24 @@ async function start() {
   // ── POST /orders — custom: decrement variant stock ──
   server.post('/orders', (req, res) => {
     const body = req.body
+    const isDemoOrder = Number(body.userId) === Number(demoUser.id)
     const orders = router.db.get('orders').value()
     const nextId = orders.length ? Math.max(...orders.map((order) => Number(order.id) || 0)) + 1 : 1
+
+    if (isDemoOrder) {
+      const demoOrders = router.db.get('demoOrders').value()
+      const nextDemoId = demoOrders.length
+        ? Math.max(...demoOrders.map((order) => Number(order.id) || 0)) + 1
+        : 1
+      const demoRecord = {
+        ...body,
+        id: nextDemoId,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      }
+      router.db.get('demoOrders').push(demoRecord).write()
+      return res.status(201).json(demoRecord)
+    }
 
     for (const item of body.items || []) {
       const product = findProduct(item.productId)

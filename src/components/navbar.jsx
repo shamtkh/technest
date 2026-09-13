@@ -145,6 +145,11 @@ export default function Navbar() {
                 </span>
                 <span className="hidden max-w-24 truncate sm:inline">{user.name}</span>
               </button>
+              {user.role === 'demo' && (
+                <span className="absolute -bottom-5 right-0 whitespace-nowrap text-[9px] font-bold uppercase tracking-wider text-amber-700">
+                  {t('demo.badge')}
+                </span>
+              )}
               {userMenuOpen && (
                 <div
                   className="absolute right-0 top-11 w-48 overflow-hidden rounded-xl border border-line bg-white py-1 shadow-realistic-lg modal-enter"
