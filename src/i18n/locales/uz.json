@@ -203,6 +203,8 @@
     "orders": "Buyurtmalar",
     "users": "Foydalanuvchilar",
     "usersEmpty": "Foydalanuvchilar topilmadi",
+    "userDeleted": "Foydalanuvchi o'chirildi",
+    "deleteUserConfirm": "Bu foydalanuvchi o'chirilsinmi?",
     "allOrders": "Barcha buyurtmalar",
     "ordersEmpty": "Buyurtmalar yo'q",
     "ordersEmptyHint": "Foydalanuvchi buyurtmalari bu yerda ko'rinadi",

@@ -73,6 +73,7 @@ export default function AdminDashboard() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
   const [deletingId, setDeletingId] = useState(null)
+  const [deletingUser, setDeletingUser] = useState(null)
   const [deletingOrderId, setDeletingOrderId] = useState(null)
   const [selectedStat, setSelectedStat] = useState(null)
   const [statusUpdating, setStatusUpdating] = useState(null)
@@ -110,7 +111,7 @@ export default function AdminDashboard() {
   }, [dispatch])
 
   useEffect(() => {
-    const hasOpenOverlay = modalOpen || activeConversationId !== null || clearConversationConfirmOpen || deletingId !== null || deletingOrderId !== null || deletingCategory !== null
+    const hasOpenOverlay = modalOpen || activeConversationId !== null || clearConversationConfirmOpen || deletingId !== null || deletingOrderId !== null || deletingCategory !== null || deletingUser !== null
     if (!hasOpenOverlay) {
       document.body.classList.remove('admin-modal-open', 'product-editor-open')
       if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
@@ -141,7 +142,7 @@ export default function AdminDashboard() {
       document.body.classList.remove('admin-modal-open')
       if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
     }
-  }, [activeConversationId, clearConversationConfirmOpen, deletingCategory, deletingId, deletingOrderId, modalOpen])
+  }, [activeConversationId, clearConversationConfirmOpen, deletingCategory, deletingId, deletingOrderId, deletingUser, modalOpen])
 
   // ── Notify admin of new support messages ──
   useEffect(() => {
@@ -391,6 +392,13 @@ export default function AdminDashboard() {
     showToast(t('admin.productDeleted'), 'warning')
   }
 
+  async function handleUserDelete(user) {
+    await api.deleteUser(user.id)
+    setUsers((current) => current.filter((item) => item.id !== user.id))
+    setDeletingUser(null)
+    showToast(t('admin.userDeleted'), 'warning')
+  }
+
   async function handleStatusChange(orderId, status) {
     setStatusUpdating(orderId)
     await dispatch(updateOrderStatusThunk({ orderId, status })).unwrap()
@@ -624,9 +632,16 @@ export default function AdminDashboard() {
             <h2 className="mb-4 font-display text-lg font-semibold text-ink-soft">{t('admin.users')}</h2>
             <div className="divide-y divide-line">
               {users.map((registeredUser) => (
-                <div key={registeredUser.id} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
-                  <span className="font-medium text-ink-soft">{registeredUser.name}</span>
-                  <span className="text-steel">{registeredUser.email}</span>
+                <div key={registeredUser.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
+                  <div className="min-w-0">
+                    <span className="font-medium text-ink-soft">{registeredUser.name}</span>
+                    <span className="ml-3 text-steel">{registeredUser.email}</span>
+                  </div>
+                  {registeredUser.role !== 'admin' && (
+                    <button onClick={() => setDeletingUser(registeredUser)} className="btn-glass rounded-full border border-line px-3 py-1.5 text-xs font-medium text-danger hover:border-danger">
+                      {t('admin.delete')}
+                    </button>
+                  )}
                 </div>
               ))}
               {!users.length && <p className="text-sm text-steel">{t('admin.usersEmpty')}</p>}
@@ -1028,6 +1043,20 @@ export default function AdminDashboard() {
               <div className="flex justify-center gap-2">
                 <button onClick={() => setDeletingCategory(null)} className="rounded-full border border-line px-4 py-2 text-sm font-medium">{t('admin.cancel')}</button>
                 <button onClick={() => handleCategoryDelete(deletingCategory)} className="rounded-full bg-danger px-4 py-2 text-sm font-medium text-white">{t('admin.delete')}</button>
+              </div>
+            </div>
+          </div>
+        </ModalPortal>
+      )}
+      {deletingUser && (
+        <ModalPortal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setDeletingUser(null)}>
+            <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-2xl bg-white p-6 text-center modal-enter">
+              <p className="mb-2 font-display text-lg font-semibold text-ink-soft">{t('admin.deleteUserConfirm')}</p>
+              <p className="mb-5 text-sm text-steel">{deletingUser.name} · {deletingUser.email}</p>
+              <div className="flex justify-center gap-2">
+                <button onClick={() => setDeletingUser(null)} className="rounded-full border border-line px-4 py-2 text-sm font-medium">{t('admin.cancel')}</button>
+                <button onClick={() => handleUserDelete(deletingUser)} className="rounded-full bg-danger px-4 py-2 text-sm font-medium text-white">{t('admin.confirm')}</button>
               </div>
             </div>
           </div>

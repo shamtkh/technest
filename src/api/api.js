@@ -169,6 +169,11 @@ export const api = {
       return safeUser
     })
   },
+
+  async deleteUser(id) {
+    await request(`/users/${encodeURIComponent(id)}`, { method: 'DELETE' })
+    return { id: Number(id) }
+  },
 }
 
 export default api

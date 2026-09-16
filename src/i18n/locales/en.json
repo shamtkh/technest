@@ -203,6 +203,8 @@
     "orders": "Orders",
     "users": "Users",
     "usersEmpty": "No users found",
+    "userDeleted": "User deleted",
+    "deleteUserConfirm": "Delete this user?",
     "allOrders": "All orders",
     "ordersEmpty": "No orders",
     "ordersEmptyHint": "User orders will appear here",
