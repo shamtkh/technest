@@ -7,15 +7,15 @@ import ProductCard from '../components/ProductCard'
 import PageTransition from '../components/PageTransition'
 import GlassSelect from '../components/GlassSelect'
 import { ProductGridSkeleton, Skeleton } from '../components/Skeleton'
-
-const CATEGORIES = ['phones', 'laptops', 'accessories', 'watches']
+import api from '../api/api'
 
 export default function ProductsPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
   const { items, status } = useSelector((s) => s.products)
   const [params, setParams] = useSearchParams()
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [categories, setCategories] = useState([])
 
   const category = params.get('category') || ''
   const brand = params.get('brand') || ''
@@ -26,6 +26,10 @@ export default function ProductsPage() {
   useEffect(() => {
     if (status === 'idle') dispatch(getProductsThunk())
   }, [status, dispatch])
+
+  useEffect(() => {
+    api.getCategories().then(setCategories).catch(() => setCategories([]))
+  }, [])
 
   const brands = useMemo(() => [...new Set(items.map((p) => p.brand))].sort(), [items])
   const priceCeiling = useMemo(() => Math.max(0, ...items.map((p) => p.price)), [items])
@@ -56,6 +60,7 @@ export default function ProductsPage() {
 
   const hasActiveFilters = category || brand || maxPrice || q
   const brandOptions = [{ value: '', label: t('categories.all') }, ...brands.map((item) => ({ value: item, label: item }))]
+  const categoryLabel = (item) => item.labelKey ? t(item.labelKey) : item.name?.[i18n.language] || item.name?.en || item.id
   const sortOptions = [
     { value: '', label: t('products.sortDefault') },
     { value: 'priceAsc', label: t('products.sortPriceAsc') },
@@ -98,13 +103,13 @@ export default function ProductsPage() {
                 >
                   {t('categories.all')}
                 </button>
-                {CATEGORIES.map((c) => (
+                {categories.map((item) => (
                   <button
-                    key={c}
-                    onClick={() => updateParam('category', c)}
-                    className={`text-left text-sm ${category === c ? 'font-semibold text-accent' : 'text-ink-soft hover:text-accent'}`}
+                    key={item.id}
+                    onClick={() => updateParam('category', item.id)}
+                    className={`text-left text-sm ${category === item.id ? 'font-semibold text-accent' : 'text-ink-soft hover:text-accent'}`}
                   >
-                    {t(`categories.${c}`)}
+                    {categoryLabel(item)}
                   </button>
                 ))}
               </div>

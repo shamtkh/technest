@@ -27,6 +27,23 @@ function computeStock(product) {
 }
 
 export const api = {
+  // ---------- categories ----------
+  async getCategories() {
+    return request('/categories')
+  },
+
+  async createCategory(payload) {
+    return request('/categories', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  async deleteCategory(id) {
+    await request(`/categories/${encodeURIComponent(id)}`, { method: 'DELETE' })
+    return { id }
+  },
+
   // ---------- products ----------
   async getProducts() {
     const products = await request('/products')

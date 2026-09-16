@@ -25,8 +25,6 @@ import { FaBoxOpen, FaBoxesStacked, FaChartLine, FaClock, FaDollarSign, FaTriang
 import { AdminDashboardSkeleton } from './Skeleton'
 import ConfirmDialog from './ConfirmDialog'
 
-const CATEGORIES = ['phones', 'laptops', 'accessories', 'watches']
-
 const ORDER_STATUSES = [
   { value: 'pending', labelKey: 'statusPending', cls: 'status-pending' },
   { value: 'accepted', labelKey: 'statusAccepted', cls: 'status-accepted' },
@@ -55,6 +53,10 @@ export default function AdminDashboard() {
   const { items: orders, newOrdersCount, status: ordersStatus } = useSelector((s) => s.orders)
   const { allMessages, adminUnreadCount, allStatus } = useSelector((s) => s.chat)
   const [users, setUsers] = useState([])
+  const [categories, setCategories] = useState([])
+  const [categoryName, setCategoryName] = useState('')
+  const [categoryError, setCategoryError] = useState('')
+  const [deletingCategory, setDeletingCategory] = useState(null)
 
   const [tab, setTab] = useState('products') // 'products' | 'orders' | 'support'
   const [activeConversationId, setActiveConversationId] = useState(null)
@@ -86,6 +88,7 @@ export default function AdminDashboard() {
     dispatch(getAllMessagesThunk())
     dispatch(resetAdminUnreadCount())
     api.getUsers().then(setUsers).catch(() => {})
+    api.getCategories().then(setCategories).catch(() => {})
   }, [dispatch, productStatus])
 
   // ── Poll orders + support messages every 12 seconds ──
@@ -104,7 +107,7 @@ export default function AdminDashboard() {
   }, [dispatch])
 
   useEffect(() => {
-    const hasOpenOverlay = modalOpen || activeConversationId !== null || clearConversationConfirmOpen || deletingId !== null || deletingOrderId !== null
+    const hasOpenOverlay = modalOpen || activeConversationId !== null || clearConversationConfirmOpen || deletingId !== null || deletingOrderId !== null || deletingCategory !== null
     if (!hasOpenOverlay) {
       document.body.classList.remove('admin-modal-open', 'product-editor-open')
       if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
@@ -135,7 +138,7 @@ export default function AdminDashboard() {
       document.body.classList.remove('admin-modal-open')
       if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
     }
-  }, [activeConversationId, clearConversationConfirmOpen, deletingId, deletingOrderId, modalOpen])
+  }, [activeConversationId, clearConversationConfirmOpen, deletingCategory, deletingId, deletingOrderId, modalOpen])
 
   // ── Notify admin of new support messages ──
   useEffect(() => {
@@ -265,7 +268,42 @@ export default function AdminDashboard() {
   }
 
   function openCreate() {
-    setEditingId(null); setEditingProduct(null); setForm(EMPTY_FORM); setErrors({}); setModalOpen(true)
+    setEditingId(null); setEditingProduct(null); setForm({ ...EMPTY_FORM, category: categories[0]?.id || '' }); setErrors({}); setModalOpen(true)
+  }
+
+  function categoryLabel(category) {
+    return category.labelKey ? t(category.labelKey) : category.name?.[i18n.language] || category.name?.en || category.id
+  }
+
+  function categorySlug(value) {
+    const slug = value.trim().toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    return slug || `category-${Date.now()}`
+  }
+
+  async function handleCategoryCreate(e) {
+    e.preventDefault()
+    const name = categoryName.trim()
+    const id = categorySlug(name)
+    if (!name) { setCategoryError(t('admin.categoryNameRequired')); return }
+    if (categories.some((category) => category.id === id)) { setCategoryError(t('admin.categoryExists')); return }
+    const created = await api.createCategory({ id, name: { uz: name, ru: name, en: name } })
+    setCategories((current) => [...current, created])
+    setCategoryName('')
+    setCategoryError('')
+    showToast(`${t('admin.categoryCreated')} ✓`, 'success')
+  }
+
+  async function handleCategoryDelete(category) {
+    if (products.some((product) => product.category === category.id)) {
+      setCategoryError(t('admin.categoryInUse'))
+      setDeletingCategory(null)
+      return
+    }
+    await api.deleteCategory(category.id)
+    setCategories((current) => current.filter((item) => item.id !== category.id))
+    setDeletingCategory(null)
+    setCategoryError('')
+    showToast(t('admin.categoryDeleted'), 'warning')
   }
 
   function openEdit(product) {
@@ -515,7 +553,7 @@ export default function AdminDashboard() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-steel">{p.brand}</td>
-                    <td className="px-4 py-3 text-steel">{t(`categories.${p.category}`)}</td>
+                    <td className="px-4 py-3 text-steel">{categoryLabel(categories.find((category) => category.id === p.category) || { id: p.category })}</td>
                     <td className="px-4 py-3 font-mono-tabular">{formatPrice(p.price)}</td>
                     <td className="px-4 py-3 font-mono-tabular">
                       <span className={p.stock === 0 ? 'text-danger' : p.stock <= 10 ? 'text-amber' : 'text-ink-soft'}>
@@ -537,6 +575,25 @@ export default function AdminDashboard() {
               </tbody>
             </table>
           </div>
+          <section className="admin-list-surface mt-6 rounded-2xl border border-line bg-white p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="font-display text-lg font-semibold text-ink-soft">{t('admin.manageCategories')}</h2>
+              <span className="text-xs text-steel">{categories.length}</span>
+            </div>
+            <form onSubmit={handleCategoryCreate} className="flex flex-col gap-2 sm:flex-row">
+              <input value={categoryName} onChange={(e) => { setCategoryName(e.target.value); setCategoryError('') }} placeholder={t('admin.categoryNamePlaceholder')} className="input flex-1" />
+              <button type="submit" className="btn-glass rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dim">+ {t('admin.addCategory')}</button>
+            </form>
+            {categoryError && <p className="mt-2 text-sm text-danger">{categoryError}</p>}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <div key={category.id} className="flex items-center gap-2 rounded-full border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft">
+                  <span>{categoryLabel(category)}</span>
+                  <button type="button" onClick={() => setDeletingCategory(category)} className="text-danger hover:text-ink" aria-label={`${t('admin.delete')} ${categoryLabel(category)}`}>×</button>
+                </div>
+              ))}
+            </div>
+          </section>
           <section className="admin-list-surface mt-6 rounded-2xl border border-line bg-white p-5">
             <h2 className="mb-4 font-display text-lg font-semibold text-ink-soft">{t('admin.users')}</h2>
             <div className="divide-y divide-line">
@@ -790,7 +847,7 @@ export default function AdminDashboard() {
                   <GlassSelect
                     value={form.category}
                     onChange={(value) => setForm({ ...form, category: value })}
-                    options={CATEGORIES.map((c) => ({ value: c, label: t(`categories.${c}`) }))}
+                    options={categories.map((category) => ({ value: category.id, label: categoryLabel(category) }))}
                   />
                 </Field>
               </div>
@@ -918,6 +975,19 @@ export default function AdminDashboard() {
               </button>
             </div>
           </div>
+          </div>
+        </ModalPortal>
+      )}
+      {deletingCategory && (
+        <ModalPortal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setDeletingCategory(null)}>
+            <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-2xl bg-white p-6 text-center modal-enter">
+              <p className="mb-5 text-sm text-ink-soft">{t('admin.confirmDeleteCategory', { name: categoryLabel(deletingCategory) })}</p>
+              <div className="flex justify-center gap-2">
+                <button onClick={() => setDeletingCategory(null)} className="rounded-full border border-line px-4 py-2 text-sm font-medium">{t('admin.cancel')}</button>
+                <button onClick={() => handleCategoryDelete(deletingCategory)} className="rounded-full bg-danger px-4 py-2 text-sm font-medium text-white">{t('admin.delete')}</button>
+              </div>
+            </div>
           </div>
         </ModalPortal>
       )}
