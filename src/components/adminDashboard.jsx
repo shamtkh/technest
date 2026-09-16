@@ -54,7 +54,7 @@ export default function AdminDashboard() {
   const { allMessages, adminUnreadCount, allStatus } = useSelector((s) => s.chat)
   const [users, setUsers] = useState([])
   const [categories, setCategories] = useState([])
-  const [categoryName, setCategoryName] = useState('')
+  const [categoryNames, setCategoryNames] = useState({ uz: '', ru: '', en: '' })
   const [categoryError, setCategoryError] = useState('')
   const [deletingCategory, setDeletingCategory] = useState(null)
 
@@ -282,13 +282,17 @@ export default function AdminDashboard() {
 
   async function handleCategoryCreate(e) {
     e.preventDefault()
-    const name = categoryName.trim()
-    const id = categorySlug(name)
-    if (!name) { setCategoryError(t('admin.categoryNameRequired')); return }
+    const names = {
+      uz: categoryNames.uz.trim(),
+      ru: categoryNames.ru.trim(),
+      en: categoryNames.en.trim(),
+    }
+    const id = categorySlug(names.en)
+    if (!names.uz || !names.ru || !names.en) { setCategoryError(t('admin.categoryNamesRequired')); return }
     if (categories.some((category) => category.id === id)) { setCategoryError(t('admin.categoryExists')); return }
-    const created = await api.createCategory({ id, name: { uz: name, ru: name, en: name } })
+    const created = await api.createCategory({ id, name: names })
     setCategories((current) => [...current, created])
-    setCategoryName('')
+    setCategoryNames({ uz: '', ru: '', en: '' })
     setCategoryError('')
     showToast(`${t('admin.categoryCreated')} ✓`, 'success')
   }
@@ -580,8 +584,10 @@ export default function AdminDashboard() {
               <h2 className="font-display text-lg font-semibold text-ink-soft">{t('admin.manageCategories')}</h2>
               <span className="text-xs text-steel">{categories.length}</span>
             </div>
-            <form onSubmit={handleCategoryCreate} className="flex flex-col gap-2 sm:flex-row">
-              <input value={categoryName} onChange={(e) => { setCategoryName(e.target.value); setCategoryError('') }} placeholder={t('admin.categoryNamePlaceholder')} className="input flex-1" />
+            <form onSubmit={handleCategoryCreate} className="grid gap-2 sm:grid-cols-[repeat(3,minmax(0,1fr))_auto]">
+              <input required value={categoryNames.uz} onChange={(e) => { setCategoryNames({ ...categoryNames, uz: e.target.value }); setCategoryError('') }} placeholder={t('admin.categoryNameUz')} className="input" />
+              <input required value={categoryNames.ru} onChange={(e) => { setCategoryNames({ ...categoryNames, ru: e.target.value }); setCategoryError('') }} placeholder={t('admin.categoryNameRu')} className="input" />
+              <input required value={categoryNames.en} onChange={(e) => { setCategoryNames({ ...categoryNames, en: e.target.value }); setCategoryError('') }} placeholder={t('admin.categoryNameEn')} className="input" />
               <button type="submit" className="btn-glass rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dim">+ {t('admin.addCategory')}</button>
             </form>
             {categoryError && <p className="mt-2 text-sm text-danger">{categoryError}</p>}
