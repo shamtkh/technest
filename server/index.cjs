@@ -55,6 +55,11 @@ async function start() {
   const router = jsonServer.router(dbPath)
   const demoUser = ensureDemoUser(router)
 
+  if (!router.db.get('supportSettings').value()) {
+    router.db.set('supportSettings', [{ id: 1, telegram: '', phone: '' }]).write()
+    await backupToCloud()
+  }
+
   // Migrate products created before variant support. Their stock did not get
   // decremented by older orders, so subtract existing order quantities once.
   const existingOrders = router.db.get('orders').value()

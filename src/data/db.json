@@ -1438,6 +1438,13 @@
       "labelKey": "categories.watches"
     }
   ],
+  "supportSettings": [
+    {
+      "id": 1,
+      "telegram": "",
+      "phone": ""
+    }
+  ],
   "users": [
     {
       "id": 1,

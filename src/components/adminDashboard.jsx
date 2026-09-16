@@ -57,6 +57,8 @@ export default function AdminDashboard() {
   const [categoryNames, setCategoryNames] = useState({ uz: '', ru: '', en: '' })
   const [categoryError, setCategoryError] = useState('')
   const [deletingCategory, setDeletingCategory] = useState(null)
+  const [supportSettings, setSupportSettings] = useState({ telegram: '', phone: '' })
+  const [supportSettingsStatus, setSupportSettingsStatus] = useState('idle')
 
   const [tab, setTab] = useState('products') // 'products' | 'orders' | 'support'
   const [activeConversationId, setActiveConversationId] = useState(null)
@@ -89,6 +91,7 @@ export default function AdminDashboard() {
     dispatch(resetAdminUnreadCount())
     api.getUsers().then(setUsers).catch(() => {})
     api.getCategories().then(setCategories).catch(() => {})
+    api.getSupportSettings().then(setSupportSettings).catch(() => {})
   }, [dispatch, productStatus])
 
   // ── Poll orders + support messages every 12 seconds ──
@@ -308,6 +311,23 @@ export default function AdminDashboard() {
     setDeletingCategory(null)
     setCategoryError('')
     showToast(t('admin.categoryDeleted'), 'warning')
+  }
+
+  async function handleSupportSettingsSubmit(e) {
+    e.preventDefault()
+    setSupportSettingsStatus('saving')
+    try {
+      const saved = await api.updateSupportSettings({
+        telegram: supportSettings.telegram.trim(),
+        phone: supportSettings.phone.trim(),
+      })
+      setSupportSettings(saved)
+      showToast(`${t('admin.supportContactsSaved')} ✓`, 'success')
+    } catch {
+      showToast(t('common.error'), 'error')
+    } finally {
+      setSupportSettingsStatus('idle')
+    }
   }
 
   function openEdit(product) {
@@ -717,6 +737,22 @@ export default function AdminDashboard() {
       {tab === 'support' && (
         <>
           <h2 className="mb-4 font-display text-lg font-semibold text-ink-soft">{t('admin.support')}</h2>
+
+          <section className="mb-6 rounded-2xl border border-line bg-white p-5">
+            <h3 className="mb-1 font-display text-base font-semibold text-ink-soft">{t('admin.supportContacts')}</h3>
+            <p className="mb-4 text-sm text-steel">{t('admin.supportContactsHint')}</p>
+            <form onSubmit={handleSupportSettingsSubmit} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+              <label className="block text-sm text-ink-soft">
+                <span className="mb-1 block text-xs font-medium text-steel">{t('support.telegramUser')}</span>
+                <input value={supportSettings.telegram} onChange={(e) => setSupportSettings({ ...supportSettings, telegram: e.target.value })} placeholder="@username" className="input" />
+              </label>
+              <label className="block text-sm text-ink-soft">
+                <span className="mb-1 block text-xs font-medium text-steel">{t('support.phoneNumber')}</span>
+                <input value={supportSettings.phone} onChange={(e) => setSupportSettings({ ...supportSettings, phone: e.target.value })} placeholder="+998 90 123 45 67" className="input" />
+              </label>
+              <button type="submit" disabled={supportSettingsStatus === 'saving'} className="btn-glass rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dim disabled:opacity-50">{t('admin.save')}</button>
+            </form>
+          </section>
 
           {conversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line py-20 text-center">

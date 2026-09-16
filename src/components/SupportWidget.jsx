@@ -7,12 +7,8 @@ import { sendMessageThunk } from '../store/thunks/sendMessageThunk'
 import { markMyMessagesRead } from '../store/slices/chatSlice'
 import { markMessageReadThunk } from '../store/thunks/markMessageReadThunk'
 import { useToast } from '../hooks/useToast'
+import api from '../api/api'
 import { FaXmark, FaTelegram, FaPhone, FaPaperPlane, FaCommentDots, FaHeadset, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
-
-const TELEGRAM_HANDLE = '@TkhrVv1'
-const TELEGRAM_URL = 'https://t.me/TkhrVv1'
-const PHONE_DISPLAY = '+998 97 000 45 25'
-const PHONE_HREF = 'tel:+998970004525'
 
 export default function SupportWidget() {
   const { t, i18n } = useTranslation()
@@ -26,6 +22,7 @@ export default function SupportWidget() {
   const [open, setOpen] = useState(false)
   const [view, setView] = useState('menu') // 'menu' | 'chat'
   const [text, setText] = useState('')
+  const [supportSettings, setSupportSettings] = useState({ telegram: '', phone: '' })
   const rootRef = useRef(null)
   const listRef = useRef(null)
   const lastNotifiedUnread = useRef(null)
@@ -35,6 +32,13 @@ export default function SupportWidget() {
       day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
     })
   }
+
+  useEffect(() => {
+    const loadSupportSettings = () => api.getSupportSettings().then(setSupportSettings).catch(() => {})
+    loadSupportSettings()
+    const interval = setInterval(loadSupportSettings, 10000)
+    return () => clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     if (!user || isAdmin) return
@@ -141,24 +145,24 @@ export default function SupportWidget() {
                 onClick={openChat}
               />
               <SupportRow
-                as="a"
-                href={TELEGRAM_URL}
+                as={supportSettings.telegram ? 'a' : 'div'}
+                href={supportSettings.telegram ? `https://t.me/${supportSettings.telegram.replace(/^@/, '')}` : undefined}
                 target="_blank"
                 rel="noreferrer"
                 icon={<FaTelegram size={18} aria-hidden="true" />}
                 iconBg="rgba(38,165,228,0.12)"
                 iconColor="#26A5E4"
                 title={t('support.telegram')}
-                subtitle={TELEGRAM_HANDLE}
+                subtitle={`${t('support.telegramUser')}: ${supportSettings.telegram || t('support.notAdded')}`}
               />
               <SupportRow
-                as="a"
-                href={PHONE_HREF}
+                as={supportSettings.phone ? 'a' : 'div'}
+                href={supportSettings.phone ? `tel:${supportSettings.phone.replace(/[^\d+]/g, '')}` : undefined}
                 icon={<FaPhone size={16} aria-hidden="true" />}
                 iconBg="rgba(34,197,94,0.12)"
                 iconColor="#16a34a"
                 title={t('support.callUs')}
-                subtitle={PHONE_DISPLAY}
+                subtitle={`${t('support.phoneNumber')}: ${supportSettings.phone || t('support.notAdded')}`}
               />
             </div>
           )}
@@ -239,7 +243,7 @@ export default function SupportWidget() {
 
 function SupportRow({ as = 'button', icon, iconBg, iconColor, title, subtitle, onClick, href, target, rel }) {
   const Tag = as
-  const tagProps = as === 'a' ? { href, target, rel } : { type: 'button', onClick }
+  const tagProps = as === 'a' ? { href, target, rel } : as === 'button' ? { type: 'button', onClick } : {}
   return (
     <Tag {...tagProps} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-paper">
       <span

@@ -27,6 +27,18 @@ function computeStock(product) {
 }
 
 export const api = {
+  // ---------- support contacts ----------
+  async getSupportSettings() {
+    return request('/supportSettings/1')
+  },
+
+  async updateSupportSettings(payload) {
+    return request('/supportSettings/1', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+  },
+
   // ---------- categories ----------
   async getCategories() {
     return request('/categories')

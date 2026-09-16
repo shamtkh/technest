@@ -1,10 +1,20 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import logo from '../assets/technest-logo-footer.png'
 import { FaTelegram, FaPhone } from 'react-icons/fa6'
+import api from '../api/api'
 
 export default function Footer() {
   const { t } = useTranslation()
+  const [supportSettings, setSupportSettings] = useState({ telegram: '', phone: '' })
+
+  useEffect(() => {
+    const loadSupportSettings = () => api.getSupportSettings().then(setSupportSettings).catch(() => {})
+    loadSupportSettings()
+    const interval = setInterval(loadSupportSettings, 10000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <footer className="border-t border-line-dark bg-ink text-white">
@@ -34,15 +44,15 @@ export default function Footer() {
               <li>{t('footer.warranty')}</li>
               <li>{t('footer.returns')}</li>
               <li>
-                <a href="https://t.me/TkhrVv1" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-accent">
+                <a href={supportSettings.telegram ? `https://t.me/${supportSettings.telegram.replace(/^@/, '')}` : undefined} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 hover:text-accent ${!supportSettings.telegram ? 'pointer-events-none' : ''}`}>
                   <FaTelegram size={14} aria-hidden="true" />
-                  {t('support.telegram')}
+                  {t('support.telegramUser')}: {supportSettings.telegram || t('support.notAdded')}
                 </a>
               </li>
               <li>
-                <a href="tel:+998970004525" className="inline-flex items-center gap-2 hover:text-accent">
+                <a href={supportSettings.phone ? `tel:${supportSettings.phone.replace(/[^\d+]/g, '')}` : undefined} className={`inline-flex items-center gap-2 hover:text-accent ${!supportSettings.phone ? 'pointer-events-none' : ''}`}>
                   <FaPhone size={12} aria-hidden="true" />
-                  +998 97 000 45 25
+                  {t('support.phoneNumber')}: {supportSettings.phone || t('support.notAdded')}
                 </a>
               </li>
             </ul>
