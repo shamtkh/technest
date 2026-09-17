@@ -984,7 +984,14 @@ export default function AdminDashboard() {
                           aria-label={`Цвет ${variant.color || index + 1}`}
                           title="Выбрать цвет"
                         />
-                        <input className="variant-stock-input input min-w-0 flex-1" type="number" min="0" value={variant.stock} onChange={(e) => updateVariant(index, { stock: Number(e.target.value) })} />
+                        <input
+                          className="variant-stock-input input min-w-0 flex-1"
+                          type="number"
+                          min="0"
+                          value={variant.stock}
+                          onFocus={(e) => { if (variant.stock === 0) e.currentTarget.select() }}
+                          onChange={(e) => updateVariant(index, { stock: Number(e.target.value) })}
+                        />
                         <button type="button" onClick={() => setForm({ ...form, variants: form.variants.filter((_, i) => i !== index) })} className="px-2 text-danger" aria-label="Variantni o'chirish">×</button>
                       </div>
                     </div>
