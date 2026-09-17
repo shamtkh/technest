@@ -55,6 +55,13 @@ async function start() {
   const router = jsonServer.router(dbPath)
   const demoUser = ensureDemoUser(router)
 
+  const legacyAdmin = router.db.get('users').find({ email: 'bexruz@gmail.com' }).value()
+  if (legacyAdmin) {
+    router.db.get('users').remove({ email: 'bexruz@gmail.com' }).write()
+    await backupToCloud()
+    console.log('  Removed legacy admin account: bexruz@gmail.com')
+  }
+
   if (!router.db.get('supportSettings').find({ id: 1 }).value()) {
     router.db.get('supportSettings').push({ id: 1, telegram: '', phone: '', instagram: '' }).write()
     await backupToCloud()
