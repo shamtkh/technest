@@ -348,10 +348,20 @@ export default function AdminDashboard() {
       storage: (product.storage || []).join(', '), description: descriptions,
       images: product.images || [],
       specs: normalizeSpecs(product.specs),
-      variants: (product.variants || []).map((variant) => ({
-        ...variant,
-        hex: variant.hex || product.colors?.find((color) => color.name === variant.color)?.hex || '#1c1c1e',
-      })),
+      variants: (product.variants || []).map((variant) => {
+        const savedColor = product.colors?.find((color) => color.name === variant.color)
+        const legacyName = variant.color || savedColor?.name || ''
+        const savedNames = variant.colorNames || savedColor?.names || {}
+        return {
+          ...variant,
+          colorNames: {
+            uz: savedNames.uz || legacyName,
+            ru: savedNames.ru || legacyName,
+            en: savedNames.en || legacyName,
+          },
+          hex: variant.hex || savedColor?.hex || '#1c1c1e',
+        }
+      }),
     })
     setErrors({})
     setModalOpen(true)
@@ -367,8 +377,15 @@ export default function AdminDashboard() {
       price: Number(form.price), oldPrice: form.oldPrice ? Number(form.oldPrice) : null,
       stock: form.variants.length ? form.variants.reduce((sum, variant) => sum + Number(variant.stock || 0), 0) : Number(form.stock),
       storage: form.storage ? form.storage.split(',').map((s) => s.trim()).filter(Boolean) : ['Standart'],
-      colors: [...new Map(form.variants.map((v) => [v.color, { name: v.color, hex: v.hex || '#1c1c1e' }])).values()],
-      variants: form.variants,
+      colors: [...new Map(form.variants.map((variant) => [variant.color, {
+        name: variant.color,
+        names: variant.colorNames || { uz: '', ru: '', en: '' },
+        hex: variant.hex || '#1c1c1e',
+      }])).values()],
+      variants: form.variants.map((variant) => ({
+        ...variant,
+        colorNames: variant.colorNames || { uz: '', ru: '', en: '' },
+      })),
       description: form.description,
       images: form.images.length ? form.images : [getProductFallbackImage(form)],
       specs: form.specs.reduce((result, spec) => {
@@ -935,23 +952,41 @@ export default function AdminDashboard() {
               <div>
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-medium text-steel">{t('admin.variantStock')}</span>
-                  <button type="button" onClick={() => setForm({ ...form, variants: [...form.variants, { storage: '', color: '', hex: '#1c1c1e', stock: 0 }] })} className="text-xs font-semibold text-accent">+ {t('admin.variant')}</button>
+                  <button type="button" onClick={() => setForm({ ...form, variants: [...form.variants, { storage: '', color: '', colorNames: { uz: '', ru: '', en: '' }, hex: '#1c1c1e', stock: 0 }] })} className="text-xs font-semibold text-accent">+ {t('admin.variant')}</button>
                 </div>
                 <div className="space-y-2">
                   {form.variants.map((variant, index) => (
-                    <div key={index} className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_3rem_minmax(4rem,0.65fr)_2rem] gap-2">
+                    <div key={index} className="rounded-xl border border-line p-2">
                       <input className="input min-w-0" placeholder="128GB" value={variant.storage} onChange={(e) => updateVariant(index, { storage: e.target.value })} />
-                      <input className="input min-w-0" placeholder="Titanium" value={variant.color} onChange={(e) => updateVariant(index, { color: e.target.value })} />
-                      <input
-                        className="variant-color-picker"
-                        type="color"
-                        value={variant.hex || '#1c1c1e'}
-                        onChange={(e) => updateVariant(index, { hex: e.target.value })}
-                        aria-label={`Цвет ${variant.color || index + 1}`}
-                        title="Выбрать цвет"
-                      />
-                      <input className="input min-w-0" type="number" min="0" value={variant.stock} onChange={(e) => updateVariant(index, { stock: Number(e.target.value) })} />
-                      <button type="button" onClick={() => setForm({ ...form, variants: form.variants.filter((_, i) => i !== index) })} className="text-danger" aria-label="Variantni o'chirish">×</button>
+                      <div className="mt-2 grid grid-cols-3 gap-2 text-[10px] font-semibold uppercase tracking-wider text-steel">
+                        <span>UZ</span><span>RU</span><span>EN</span>
+                      </div>
+                      <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                        {['uz', 'ru', 'en'].map((language) => (
+                          <input
+                            key={language}
+                            className="input min-w-0"
+                            placeholder={`${language.toUpperCase()} color`}
+                            value={variant.colorNames?.[language] || ''}
+                            onChange={(e) => {
+                              const colorNames = { uz: '', ru: '', en: '', ...variant.colorNames, [language]: e.target.value }
+                              updateVariant(index, { colorNames, color: colorNames.ru || colorNames.uz || colorNames.en })
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <input
+                          className="variant-color-picker"
+                          type="color"
+                          value={variant.hex || '#1c1c1e'}
+                          onChange={(e) => updateVariant(index, { hex: e.target.value })}
+                          aria-label={`Цвет ${variant.color || index + 1}`}
+                          title="Выбрать цвет"
+                        />
+                        <input className="input min-w-0 flex-1" type="number" min="0" value={variant.stock} onChange={(e) => updateVariant(index, { stock: Number(e.target.value) })} />
+                        <button type="button" onClick={() => setForm({ ...form, variants: form.variants.filter((_, i) => i !== index) })} className="px-2 text-danger" aria-label="Variantni o'chirish">×</button>
+                      </div>
                     </div>
                   ))}
                 </div>

@@ -61,6 +61,9 @@ export default function ProductPage() {
     return product.stock || 0
   })()
 
+  const selectedColor = product.colors?.find((item) => item.name === color)
+  const colorLabel = selectedColor?.names?.[i18n.language] || selectedColor?.names?.ru || color
+
   const cartItem = cartItems.find(
     (item) => item.productId === product?.id && item.storage === storage && item.color === color
   )
@@ -272,14 +275,14 @@ export default function ProductPage() {
             {product.colors?.length > 0 && (
               <div className="mt-5">
                 <div className="mb-2 text-sm font-medium text-ink-soft">
-                  {t('product.color')}: <span className="text-steel">{color}</span>
+                  {t('product.color')}: <span className="text-steel">{colorLabel}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {product.colors.map((c) => (
                     <button
                       key={c.name}
                       onClick={() => setColor(c.name)}
-                      aria-label={c.name}
+                      aria-label={c.names?.[i18n.language] || c.names?.ru || c.name}
                       className="h-9 w-9 rounded-full border-2"
                       style={{
                         backgroundColor: c.hex,
