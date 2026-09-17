@@ -316,16 +316,15 @@ export default function Navbar() {
 
 function MobileMenuToggle({ checked, onChange }) {
   return (
-    <label className="mobile-menu-toggle flex w-6 cursor-pointer flex-col gap-1.5 lg:hidden" aria-label={checked ? 'Close menu' : 'Open menu'}>
+    <label className="mobile-menu-toggle bar lg:hidden" aria-label={checked ? 'Close menu' : 'Open menu'}>
       <input
-        className="peer hidden"
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
       />
-      <span className="h-0.5 w-1/2 rounded-2xl bg-ink-soft duration-500 origin-right peer-checked:-translate-x-2 peer-checked:-translate-y-px peer-checked:rotate-[225deg]" />
-      <span className="h-0.5 w-full rounded-2xl bg-ink-soft duration-500 peer-checked:-rotate-45" />
-      <span className="h-0.5 w-1/2 self-end rounded-2xl bg-ink-soft duration-500 origin-left peer-checked:translate-x-2 peer-checked:translate-y-px peer-checked:rotate-[225deg]" />
+      <span className="top" />
+      <span className="middle" />
+      <span className="bottom" />
     </label>
   )
 }
