@@ -83,9 +83,13 @@ export default function AdminDashboard() {
   const pollRef = useRef(null)
   const knownOrderIds = useRef(null)
 
-  // ── Initial data loads ──
+  // ── Initial product load ──
   useEffect(() => {
     if (productStatus === 'idle') dispatch(getProductsThunk())
+  }, [dispatch, productStatus])
+
+  // ── Initial dashboard data loads ──
+  useEffect(() => {
     dispatch(getAllOrdersThunk())
     dispatch(resetNewOrdersCount())
     dispatch(getAllMessagesThunk())
@@ -93,7 +97,7 @@ export default function AdminDashboard() {
     api.getUsers().then(setUsers).catch(() => {})
     api.getCategories().then(setCategories).catch(() => {})
     api.getSupportSettings().then(setSupportSettings).catch(() => {})
-  }, [dispatch, productStatus])
+  }, [dispatch])
 
   // ── Poll orders + support messages every 12 seconds ──
   useEffect(() => {
