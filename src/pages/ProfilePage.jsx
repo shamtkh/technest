@@ -25,7 +25,7 @@ export default function ProfilePage() {
   const { showToast } = useToast()
   const user = useSelector((state) => state.auth.user)
   const [orders, setOrders] = useState([])
-  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '', password: '', confirmPassword: '' })
+  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '', currentPassword: '', password: '', confirmPassword: '' })
   const [saving, setSaving] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const userId = user?.id
@@ -48,6 +48,10 @@ export default function ProfilePage() {
 
   async function handleSubmit(event) {
     event.preventDefault()
+    if (form.password && !form.currentPassword) {
+      showToast(t('profile.currentPasswordRequired'), 'error')
+      return
+    }
     if (form.password && form.password !== form.confirmPassword) {
       showToast(t('profile.passwordMismatch'), 'error')
       return
@@ -58,13 +62,21 @@ export default function ProfilePage() {
         name: form.name,
         email: form.email,
         phone: form.phone,
+        ...(form.password ? { currentPassword: form.currentPassword } : {}),
         ...(form.password ? { password: form.password } : {}),
       })
       dispatch(setUser(updated))
-      setForm((current) => ({ ...current, password: '', confirmPassword: '' }))
+      setForm((current) => ({ ...current, currentPassword: '', password: '', confirmPassword: '' }))
       showToast(`${t('profile.saved')} ✓`, 'success')
     } catch (error) {
-      showToast(error.message === 'EMAIL_TAKEN' ? t('auth.emailTaken') : t('common.error'), 'error')
+      showToast(
+        error.message === 'EMAIL_TAKEN'
+          ? t('auth.emailTaken')
+          : error.message === 'INVALID_CURRENT_PASSWORD'
+            ? t('profile.invalidCurrentPassword')
+            : t('common.error'),
+        'error'
+      )
     } finally {
       setSaving(false)
     }
@@ -97,6 +109,7 @@ export default function ProfilePage() {
             <ProfileField label={t('auth.email')} type="email" value={form.email} onChange={(value) => updateField('email', value)} />
             <ProfileField label={t('profile.phone')} type="tel" value={form.phone} onChange={(value) => updateField('phone', value)} placeholder="+998 90 123 45 67" />
             <div className="grid gap-4 sm:grid-cols-2">
+              <ProfileField label={t('profile.currentPassword')} type="password" value={form.currentPassword} onChange={(value) => updateField('currentPassword', value)} />
               <ProfileField label={t('profile.newPassword')} type="password" value={form.password} onChange={(value) => updateField('password', value)} />
               <ProfileField label={t('auth.confirmPassword')} type="password" value={form.confirmPassword} onChange={(value) => updateField('confirmPassword', value)} />
             </div>

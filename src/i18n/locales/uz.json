@@ -178,6 +178,7 @@
     "personalHint": "Hisob ma'lumotlari va telefon raqamini yangilang",
     "phone": "Telefon raqami",
     "newPassword": "Yangi parol",
+    "currentPassword": "Joriy parol",
     "password": "Parol",
     "accountInfo": "Hisob haqida",
     "registrationDate": "Ro'yxatdan o'tgan sana",
@@ -186,6 +187,8 @@
     "saving": "Saqlanmoqda...",
     "saved": "Profil saqlandi",
     "passwordMismatch": "Parollar mos kelmaydi",
+    "currentPasswordRequired": "O'zgartirishdan oldin joriy parolni kiriting",
+    "invalidCurrentPassword": "Joriy parol noto'g'ri",
     "orders": "So'nggi buyurtmalar",
     "allOrders": "Barcha buyurtmalar",
     "items": "ta"

@@ -178,6 +178,7 @@
     "personalHint": "Измените данные аккаунта и номер телефона",
     "phone": "Номер телефона",
     "newPassword": "Новый пароль",
+    "currentPassword": "Текущий пароль",
     "password": "Пароль",
     "accountInfo": "О аккаунте",
     "registrationDate": "Дата регистрации",
@@ -186,6 +187,8 @@
     "saving": "Сохраняем...",
     "saved": "Профиль сохранён",
     "passwordMismatch": "Пароли не совпадают",
+    "currentPasswordRequired": "Введите текущий пароль перед сменой",
+    "invalidCurrentPassword": "Текущий пароль неверный",
     "orders": "Последние заказы",
     "allOrders": "Все заказы",
     "items": "тов."

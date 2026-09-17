@@ -178,6 +178,7 @@
     "personalHint": "Update your account details and phone number",
     "phone": "Phone number",
     "newPassword": "New password",
+    "currentPassword": "Current password",
     "password": "Password",
     "accountInfo": "Account info",
     "registrationDate": "Registration date",
@@ -186,6 +187,8 @@
     "saving": "Saving...",
     "saved": "Profile saved",
     "passwordMismatch": "Passwords do not match",
+    "currentPasswordRequired": "Enter your current password before changing it",
+    "invalidCurrentPassword": "Current password is incorrect",
     "orders": "Recent orders",
     "allOrders": "All orders",
     "items": "items"

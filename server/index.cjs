@@ -238,6 +238,9 @@ async function start() {
     const id = Number(req.params.id)
     const current = router.db.get('users').find({ id }).value()
     if (!current) return res.status(404).json({ error: 'USER_NOT_FOUND' })
+    if (req.body.password && req.body.currentPassword !== current.password) {
+      return res.status(401).json({ error: 'INVALID_CURRENT_PASSWORD' })
+    }
 
     const email = String(req.body.email ?? current.email).trim().toLowerCase()
     const duplicate = router.db.get('users').value().some((user) => user.id !== id && user.email.toLowerCase() === email)
