@@ -1,10 +1,17 @@
 .burger-menu {
   display: block;
   position: relative;
-  width: 28px;
-  height: 20px;
+  width: 34px;
+  height: 28px;
   cursor: pointer;
   user-select: none;
+  padding: 7px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 6px 18px rgba(27, 55, 105, 0.12);
+  backdrop-filter: blur(14px) saturate(135%);
+  box-sizing: border-box;
 }
 
 .burger-menu input {
@@ -24,9 +31,9 @@
   position: absolute;
   top: 10%;
   left: 0;
-  width: 28px;
+  width: 22px;
   height: 2px;
-  background: #0f766e;
+  background: rgba(37, 52, 77, 0.82);
   transition: 0.28s ease;
 }
 
@@ -34,14 +41,14 @@
 .burger-menu .checkmark span:nth-child(3) { top: 90%; }
 
 .burger-menu input:checked + .checkmark span:nth-child(1) {
-  width: 25px;
+  width: 23px;
   top: 50%;
   left: 1px;
   transform: translateY(-50%) rotate(45deg);
 }
 
 .burger-menu input:checked + .checkmark span:nth-child(2) {
-  width: 25px;
+  width: 23px;
   top: 50%;
   left: 1px;
   transform: translateY(-50%) rotate(-45deg);
