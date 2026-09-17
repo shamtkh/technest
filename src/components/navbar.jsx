@@ -176,17 +176,7 @@ export default function Navbar() {
             </Link>
           )}
 
-          <label className="mobile-menu-toggle flex w-8 cursor-pointer flex-col gap-2 lg:hidden" aria-label="Menu">
-            <input
-              className="peer hidden"
-              type="checkbox"
-              checked={mobileOpen}
-              onChange={(event) => setMobileOpen(event.target.checked)}
-            />
-            <span className="h-[3px] w-1/2 rounded-2xl bg-ink-soft duration-500 origin-right peer-checked:-translate-x-[12px] peer-checked:-translate-y-[1px] peer-checked:rotate-[225deg]" />
-            <span className="h-[3px] w-full rounded-2xl bg-ink-soft duration-500 peer-checked:-rotate-45" />
-            <span className="h-[3px] w-1/2 self-end rounded-2xl bg-ink-soft duration-500 origin-left peer-checked:translate-x-[12px] peer-checked:translate-y-[1px] peer-checked:rotate-[225deg]" />
-          </label>
+          <MobileMenuToggle checked={mobileOpen} onChange={setMobileOpen} />
         </div>
       </div>
       </header>
@@ -199,9 +189,7 @@ export default function Navbar() {
           <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
             <div className="mobile-drawer-header">
               <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-drawer-logo h-9 w-32 object-cover object-center" />
-              <button type="button" className="navbar-icon flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white group" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-                <span aria-hidden="true" className="block text-lg font-medium transition-transform duration-300 group-hover:rotate-90">×</span>
-              </button>
+              <MobileMenuToggle checked={mobileOpen} onChange={setMobileOpen} />
             </div>
             <div className="mb-5">
             <SearchBar compact onSubmit={() => setMobileOpen(false)} />
@@ -323,5 +311,21 @@ export default function Navbar() {
         />
       )}
     </>
+  )
+}
+
+function MobileMenuToggle({ checked, onChange }) {
+  return (
+    <label className="mobile-menu-toggle flex w-6 cursor-pointer flex-col gap-1.5 lg:hidden" aria-label={checked ? 'Close menu' : 'Open menu'}>
+      <input
+        className="peer hidden"
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span className="h-0.5 w-1/2 rounded-2xl bg-ink-soft duration-500 origin-right peer-checked:-translate-x-2 peer-checked:-translate-y-px peer-checked:rotate-[225deg]" />
+      <span className="h-0.5 w-full rounded-2xl bg-ink-soft duration-500 peer-checked:-rotate-45" />
+      <span className="h-0.5 w-1/2 self-end rounded-2xl bg-ink-soft duration-500 origin-left peer-checked:translate-x-2 peer-checked:translate-y-px peer-checked:rotate-[225deg]" />
+    </label>
   )
 }
