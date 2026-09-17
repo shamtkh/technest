@@ -224,9 +224,15 @@ body.confirm-dialog-open {
   overscroll-behavior: contain;
 }
 
+.admin-modal-overlay {
+  z-index: 1000;
+  isolation: isolate;
+}
+
 .admin-product-modal {
   height: min(86vh, 52rem);
   max-height: calc(100dvh - 2rem);
+  min-height: 0;
   box-shadow: var(--shadow-realistic-lg);
 }
 
@@ -342,14 +348,14 @@ body.confirm-dialog-open {
     border-radius: 1.35rem;
   }
   .admin-modal-overlay {
-    align-items: flex-start;
-    padding-top: calc(var(--admin-header-height, 4.25rem) + 0.5rem);
-    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    align-items: center;
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
   .admin-product-modal {
     width: min(100%, 34rem);
-    height: min(calc(100dvh - var(--admin-header-height, 4.25rem) - 5.5rem), 42rem);
-    max-height: calc(100dvh - var(--admin-header-height, 4.25rem) - 5.5rem);
+    height: min(calc(100dvh - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)), 42rem);
+    max-height: calc(100dvh - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     margin-top: 0;
     padding: 1.25rem;
   }
