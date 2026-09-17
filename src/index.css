@@ -455,6 +455,19 @@ body.confirm-dialog-open {
 .mobile-tab:hover { color: var(--color-accent); transform: translateY(-2px); }
 .mobile-tab.active { color: var(--color-accent); background: rgba(61, 127, 255, 0.1); }
 
+.mobile-filter-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition: max-height 0.42s ease, opacity 0.28s ease, transform 0.42s ease;
+}
+.mobile-filter-panel.is-open {
+  max-height: 52rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .mobile-drawer-backdrop {
   position: fixed;
   inset: 0;
@@ -506,6 +519,13 @@ body.confirm-dialog-open {
 }
 
 @media (min-width: 1024px) {
+  .mobile-filter-panel,
+  .mobile-filter-panel.is-open {
+    max-height: none;
+    overflow: visible;
+    opacity: 1;
+    transform: none;
+  }
   .mobile-menu-toggle.bar,
   .mobile-drawer-backdrop {
     display: none;

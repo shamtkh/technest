@@ -92,7 +92,7 @@ export default function ProductsPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
-        <aside className={`${mobileFiltersOpen ? 'block' : 'hidden'} lg:block`}>
+        <aside className={`mobile-filter-panel ${mobileFiltersOpen ? 'is-open' : ''} lg:block`}>
           <div className="space-y-6 rounded-2xl border border-line bg-white p-5">
             <div>
               <h3 className="mb-3 spec-strip uppercase text-steel">{t('categories.all')}</h3>
