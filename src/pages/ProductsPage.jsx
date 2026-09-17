@@ -78,7 +78,7 @@ export default function ProductsPage() {
   return (
     <PageTransition>
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between lg:mb-6">
         <div>
           <h1 className="font-display text-2xl font-bold text-ink-soft">{t('products.title')}</h1>
           <p className="mt-1 spec-strip text-steel">{t('products.resultsCount', { count: filtered.length })}</p>
@@ -91,7 +91,7 @@ export default function ProductsPage() {
         </button>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
+      <div className="grid gap-4 lg:gap-8 lg:grid-cols-[240px_1fr]">
         <aside className={`mobile-filter-panel ${mobileFiltersOpen ? 'is-open' : ''} lg:block`}>
           <div className="space-y-6 rounded-2xl border border-line bg-white p-5">
             <div>
