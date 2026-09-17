@@ -83,6 +83,8 @@ export default function AdminDashboard() {
   const pollRef = useRef(null)
   const knownOrderIds = useRef(null)
   const productFormScrollRef = useRef(null)
+  const productImagesInputRef = useRef(null)
+  const imagePickerPositionRef = useRef(null)
 
   // ── Initial product load ──
   useEffect(() => {
@@ -476,12 +478,35 @@ export default function AdminDashboard() {
     setForm((prev) => ({ ...prev, images: prev.images.filter((_, imageIndex) => imageIndex !== index) }))
   }
 
-  async function handleProductImageChange(event) {
-    const scrollTop = productFormScrollRef.current?.scrollTop || 0
-    await handleImageChange(event, setForm)
+  function rememberImagePickerPosition() {
+    imagePickerPositionRef.current = {
+      scrollTop: productFormScrollRef.current?.scrollTop || 0,
+      pageX: window.scrollX,
+      pageY: window.scrollY,
+    }
+  }
+
+  function restoreImagePickerPosition() {
+    const position = imagePickerPositionRef.current
+    if (!position) return
     requestAnimationFrame(() => {
-      if (productFormScrollRef.current) productFormScrollRef.current.scrollTop = scrollTop
+      window.scrollTo(position.pageX, position.pageY)
+      if (productFormScrollRef.current) productFormScrollRef.current.scrollTop = position.scrollTop
+      requestAnimationFrame(() => {
+        window.scrollTo(position.pageX, position.pageY)
+        if (productFormScrollRef.current) productFormScrollRef.current.scrollTop = position.scrollTop
+      })
     })
+  }
+
+  function openImagePicker() {
+    rememberImagePickerPosition()
+    productImagesInputRef.current?.click()
+  }
+
+  async function handleProductImageChange(event) {
+    await handleImageChange(event, setForm)
+    restoreImagePickerPosition()
   }
 
   async function handleProductImagePaste(event) {
@@ -1046,10 +1071,10 @@ export default function AdminDashboard() {
               <div>
                 <span className="mb-1 block text-xs font-medium text-steel">{t('admin.imagesLimit')}</span>
                 <div onPaste={handleProductImagePaste}>
-                  <input id="product-images-input" type="file" accept="image/*" multiple onChange={handleProductImageChange} className="sr-only" />
-                  <label htmlFor="product-images-input" className="image-picker-button inline-flex cursor-pointer items-center rounded-full px-4 py-2 text-sm font-semibold">
+                  <input ref={productImagesInputRef} id="product-images-input" type="file" accept="image/*" multiple onChange={handleProductImageChange} onBlur={restoreImagePickerPosition} className="sr-only" />
+                  <button type="button" onClick={openImagePicker} className="image-picker-button inline-flex cursor-pointer items-center rounded-full px-4 py-2 text-sm font-semibold">
                     {t('admin.chooseImages')}
-                  </label>
+                  </button>
                   <p className="mt-2 text-xs text-steel">{t('admin.pasteImageHint')}</p>
                 {!!form.images.length && (
                   <div className="mt-2 flex flex-wrap gap-2">
