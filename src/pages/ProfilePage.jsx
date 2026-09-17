@@ -24,6 +24,7 @@ export default function ProfilePage() {
   const navigate = useNavigate()
   const { showToast } = useToast()
   const user = useSelector((state) => state.auth.user)
+  const isAdmin = user?.role === 'admin'
   const [orders, setOrders] = useState([])
   const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '', currentPassword: '', password: '', confirmPassword: '' })
   const [saving, setSaving] = useState(false)
@@ -107,7 +108,9 @@ export default function ProfilePage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <ProfileField label={t('auth.name')} value={form.name} onChange={(value) => updateField('name', value)} />
             <ProfileField label={t('auth.email')} type="email" value={form.email} onChange={(value) => updateField('email', value)} />
-            <ProfileField label={t('profile.phone')} type="tel" value={form.phone} onChange={(value) => updateField('phone', value)} placeholder="+998 90 123 45 67" />
+            {!isAdmin && (
+              <ProfileField label={t('profile.phone')} type="tel" value={form.phone} onChange={(value) => updateField('phone', value)} placeholder="+998 90 123 45 67" />
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <ProfileField label={t('profile.currentPassword')} type="password" value={form.currentPassword} onChange={(value) => updateField('currentPassword', value)} />
               <ProfileField label={t('profile.newPassword')} type="password" value={form.password} onChange={(value) => updateField('password', value)} />
@@ -124,7 +127,7 @@ export default function ProfilePage() {
             <h2 className="mb-4 font-display font-semibold text-ink-soft">{t('profile.accountInfo')}</h2>
             <div className="space-y-3 text-sm">
               <InfoRow icon={<FaCalendar />} label={t('profile.registrationDate')} value={user?.createdAt ? new Date(user.createdAt).toLocaleDateString(i18n.language) : '—'} />
-              <InfoRow icon={<FaPhone />} label={t('profile.phone')} value={user?.phone || t('profile.notAdded')} />
+              {!isAdmin && <InfoRow icon={<FaPhone />} label={t('profile.phone')} value={user?.phone || t('profile.notAdded')} />}
               <InfoRow icon={<FaLock />} label={t('profile.password')} value="••••••••" />
             </div>
           </section>
@@ -135,7 +138,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <section className="mt-6 rounded-2xl border border-line bg-white p-5 sm:p-6">
+      {!isAdmin && <section className="mt-6 rounded-2xl border border-line bg-white p-5 sm:p-6">
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="font-display font-semibold text-ink-soft">{t('profile.orders')}</h2>
           <button type="button" onClick={() => navigate('/orders')} className="text-sm font-semibold text-accent hover:text-accent-dim">{t('profile.allOrders')}</button>
@@ -158,7 +161,7 @@ export default function ProfilePage() {
             ))}
           </div>
         )}
-      </section>
+      </section>}
 
       {showLogoutConfirm && (
         <ConfirmDialog
