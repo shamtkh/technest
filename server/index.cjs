@@ -143,6 +143,35 @@ async function start() {
     return product.variants.find((variant) => variant.storage === storage && variant.color === color)
   }
 
+  function getSupportSettings() {
+    const settings = router.db.get('supportSettings').value()
+    if (Array.isArray(settings) && settings.length > 0) return settings[0]
+
+    const defaults = { id: 1, telegram: '', phone: '', instagram: '' }
+    router.db.set('supportSettings', [defaults]).write()
+    return defaults
+  }
+
+  server.get('/supportSettings/:id', (req, res) => {
+    const settings = getSupportSettings()
+    if (String(settings.id) !== String(req.params.id)) return res.status(404).json({ error: 'Support settings not found' })
+    res.json(settings)
+  })
+
+  server.patch('/supportSettings/:id', (req, res) => {
+    const settings = getSupportSettings()
+    if (String(settings.id) !== String(req.params.id)) return res.status(404).json({ error: 'Support settings not found' })
+
+    const updated = {
+      ...settings,
+      telegram: String(req.body.telegram || '').trim(),
+      phone: String(req.body.phone || '').trim(),
+      instagram: String(req.body.instagram || '').trim(),
+    }
+    router.db.set('supportSettings', [updated]).write()
+    res.json(updated)
+  })
+
   server.post('/products', (req, res) => {
     const product = normalizeProductPayload(req.body)
     const products = router.db.get('products').value()
