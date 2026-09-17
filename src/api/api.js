@@ -29,14 +29,16 @@ function computeStock(product) {
 export const api = {
   // ---------- support contacts ----------
   async getSupportSettings() {
-    return request('/supportSettings/1')
+    const settings = await request('/supportSettings/1')
+    return { telegram: '', phone: '', instagram: '', ...settings }
   },
 
   async updateSupportSettings(payload) {
-    return request('/supportSettings/1', {
+    const settings = await request('/supportSettings/1', {
       method: 'PATCH',
       body: JSON.stringify(payload),
     })
+    return { telegram: '', phone: '', instagram: '', ...settings }
   },
 
   // ---------- categories ----------

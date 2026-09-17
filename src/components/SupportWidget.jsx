@@ -8,7 +8,7 @@ import { markMyMessagesRead } from '../store/slices/chatSlice'
 import { markMessageReadThunk } from '../store/thunks/markMessageReadThunk'
 import { useToast } from '../hooks/useToast'
 import api from '../api/api'
-import { FaXmark, FaTelegram, FaPhone, FaPaperPlane, FaCommentDots, FaHeadset, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
+import { FaXmark, FaTelegram, FaPhone, FaInstagram, FaPaperPlane, FaCommentDots, FaHeadset, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 
 export default function SupportWidget() {
   const { t, i18n } = useTranslation()
@@ -22,7 +22,7 @@ export default function SupportWidget() {
   const [open, setOpen] = useState(false)
   const [view, setView] = useState('menu') // 'menu' | 'chat'
   const [text, setText] = useState('')
-  const [supportSettings, setSupportSettings] = useState({ telegram: '', phone: '' })
+  const [supportSettings, setSupportSettings] = useState({ telegram: '', phone: '', instagram: '' })
   const rootRef = useRef(null)
   const listRef = useRef(null)
   const lastNotifiedUnread = useRef(null)
@@ -135,7 +135,7 @@ export default function SupportWidget() {
           </div>
 
           {view === 'menu' && (
-            <div className="divide-y divide-line overflow-y-auto py-1">
+            <div className="divide-y divide-line overflow-hidden py-1">
               <SupportRow
                 icon={<FaCommentDots size={17} aria-hidden="true" />}
                 iconBg="rgba(61,127,255,0.12)"
@@ -154,6 +154,17 @@ export default function SupportWidget() {
                 iconColor="#26A5E4"
                 title={t('support.telegram')}
                 subtitle={`${t('support.telegramUser')}: ${supportSettings.telegram || t('support.notAdded')}`}
+              />
+              <SupportRow
+                as={supportSettings.instagram ? 'a' : 'div'}
+                href={supportSettings.instagram ? `https://instagram.com/${supportSettings.instagram.replace(/^@/, '')}` : undefined}
+                target="_blank"
+                rel="noreferrer"
+                icon={<FaInstagram size={18} aria-hidden="true" />}
+                iconBg="rgba(225,48,108,0.12)"
+                iconColor="#e1306c"
+                title={t('support.instagram')}
+                subtitle={`${t('support.instagramUser')}: ${supportSettings.instagram || t('support.notAdded')}`}
               />
               <SupportRow
                 as={supportSettings.phone ? 'a' : 'div'}
@@ -245,7 +256,7 @@ function SupportRow({ as = 'button', icon, iconBg, iconColor, title, subtitle, o
   const Tag = as
   const tagProps = as === 'a' ? { href, target, rel } : as === 'button' ? { type: 'button', onClick } : {}
   return (
-    <Tag {...tagProps} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-paper">
+    <Tag {...tagProps} className="flex w-full items-center gap-3 px-4 py-3 text-left">
       <span
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
         style={{ background: iconBg, color: iconColor }}

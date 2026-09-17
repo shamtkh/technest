@@ -55,8 +55,8 @@ async function start() {
   const router = jsonServer.router(dbPath)
   const demoUser = ensureDemoUser(router)
 
-  if (!router.db.get('supportSettings').value()) {
-    router.db.set('supportSettings', [{ id: 1, telegram: '', phone: '' }]).write()
+  if (!router.db.get('supportSettings').find({ id: 1 }).value()) {
+    router.db.get('supportSettings').push({ id: 1, telegram: '', phone: '', instagram: '' }).write()
     await backupToCloud()
   }
 

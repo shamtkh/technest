@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import logo from '../assets/technest-logo-footer.png'
-import { FaTelegram, FaPhone } from 'react-icons/fa6'
+import { FaTelegram, FaPhone, FaInstagram } from 'react-icons/fa6'
 import api from '../api/api'
 
 export default function Footer() {
   const { t } = useTranslation()
-  const [supportSettings, setSupportSettings] = useState({ telegram: '', phone: '' })
+  const [supportSettings, setSupportSettings] = useState({ telegram: '', phone: '', instagram: '' })
 
   useEffect(() => {
     const loadSupportSettings = () => api.getSupportSettings().then(setSupportSettings).catch(() => {})
@@ -47,6 +47,12 @@ export default function Footer() {
                 <a href={supportSettings.telegram ? `https://t.me/${supportSettings.telegram.replace(/^@/, '')}` : undefined} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 hover:text-accent ${!supportSettings.telegram ? 'pointer-events-none' : ''}`}>
                   <FaTelegram size={14} aria-hidden="true" />
                   {t('support.telegramUser')}: {supportSettings.telegram || t('support.notAdded')}
+                </a>
+              </li>
+              <li>
+                <a href={supportSettings.instagram ? `https://instagram.com/${supportSettings.instagram.replace(/^@/, '')}` : undefined} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 hover:text-accent ${!supportSettings.instagram ? 'pointer-events-none' : ''}`}>
+                  <FaInstagram size={14} aria-hidden="true" />
+                  {t('support.instagramUser')}: {supportSettings.instagram || t('support.notAdded')}
                 </a>
               </li>
               <li>
