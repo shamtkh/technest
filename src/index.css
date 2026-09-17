@@ -506,6 +506,7 @@ body.confirm-dialog-open {
 }
 
 @media (min-width: 1024px) {
+  .mobile-menu-toggle.bar,
   .mobile-drawer-backdrop {
     display: none;
   }
