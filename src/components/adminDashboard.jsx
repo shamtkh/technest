@@ -82,6 +82,7 @@ export default function AdminDashboard() {
   const [orderSearch, setOrderSearch] = useState('')
   const pollRef = useRef(null)
   const knownOrderIds = useRef(null)
+  const productFormScrollRef = useRef(null)
 
   // ── Initial product load ──
   useEffect(() => {
@@ -481,6 +482,22 @@ export default function AdminDashboard() {
 
   function removeImage(index) {
     setForm((prev) => ({ ...prev, images: prev.images.filter((_, imageIndex) => imageIndex !== index) }))
+  }
+
+  async function handleProductImageChange(event) {
+    const scrollTop = productFormScrollRef.current?.scrollTop || 0
+    await handleImageChange(event, setForm)
+    requestAnimationFrame(() => {
+      if (productFormScrollRef.current) productFormScrollRef.current.scrollTop = scrollTop
+    })
+  }
+
+  async function handleProductImagePaste(event) {
+    const scrollTop = productFormScrollRef.current?.scrollTop || 0
+    await handleImagePaste(event, setForm)
+    requestAnimationFrame(() => {
+      if (productFormScrollRef.current) productFormScrollRef.current.scrollTop = scrollTop
+    })
   }
 
   const statusInfo = (val) => {
@@ -919,7 +936,7 @@ export default function AdminDashboard() {
               {editingId ? t('admin.editProduct') : t('admin.addProduct')}
             </h3>
             <form id="product-editor-form" onSubmit={handleSubmit} className="admin-product-form min-h-0">
-              <div className="admin-form-scroll space-y-3 overflow-y-auto overscroll-contain pr-1">
+              <div ref={productFormScrollRef} className="admin-form-scroll space-y-3 overflow-y-auto overscroll-contain pr-1">
               <Field label={t('admin.name')} error={errors.name}>
                 <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input" />
               </Field>
@@ -1035,9 +1052,9 @@ export default function AdminDashboard() {
               </Field>
               <div>
                 <span className="mb-1 block text-xs font-medium text-steel">{t('admin.imagesLimit')}</span>
-                <div onPaste={(e) => handleImagePaste(e, setForm)}>
-                  <input id="product-images-input" type="file" accept="image/*" multiple onChange={(e) => handleImageChange(e, setForm)} className="sr-only" />
-                  <label htmlFor="product-images-input" className="inline-flex cursor-pointer rounded-full border border-line px-4 py-2 text-sm font-medium text-ink-soft hover:border-accent hover:text-accent">
+                <div onPaste={handleProductImagePaste}>
+                  <input id="product-images-input" type="file" accept="image/*" multiple onChange={handleProductImageChange} className="sr-only" />
+                  <label htmlFor="product-images-input" className="image-picker-button inline-flex cursor-pointer items-center rounded-full px-4 py-2 text-sm font-semibold">
                     {t('admin.chooseImages')}
                   </label>
                   <p className="mt-2 text-xs text-steel">{t('admin.pasteImageHint')}</p>
