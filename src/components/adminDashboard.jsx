@@ -15,7 +15,7 @@ import { sendMessageThunk } from '../store/thunks/sendMessageThunk'
 import { clearConversationThunk } from '../store/thunks/clearConversationThunk'
 import { resetAdminUnreadCount } from '../store/slices/chatSlice'
 import { validateProductForm } from '../validations/createProductValidate'
-import { handleImageChange } from '../core/handlemageChange'
+import { handleImageChange, handleImagePaste } from '../core/handlemageChange'
 import { formatPrice } from '../utils/format'
 import { useToast } from '../hooks/useToast'
 import { getProductFallbackImage } from '../utils/productImages'
@@ -1026,8 +1026,14 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               </Field>
-              <Field label={t('admin.imagesLimit')}>
-                <input type="file" accept="image/*" multiple onChange={(e) => handleImageChange(e, setForm)} className="text-sm text-steel" />
+              <div>
+                <span className="mb-1 block text-xs font-medium text-steel">{t('admin.imagesLimit')}</span>
+                <div onPaste={(e) => handleImagePaste(e, setForm)}>
+                  <input id="product-images-input" type="file" accept="image/*" multiple onChange={(e) => handleImageChange(e, setForm)} className="sr-only" />
+                  <label htmlFor="product-images-input" className="inline-flex cursor-pointer rounded-full border border-line px-4 py-2 text-sm font-medium text-ink-soft hover:border-accent hover:text-accent">
+                    {t('admin.chooseImages')}
+                  </label>
+                  <p className="mt-2 text-xs text-steel">{t('admin.pasteImageHint')}</p>
                 {!!form.images.length && (
                   <div className="mt-2 flex flex-wrap gap-2">
                     {form.images.map((image, index) => (
@@ -1046,7 +1052,8 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                 )}
-              </Field>
+                </div>
+              </div>
               </div>
               <div className="admin-form-actions flex shrink-0 justify-end gap-2 bg-white pt-3">
                 <button type="button" onClick={() => setModalOpen(false)} className="btn-glass rounded-full border border-line px-4 py-2 text-sm font-medium">

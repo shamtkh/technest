@@ -244,6 +244,8 @@
     "specificationValue": "Qiymati",
     "removeSpecification": "Xususiyatni o'chirish",
     "imagesLimit": "Rasmlar (5 tagacha)",
+    "chooseImages": "Rasmlarni tanlash",
+    "pasteImageHint": "Rasmni buferdan Ctrl+V orqali ham joylashtirishingiz mumkin",
     "statsProducts": "Mahsulotlar",
     "statsStock": "Umumiy qoldiq",
     "statsLowStock": "Kam qoldiq",

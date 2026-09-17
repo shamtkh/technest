@@ -244,6 +244,8 @@
     "specificationValue": "Значение",
     "removeSpecification": "Удалить характеристику",
     "imagesLimit": "Изображения (до 5)",
+    "chooseImages": "Выбрать изображения",
+    "pasteImageHint": "Также можно вставить изображение из буфера через Ctrl+V",
     "statsProducts": "Товары",
     "statsStock": "Общий остаток",
     "statsLowStock": "Малый остаток",

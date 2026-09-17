@@ -244,6 +244,8 @@
     "specificationValue": "Value",
     "removeSpecification": "Remove specification",
     "imagesLimit": "Images (up to 5)",
+    "chooseImages": "Choose images",
+    "pasteImageHint": "You can also paste an image from the clipboard with Ctrl+V",
     "statsProducts": "Products",
     "statsStock": "Total stock",
     "statsLowStock": "Low stock",

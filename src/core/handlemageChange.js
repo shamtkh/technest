@@ -1,9 +1,24 @@
 export const handleImageChange = async (e, setForm) => {
-    const files = Array.from(e.target.files || []).slice(0, 5)
+    const files = Array.from(e.target.files || [])
     if (!files.length) return
 
-    const images = await Promise.all(files.map(resizeImage))
-    setForm(prev => ({ ...prev, images }))
+    await addImageFiles(files, setForm)
+    e.target.value = ''
+}
+
+export const handleImagePaste = async (e, setForm) => {
+    const files = Array.from(e.clipboardData?.items || [])
+        .filter((item) => item.type.startsWith('image/'))
+        .map((item) => item.getAsFile())
+        .filter(Boolean)
+    if (!files.length) return
+    e.preventDefault()
+    await addImageFiles(files, setForm)
+}
+
+async function addImageFiles(files, setForm) {
+    const images = await Promise.all(files.slice(0, 5).map(resizeImage))
+    setForm((prev) => ({ ...prev, images: [...prev.images, ...images].slice(0, 5) }))
 }
 
 async function resizeImage(file) {
