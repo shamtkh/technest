@@ -641,6 +641,7 @@ export default function AdminDashboard() {
                   <div className="min-w-0">
                     <span className="font-medium text-ink-soft">{registeredUser.name}</span>
                     <span className="ml-3 text-steel">{registeredUser.email}</span>
+                    <span className="ml-3 text-steel">{registeredUser.phone || t('profile.notAdded')}</span>
                   </div>
                   {registeredUser.role !== 'admin' && (
                     <button onClick={() => setDeletingUser(registeredUser)} className="btn-glass rounded-full border border-line px-3 py-1.5 text-xs font-medium text-danger hover:border-danger">

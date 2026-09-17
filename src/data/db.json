@@ -1443,7 +1443,7 @@
       "id": 1,
       "telegram": "",
       "phone": "",
-      "instagram": "@shams.tkh"
+      "instagram": ""
     }
   ],
   "users": [
@@ -1474,13 +1474,6 @@
       "email": "qw@gmail.com",
       "password": "123456",
       "role": "customer"
-    },
-    {
-      "id": 5,
-      "name": "bexruz",
-      "email": "bexruz@gmail.com",
-      "password": "bexruz123",
-      "role": "admin"
     },
     {
       "id": 6,
