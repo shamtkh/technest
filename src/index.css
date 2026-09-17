@@ -464,6 +464,7 @@ body.confirm-dialog-open {
 }
 .mobile-filter-panel.is-open {
   max-height: 52rem;
+  overflow: visible;
   opacity: 1;
   transform: translateY(0);
 }
