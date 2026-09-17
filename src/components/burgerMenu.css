@@ -2,7 +2,7 @@
 	display: block;
 	position: relative;
 	width: 30px;
-	height: 22px;
+	height: 17px;
 	cursor: pointer;
 	user-select: none;
 }
@@ -17,7 +17,7 @@
 
 .burger-menu .checkmark {
 	position: absolute;
-	inset: 3px 4px;
+	inset: 2px 4px;
 }
 
 .burger-menu .checkmark span {
@@ -26,17 +26,17 @@
 	left: 0;
 	width: 22px;
 	height: 2px;
-	background: #0f766e;
+	background: linear-gradient(90deg, #17191d 0%, #59616d 52%, #17191d 100%);
 	transition: 0.28s ease;
 }
 
-.burger-menu .checkmark span:nth-child(2) { top: 8px; }
-.burger-menu .checkmark span:nth-child(3) { top: 16px; }
+.burger-menu .checkmark span:nth-child(2) { top: 5px; }
+.burger-menu .checkmark span:nth-child(3) { top: 10px; }
 
 .burger-menu input:checked + .checkmark span:nth-child(1),
 .burger-menu input:checked + .checkmark span:nth-child(2) {
 	width: 23px;
-	top: 8px;
+	top: 5px;
 	left: 0;
 }
 
