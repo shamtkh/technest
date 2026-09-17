@@ -15,6 +15,7 @@ import OrdersPage from './pages/ordersPage'
 import AdminPage from './pages/adminPage'
 import NotFoundPage from './pages/NotFoundPage'
 import ForbiddenPage from './pages/forbiddenPage'
+import ProfilePage from './pages/ProfilePage'
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="orders" element={<OrdersPage />} />
+                      <Route path="profile" element={<ProfilePage />} />
           </Route>
 
           <Route element={<AdminRoute />}>

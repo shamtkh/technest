@@ -56,7 +56,7 @@ export default function Navbar() {
       <header className="site-header sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/" className="mobile-navbar-brand flex items-center gap-2 shrink-0">
-          <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-logo h-11 w-[140px] lg:h-14 lg:w-[204px]" />
+          <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-logo h-11 w-35 lg:h-14 lg:w-51" />
         </Link>
 
         <nav className="hidden items-center gap-6 lg:flex">
@@ -162,6 +162,9 @@ export default function Navbar() {
                       {t('nav.orders')}
                     </Link>
                   )}
+                  <Link to="/profile" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-ink-soft hover:bg-paper">
+                    {t('nav.profile')}
+                  </Link>
                   <button onClick={handleLogout} className="block w-full px-4 py-2 text-left text-sm text-danger hover:bg-paper">
                     {t('nav.logout')}
                   </button>
@@ -276,6 +279,7 @@ export default function Navbar() {
                 </button>
                 {userMenuOpen && (
                   <div className="mobile-profile-dropdown">
+                    <Link to="/profile" onClick={() => setMobileOpen(false)}>{t('nav.profile')}</Link>
                     {!isAdmin && (
                       <Link to="/orders" onClick={() => setMobileOpen(false)}>{t('nav.orders')}</Link>
                     )}

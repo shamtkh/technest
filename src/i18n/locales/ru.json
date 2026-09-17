@@ -10,6 +10,7 @@
     "products": "Каталог",
     "cart": "Корзина",
     "orders": "Заказы",
+      "profile": "Мой профиль",
     "admin": "Админ-панель",
     "login": "Войти",
     "register": "Регистрация",
@@ -170,6 +171,24 @@
     "statusProcessing": "В обработке",
     "statusDelivered": "Доставлен",
     "total": "Сумма заказа"
+  },
+  "profile": {
+    "title": "Мой профиль",
+    "personalData": "Личные данные",
+    "personalHint": "Измените данные аккаунта и номер телефона",
+    "phone": "Номер телефона",
+    "newPassword": "Новый пароль",
+    "password": "Пароль",
+    "accountInfo": "О аккаунте",
+    "registrationDate": "Дата регистрации",
+    "notAdded": "Не добавлен",
+    "save": "Сохранить изменения",
+    "saving": "Сохраняем...",
+    "saved": "Профиль сохранён",
+    "passwordMismatch": "Пароли не совпадают",
+    "orders": "Последние заказы",
+    "allOrders": "Все заказы",
+    "items": "тов."
   },
   "admin": {
     "title": "Админ-панель",

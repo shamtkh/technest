@@ -10,6 +10,7 @@
     "products": "Catalog",
     "cart": "Cart",
     "orders": "Orders",
+      "profile": "My profile",
     "admin": "Admin panel",
     "login": "Sign in",
     "register": "Sign up",
@@ -170,6 +171,24 @@
     "statusProcessing": "Processing",
     "statusDelivered": "Delivered",
     "total": "Order total"
+  },
+  "profile": {
+    "title": "My profile",
+    "personalData": "Personal details",
+    "personalHint": "Update your account details and phone number",
+    "phone": "Phone number",
+    "newPassword": "New password",
+    "password": "Password",
+    "accountInfo": "Account info",
+    "registrationDate": "Registration date",
+    "notAdded": "Not added",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "saved": "Profile saved",
+    "passwordMismatch": "Passwords do not match",
+    "orders": "Recent orders",
+    "allOrders": "All orders",
+    "items": "items"
   },
   "admin": {
     "title": "Admin panel",

@@ -105,6 +105,16 @@ export const api = {
     })
   },
 
+  async updateUser(id, payload) {
+    const user = await request(`/users/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+    const safeUser = { ...user }
+    delete safeUser.password
+    return safeUser
+  },
+
   // ---------- orders ----------
   async createOrder(order) {
     return request('/orders', {

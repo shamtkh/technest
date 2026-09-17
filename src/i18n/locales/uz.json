@@ -10,6 +10,7 @@
     "products": "Katalog",
     "cart": "Savatcha",
     "orders": "Buyurtmalar",
+      "profile": "Mening profilim",
     "admin": "Admin panel",
     "login": "Kirish",
     "register": "Ro'yxatdan o'tish",
@@ -170,6 +171,24 @@
     "statusProcessing": "Tayyorlanmoqda",
     "statusDelivered": "Yetkazildi",
     "total": "Jami summa"
+  },
+  "profile": {
+    "title": "Mening profilim",
+    "personalData": "Shaxsiy ma'lumotlar",
+    "personalHint": "Hisob ma'lumotlari va telefon raqamini yangilang",
+    "phone": "Telefon raqami",
+    "newPassword": "Yangi parol",
+    "password": "Parol",
+    "accountInfo": "Hisob haqida",
+    "registrationDate": "Ro'yxatdan o'tgan sana",
+    "notAdded": "Qo'shilmagan",
+    "save": "O'zgarishlarni saqlash",
+    "saving": "Saqlanmoqda...",
+    "saved": "Profil saqlandi",
+    "passwordMismatch": "Parollar mos kelmaydi",
+    "orders": "So'nggi buyurtmalar",
+    "allOrders": "Barcha buyurtmalar",
+    "items": "ta"
   },
   "admin": {
     "title": "Admin panel",

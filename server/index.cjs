@@ -211,7 +211,7 @@ async function start() {
     if (exists) return res.status(409).json({ error: 'EMAIL_TAKEN' })
 
     const nextId = users.length ? Math.max(...users.map((u) => u.id)) + 1 : 1
-    const user = { id: nextId, name, email, password, role: 'customer' }
+    const user = { id: nextId, name, email, password, role: 'customer', createdAt: new Date().toISOString() }
 
     router.db.get('users').push(user).write()
 
@@ -234,10 +234,36 @@ async function start() {
     res.json(users.map(({ password: _, ...safe }) => safe))
   })
 
+  server.patch('/users/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const current = router.db.get('users').find({ id }).value()
+    if (!current) return res.status(404).json({ error: 'USER_NOT_FOUND' })
+
+    const email = String(req.body.email ?? current.email).trim().toLowerCase()
+    const duplicate = router.db.get('users').value().some((user) => user.id !== id && user.email.toLowerCase() === email)
+    if (duplicate) return res.status(409).json({ error: 'EMAIL_TAKEN' })
+
+    const updated = {
+      ...current,
+      name: String(req.body.name ?? current.name).trim(),
+      email,
+      phone: String(req.body.phone ?? current.phone ?? '').trim(),
+      ...(req.body.password ? { password: String(req.body.password) } : {}),
+    }
+    router.db.get('users').find({ id }).assign(updated).write()
+    const { password: _, ...safeUser } = updated
+    res.json(safeUser)
+  })
+
   // ── POST /orders — custom: decrement variant stock ──
   server.post('/orders', (req, res) => {
     const body = req.body
     const isDemoOrder = Number(body.userId) === Number(demoUser.id)
+    if (body.userId && body.contact?.phone) {
+      router.db.get('users').find({ id: Number(body.userId) }).assign({
+        phone: String(body.contact.phone).trim(),
+      }).write()
+    }
     const orders = router.db.get('orders').value()
     const nextId = orders.length ? Math.max(...orders.map((order) => Number(order.id) || 0)) + 1 : 1
 

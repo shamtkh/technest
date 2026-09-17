@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { createOrderThunk } from '../store/thunks/ordersThunk'
 import { getProductsThunk } from '../store/thunks/getProductsThunk'
 import { clearCart } from '../store/slices/cartSlice'
+import { setUser } from '../store/slices/authSlice'
 import { formatPrice } from '../utils/format'
 import { useToast } from '../hooks/useToast'
 
@@ -40,7 +41,7 @@ export default function CheckoutPage() {
 
   const [form, setForm] = useState({
     fullName: user?.name || '',
-    phone: '',
+    phone: user?.phone || '',
     city: '',
     street: '',
     house: '',
@@ -93,6 +94,7 @@ export default function CheckoutPage() {
         })),
         total: subtotal,
       })).unwrap()
+      dispatch(setUser({ ...user, name: form.fullName, phone: form.phone }))
       dispatch(clearCart())
       dispatch(getProductsThunk())
       showToast(t('checkout.orderSuccess'), 'success', 5000)
