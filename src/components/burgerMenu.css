@@ -1,8 +1,8 @@
 .burger-menu {
   display: block;
   position: relative;
-  width: 32px;
-  height: 28px;
+  width: 28px;
+  height: 20px;
   cursor: pointer;
   user-select: none;
 }
@@ -24,27 +24,31 @@
   position: absolute;
   top: 10%;
   left: 0;
-  width: 32px;
+  width: 28px;
   height: 2px;
-  background: var(--color-ink-soft);
-  transition: 0.3s ease;
+  background: #0f766e;
+  transition: 0.28s ease;
 }
 
 .burger-menu .checkmark span:nth-child(2) { top: 50%; }
 .burger-menu .checkmark span:nth-child(3) { top: 90%; }
 
 .burger-menu input:checked + .checkmark span:nth-child(1) {
+  width: 25px;
   top: 50%;
+  left: 1px;
   transform: translateY(-50%) rotate(45deg);
 }
 
 .burger-menu input:checked + .checkmark span:nth-child(2) {
+  width: 25px;
   top: 50%;
+  left: 1px;
   transform: translateY(-50%) rotate(-45deg);
 }
 
 .burger-menu input:checked + .checkmark span:nth-child(3) {
-  transform: translateX(-50px);
+  transform: translateX(-36px);
   opacity: 0;
 }
 
