@@ -460,7 +460,13 @@ body.confirm-dialog-open {
   inset: 0;
   z-index: 50;
   background: rgba(11, 14, 20, 0.32);
-  animation: fadeIn 0.22s ease both;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.mobile-drawer-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
 }
 .mobile-drawer {
   position: absolute;
@@ -475,7 +481,13 @@ body.confirm-dialog-open {
   padding: 1.25rem 1.1rem calc(5rem + env(safe-area-inset-bottom));
   box-shadow: -18px 0 44px rgba(27, 55, 105, 0.18), inset 1px 0 0 rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(24px) saturate(135%);
-  animation: drawerSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mobile-drawer-backdrop.is-open .mobile-drawer {
+  opacity: 1;
+  transform: translateX(0);
 }
 .mobile-drawer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
 .mobile-navbar-logo { transform: none; }
@@ -488,11 +500,6 @@ body.confirm-dialog-open {
 .mobile-profile-dropdown a:hover { background: rgba(61, 127, 255, 0.1); }
 .mobile-profile-dropdown button { color: var(--color-danger); }
 .mobile-profile-dropdown button:hover { background: rgba(255, 90, 95, 0.1); }
-
-@keyframes drawerSlideIn {
-  from { opacity: 0; transform: translateX(100%); }
-  to { opacity: 1; transform: translateX(0); }
-}
 
 @media (max-width: 1023px) {
   .mobile-tab-bar { display: grid; }

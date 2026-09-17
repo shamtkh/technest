@@ -176,23 +176,26 @@ export default function Navbar() {
             </Link>
           )}
 
-          <button
-            className="navbar-icon flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white lg:hidden"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label="Menu"
-          >
-            <div className="relative h-3 w-4">
-              <span className={`absolute left-0 top-0 h-0.5 w-4 rounded bg-ink-soft transition-all duration-300 ${mobileOpen ? 'top-[5px] rotate-45' : ''}`} />
-              <span className={`absolute left-0 top-[5px] h-0.5 w-4 rounded bg-ink-soft transition-all duration-300 ${mobileOpen ? 'opacity-0 scale-x-0' : ''}`} />
-              <span className={`absolute left-0 top-[10px] h-0.5 w-4 rounded bg-ink-soft transition-all duration-300 ${mobileOpen ? 'top-[5px] -rotate-45' : ''}`} />
-            </div>
-          </button>
+          <label className="mobile-menu-toggle flex w-8 cursor-pointer flex-col gap-2 lg:hidden" aria-label="Menu">
+            <input
+              className="peer hidden"
+              type="checkbox"
+              checked={mobileOpen}
+              onChange={(event) => setMobileOpen(event.target.checked)}
+            />
+            <span className="h-[3px] w-1/2 rounded-2xl bg-ink-soft duration-500 origin-right peer-checked:-translate-x-[12px] peer-checked:-translate-y-[1px] peer-checked:rotate-[225deg]" />
+            <span className="h-[3px] w-full rounded-2xl bg-ink-soft duration-500 peer-checked:-rotate-45" />
+            <span className="h-[3px] w-1/2 self-end rounded-2xl bg-ink-soft duration-500 origin-left peer-checked:translate-x-[12px] peer-checked:translate-y-[1px] peer-checked:rotate-[225deg]" />
+          </label>
         </div>
       </div>
       </header>
 
-      {mobileOpen && (
-        <div className="mobile-drawer-backdrop lg:hidden" onClick={() => setMobileOpen(false)}>
+      <div
+        className={`mobile-drawer-backdrop lg:hidden ${mobileOpen ? 'is-open' : ''}`}
+        onClick={() => setMobileOpen(false)}
+        aria-hidden={!mobileOpen}
+      >
           <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
             <div className="mobile-drawer-header">
               <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-drawer-logo h-9 w-32 object-cover object-center" />
@@ -296,8 +299,7 @@ export default function Navbar() {
             )}
             </div>
           </aside>
-        </div>
-      )}
+      </div>
 
       <nav className="mobile-tab-bar lg:hidden" aria-label="Mobile navigation">
         <NavLink to="/" end className={({ isActive }) => `mobile-tab${isActive ? ' active' : ''}`}><FaHouse aria-hidden="true" /><span>{t('nav.home')}</span></NavLink>
