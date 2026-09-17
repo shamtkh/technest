@@ -496,6 +496,15 @@ body.confirm-dialog-open {
   width: 34px;
   height: 28px;
   cursor: pointer;
+  color: var(--color-ink-soft);
+  transform: none;
+  transition: none;
+}
+.mobile-menu-toggle.bar:hover,
+.mobile-menu-toggle.bar:focus-within {
+  color: var(--color-ink-soft);
+  transform: none;
+  filter: none;
 }
 .mobile-menu-toggle.bar input[type="checkbox"] {
   display: none;
