@@ -23,7 +23,7 @@ export default function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <BrandLogo src={logo} alt={t('brand')} className="h-20 w-72" />
+              <BrandLogo src={logo} alt={t('brand')} className="h-20 w-72" processCheckerboard={false} />
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-steel">{t('footer.about')}</p>
           </div>

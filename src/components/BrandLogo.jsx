@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 
-export default function BrandLogo({ src, alt, className = '' }) {
+export default function BrandLogo({ src, alt, className = '', processCheckerboard = true }) {
   const [processedSrc, setProcessedSrc] = useState(src)
   const [loaded, setLoaded] = useState(false)
   const processed = useRef(false)
@@ -41,7 +41,7 @@ export default function BrandLogo({ src, alt, className = '' }) {
         alt={alt}
         onLoad={(event) => {
           setLoaded(true)
-          removeCheckerboard(event)
+          if (processCheckerboard) removeCheckerboard(event)
         }}
         className="relative h-full w-full object-contain"
       />
