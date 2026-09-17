@@ -141,8 +141,9 @@ input:focus-visible { outline: none; }
 }
 
 .variant-color-picker {
-  width: 100%;
-  min-width: 0;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  min-width: 2.75rem;
   height: 2.75rem;
   cursor: pointer;
   border: 1.5px solid var(--color-line);
@@ -150,6 +151,12 @@ input:focus-visible { outline: none; }
   background: white;
   padding: 0.35rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.variant-stock-input {
+  min-width: 5rem;
+  color: var(--color-ink-soft);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 .variant-color-picker:hover, .variant-color-picker:focus-visible {
   border-color: var(--color-accent);
