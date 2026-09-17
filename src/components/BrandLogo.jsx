@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 
 export default function BrandLogo({ src, alt, className = '' }) {
   const [processedSrc, setProcessedSrc] = useState(src)
+  const [loaded, setLoaded] = useState(false)
   const processed = useRef(false)
 
   function removeCheckerboard(event) {
@@ -32,5 +33,18 @@ export default function BrandLogo({ src, alt, className = '' }) {
     setProcessedSrc(canvas.toDataURL('image/png'))
   }
 
-  return <img src={processedSrc} alt={alt} onLoad={removeCheckerboard} className={className} />
+  return (
+    <span className={`relative inline-flex overflow-hidden ${className}`}>
+      <span className={`skeleton absolute inset-0 transition-opacity duration-300 ${loaded ? 'opacity-0' : ''}`} aria-hidden="true" />
+      <img
+        src={processedSrc}
+        alt={alt}
+        onLoad={(event) => {
+          setLoaded(true)
+          removeCheckerboard(event)
+        }}
+        className="relative h-full w-full object-contain"
+      />
+    </span>
+  )
 }
