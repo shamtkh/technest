@@ -7,6 +7,7 @@ import { logout } from '../store/slices/authSlice'
 import { FaBell, FaHouse, FaMagnifyingGlass, FaBagShopping, FaTableCellsLarge, FaClipboardList, FaUser } from 'react-icons/fa6'
 import logo from '../assets/technest-logo-navbar.png'
 import BrandLogo from './BrandLogo'
+import BurgerMenu from './BurgerMenu'
 import ConfirmDialog from './ConfirmDialog'
 
 const LANGS = [
@@ -176,7 +177,7 @@ export default function Navbar() {
             </Link>
           )}
 
-          <MobileMenuToggle checked={mobileOpen} onChange={setMobileOpen} />
+          <BurgerMenu checked={mobileOpen} onChange={setMobileOpen} />
         </div>
       </div>
       </header>
@@ -189,7 +190,7 @@ export default function Navbar() {
           <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
             <div className="mobile-drawer-header">
               <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-drawer-logo h-9 w-32 object-cover object-center" />
-              <MobileMenuToggle checked={mobileOpen} onChange={setMobileOpen} />
+              <BurgerMenu checked={mobileOpen} onChange={setMobileOpen} />
             </div>
             <div className="mb-5">
             <SearchBar compact onSubmit={() => setMobileOpen(false)} />
@@ -314,17 +315,3 @@ export default function Navbar() {
   )
 }
 
-function MobileMenuToggle({ checked, onChange }) {
-  return (
-    <label className="mobile-menu-toggle bar lg:hidden" aria-label={checked ? 'Close menu' : 'Open menu'}>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-      />
-      <span className="top" />
-      <span className="middle" />
-      <span className="bottom" />
-    </label>
-  )
-}

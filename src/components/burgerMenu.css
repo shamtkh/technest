@@ -1,0 +1,55 @@
+.burger-menu {
+  display: block;
+  position: relative;
+  width: 34px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.burger-menu input[type="checkbox"] {
+  -webkit-appearance: none;
+  display: none;
+  visibility: hidden;
+}
+
+.burger-menu span {
+  position: absolute;
+  left: 0;
+  display: inline-block;
+  width: 32px;
+  height: 4px;
+  border-radius: 100px;
+  background: var(--color-ink-soft);
+  transition: 0.3s ease;
+}
+
+.burger-menu span.top { top: 0; }
+.burger-menu span.middle { top: 12px; }
+.burger-menu span.bottom { bottom: 0; }
+
+.burger-menu input[type="checkbox"]:checked ~ span.top {
+  width: 34px;
+  left: 3px;
+  transform: rotate(45deg);
+  transform-origin: top left;
+}
+
+.burger-menu input[type="checkbox"]:checked ~ span.bottom {
+  width: 34px;
+  bottom: -1px;
+  left: 3px;
+  transform: rotate(-45deg);
+  transform-origin: top left;
+  box-shadow: 0 0 8px rgba(73, 80, 87, 0.25);
+}
+
+.burger-menu input[type="checkbox"]:checked ~ span.middle {
+  transform: translateX(-14px);
+  opacity: 0;
+}
+
+@media (min-width: 1024px) {
+  .burger-menu {
+    display: none;
+  }
+}
