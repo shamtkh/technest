@@ -975,21 +975,22 @@ export default function AdminDashboard() {
                   {form.variants.map((variant, index) => (
                     <div key={index} className="rounded-xl border border-line p-2">
                       <input className="input min-w-0" placeholder="128GB" value={variant.storage} onChange={(e) => updateVariant(index, { storage: e.target.value })} />
-                      <div className="mt-2 grid grid-cols-3 gap-2 text-[10px] font-semibold uppercase tracking-wider text-steel">
-                        <span>UZ</span><span>RU</span><span>EN</span>
-                      </div>
                       <div className="mt-2 grid gap-2 sm:grid-cols-3">
                         {['uz', 'ru', 'en'].map((language) => (
-                          <input
-                            key={language}
-                            className="input min-w-0"
-                            placeholder={`${language.toUpperCase()} color`}
-                            value={variant.colorNames?.[language] || ''}
-                            onChange={(e) => {
-                              const colorNames = { uz: '', ru: '', en: '', ...variant.colorNames, [language]: e.target.value }
-                              updateVariant(index, { colorNames, color: colorNames.ru || colorNames.uz || colorNames.en })
-                            }}
-                          />
+                          <label key={language} className="min-w-0">
+                            <span className="mb-1 block pl-1 text-[10px] font-semibold uppercase tracking-wider text-steel">
+                              {language === 'uz' ? "O'zbekcha" : language === 'ru' ? 'Русский' : 'English'}
+                            </span>
+                            <input
+                              className="input min-w-0"
+                              placeholder={language === 'uz' ? "O'zbekcha rang" : language === 'ru' ? 'Название цвета' : 'Color name'}
+                              value={variant.colorNames?.[language] || ''}
+                              onChange={(e) => {
+                                const colorNames = { uz: '', ru: '', en: '', ...variant.colorNames, [language]: e.target.value }
+                                updateVariant(index, { colorNames, color: colorNames.ru || colorNames.uz || colorNames.en })
+                              }}
+                            />
+                          </label>
                         ))}
                       </div>
                       <div className="mt-2 flex items-center gap-2">
