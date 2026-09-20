@@ -101,6 +101,7 @@ export default function CheckoutPage() {
       setPlaced(true)
     } catch {
       showToast(t('checkout.orderError'), 'error')
+      dispatch(getProductsThunk())
     }
     setPlacing(false)
   }

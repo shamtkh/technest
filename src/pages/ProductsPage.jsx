@@ -24,8 +24,10 @@ export default function ProductsPage() {
   const maxPrice = params.get('maxPrice') || ''
 
   useEffect(() => {
-    if (status === 'idle') dispatch(getProductsThunk())
-  }, [status, dispatch])
+    dispatch(getProductsThunk())
+    const interval = setInterval(() => dispatch(getProductsThunk()), 15000)
+    return () => clearInterval(interval)
+  }, [dispatch])
 
   useEffect(() => {
     api.getCategories().then(setCategories).catch(() => setCategories([]))

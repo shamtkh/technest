@@ -23,10 +23,13 @@ export default function OrdersPage() {
   const { items, status } = useSelector((s) => s.orders)
 
   useEffect(() => {
-    if (user) dispatch(getMyOrdersThunk(user.id))
+    if (!user) return
+    dispatch(getMyOrdersThunk(user.id))
+    const interval = setInterval(() => dispatch(getMyOrdersThunk(user.id)), 15000)
+    return () => clearInterval(interval)
   }, [user, dispatch])
 
-  if (status === 'loading') {
+  if (status === 'loading' && items.length === 0) {
     return <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8 page-enter"><Skeleton className="mb-6 h-8 w-40" /><OrdersSkeleton /></div>
   }
 

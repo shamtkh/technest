@@ -212,13 +212,16 @@ async function start() {
 
   // ── POST /auth/register ──
   server.post('/auth/register', (req, res) => {
-    const { name, email, password } = req.body
+    const { name, password } = req.body
+    // Normalize the same way /auth/login does, otherwise an email saved with
+    // stray whitespace/casing here can never match a trimmed login attempt.
+    const email = String(req.body.email || '').trim().toLowerCase()
     const users = router.db.get('users').value()
-    const exists = users.some((u) => u.email.toLowerCase() === email.toLowerCase())
+    const exists = users.some((u) => u.email.toLowerCase() === email)
     if (exists) return res.status(409).json({ error: 'EMAIL_TAKEN' })
 
     const nextId = users.length ? Math.max(...users.map((u) => u.id)) + 1 : 1
-    const user = { id: nextId, name, email, password, role: 'customer', createdAt: new Date().toISOString() }
+    const user = { id: nextId, name: String(name || '').trim(), email, password, role: 'customer', createdAt: new Date().toISOString() }
 
     router.db.get('users').push(user).write()
 
@@ -299,9 +302,18 @@ async function start() {
         return res.status(400).json({ error: 'INVALID_ORDER_ITEM' })
       }
 
-      const variant = getOrderVariant(product, item)
-      const availableStock = variant ? Number(variant.stock) || 0 : Number(product.stock) || 0
-      if (requestedQuantity > availableStock) {
+      // Carts persist across sessions, so a cart item's storage/color may no
+      // longer match any real variant (admin renamed/removed it since it was
+      // added). Falling back to the product's aggregate stock here would let
+      // the order pass validation while the decrement step below finds no
+      // matching variant to reduce, silently desyncing inventory.
+      if (product.variants?.length) {
+        const variant = getOrderVariant(product, item)
+        if (!variant) return res.status(409).json({ error: 'INVALID_ORDER_ITEM' })
+        if (requestedQuantity > (Number(variant.stock) || 0)) {
+          return res.status(409).json({ error: 'INSUFFICIENT_STOCK' })
+        }
+      } else if (requestedQuantity > (Number(product.stock) || 0)) {
         return res.status(409).json({ error: 'INSUFFICIENT_STOCK' })
       }
     }

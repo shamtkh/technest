@@ -1469,13 +1469,6 @@
       "role": "customer"
     },
     {
-      "id": 4,
-      "name": "qw",
-      "email": "qw@gmail.com",
-      "password": "123456",
-      "role": "customer"
-    },
-    {
       "id": 6,
       "name": "test",
       "email": "test@mail.ru",

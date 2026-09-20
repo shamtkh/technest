@@ -33,8 +33,10 @@ export default function ProductPage() {
   const [loadedImages, setLoadedImages] = useState({})
 
   useEffect(() => {
-    if (status === 'idle') dispatch(getProductsThunk())
-  }, [status, dispatch])
+    dispatch(getProductsThunk())
+    const interval = setInterval(() => dispatch(getProductsThunk()), 15000)
+    return () => clearInterval(interval)
+  }, [dispatch])
 
   if (product && product.id !== loadedProductId) {
     setLoadedProductId(product.id)

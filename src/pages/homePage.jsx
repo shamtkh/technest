@@ -21,8 +21,10 @@ export default function HomePage() {
   const { items, status } = useSelector((s) => s.products)
 
   useEffect(() => {
-    if (status === 'idle') dispatch(getProductsThunk())
-  }, [status, dispatch])
+    dispatch(getProductsThunk())
+    const interval = setInterval(() => dispatch(getProductsThunk()), 15000)
+    return () => clearInterval(interval)
+  }, [dispatch])
 
   const featured = items.filter((p) => p.featured).slice(0, 4)
 
