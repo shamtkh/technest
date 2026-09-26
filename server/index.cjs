@@ -116,6 +116,12 @@ async function start() {
   // defaults() (CORS, no-cache headers, etc.) must run before the custom routes
   // below — otherwise their responses go out without CORS headers and browsers
   // silently block them (they still succeed when hit directly, e.g. via curl).
+  // Let browsers cache CORS preflights (the site and API are on different
+  // origins in production) instead of re-checking before every write.
+  server.use((req, res, next) => {
+    if (req.method === 'OPTIONS') res.setHeader('Access-Control-Max-Age', '7200')
+    next()
+  })
   server.use(defaults)
   server.use(jsonServer.bodyParser)
 

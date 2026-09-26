@@ -53,7 +53,7 @@ export default function BulkStockImport({ products }) {
     setBusy(true)
     try {
       const result = await api.bulkUpdateStock(updates)
-      dispatch(getProductsThunk())
+      dispatch(getProductsThunk({ force: true }))
       showToast(t('bulk.done', { rows: result.updated, products: result.products }), 'success', 5000)
     } catch (err) {
       // Row numbers shown to the admin match the spreadsheet (header is row 1).

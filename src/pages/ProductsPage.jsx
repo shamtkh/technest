@@ -6,13 +6,17 @@ import { getProductsThunk } from '../store/thunks/getProductsThunk'
 import ProductCard from '../components/ProductCard'
 import PageTransition from '../components/PageTransition'
 import GlassSelect from '../components/GlassSelect'
+import { usePolling } from '../hooks/usePolling'
 import { ProductGridSkeleton, Skeleton } from '../components/Skeleton'
 import api from '../api/api'
 
 export default function ProductsPage() {
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
-  const { items, status } = useSelector((s) => s.products)
+  // Select fields separately: the slice also holds fetch bookkeeping that
+  // changes on every poll and shouldn't re-render the page.
+  const items = useSelector((s) => s.products.items)
+  const status = useSelector((s) => s.products.status)
   const [params, setParams] = useSearchParams()
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [categories, setCategories] = useState([])
@@ -25,9 +29,8 @@ export default function ProductsPage() {
 
   useEffect(() => {
     dispatch(getProductsThunk())
-    const interval = setInterval(() => dispatch(getProductsThunk()), 15000)
-    return () => clearInterval(interval)
   }, [dispatch])
+  usePolling(() => dispatch(getProductsThunk()), 15000)
 
   useEffect(() => {
     api.getCategories().then(setCategories).catch(() => setCategories([]))

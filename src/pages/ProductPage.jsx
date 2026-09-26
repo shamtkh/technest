@@ -15,6 +15,7 @@ import WishlistButton from '../components/WishlistButton'
 import ProductReviews from '../components/ProductReviews'
 import { addViewed } from '../store/slices/recentlyViewedSlice'
 import api from '../api/api'
+import { usePolling } from '../hooks/usePolling'
 import { firstAvailableVariant } from '../utils/variants'
 
 // Same category first; prefer the same brand and a similar price point.
@@ -36,7 +37,10 @@ export default function ProductPage() {
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
   const { showToast } = useToast()
-  const { items, status } = useSelector((s) => s.products)
+  // Select fields separately: the slice also holds fetch bookkeeping that
+  // changes on every poll and shouldn't re-render the page.
+  const items = useSelector((s) => s.products.items)
+  const status = useSelector((s) => s.products.status)
   const cartItems = useSelector((s) => s.cart.items)
   const user = useSelector((s) => s.auth.user)
   const isAdmin = user?.role === 'admin'
@@ -53,9 +57,8 @@ export default function ProductPage() {
 
   useEffect(() => {
     dispatch(getProductsThunk())
-    const interval = setInterval(() => dispatch(getProductsThunk()), 15000)
-    return () => clearInterval(interval)
   }, [dispatch])
+  usePolling(() => dispatch(getProductsThunk()), 15000)
 
   useEffect(() => {
     dispatch(addViewed(id))

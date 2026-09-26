@@ -9,6 +9,7 @@ import PageTransition from '../components/PageTransition'
 import Reveal from '../components/Reveal'
 import { HomePageSkeleton } from '../components/Skeleton'
 import api from '../api/api'
+import { usePolling } from '../hooks/usePolling'
 
 const BANNER_INTERVAL_MS = 6000
 
@@ -32,16 +33,18 @@ const CATEGORY_IMAGES = {
 export default function HomePage() {
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
-  const { items, status } = useSelector((s) => s.products)
+  // Select fields separately: the slice also holds fetch bookkeeping that
+  // changes on every poll and shouldn't re-render the page.
+  const items = useSelector((s) => s.products.items)
+  const status = useSelector((s) => s.products.status)
   const recentIds = useSelector((s) => s.recentlyViewed.ids)
   const [banners, setBanners] = useState([])
   const [activeBanner, setActiveBanner] = useState(0)
 
   useEffect(() => {
     dispatch(getProductsThunk())
-    const interval = setInterval(() => dispatch(getProductsThunk()), 15000)
-    return () => clearInterval(interval)
   }, [dispatch])
+  usePolling(() => dispatch(getProductsThunk()), 15000)
 
   useEffect(() => {
     api.getBanners()

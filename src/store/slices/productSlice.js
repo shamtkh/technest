@@ -9,6 +9,8 @@ const initialState = {
   status: 'idle',
   error: null,
   mutationStatus: 'idle',
+  fetching: false,
+  lastFetchedAt: null,
 }
 
 const productSlice = createSlice({
@@ -17,14 +19,20 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Background refreshes don't flip status to 'loading' once items exist,
+      // so pages don't re-render (or flash skeletons) on every poll.
       .addCase(getProductsThunk.pending, (state) => {
-        state.status = 'loading'
+        state.fetching = true
+        if (!state.items.length) state.status = 'loading'
       })
       .addCase(getProductsThunk.fulfilled, (state, action) => {
+        state.fetching = false
+        state.lastFetchedAt = Date.now()
         state.status = 'succeeded'
-        state.items = action.payload
+        if (action.payload.changed) state.items = action.payload.items
       })
       .addCase(getProductsThunk.rejected, (state, action) => {
+        state.fetching = false
         state.status = 'failed'
         state.error = action.payload || 'error'
       })

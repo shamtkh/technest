@@ -3,10 +3,13 @@ const BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'h
 async function request(url, options = {}) {
   let res
   try {
-    res = await fetch(`${BASE}${url}`, {
-      headers: { 'Content-Type': 'application/json', ...options.headers },
-      ...options,
-    })
+    // Content-Type only when there's a body: on a GET it turns a simple
+    // cross-origin request into one that needs a CORS preflight, i.e. an
+    // extra round trip to the API before every read.
+    const headers = options.body
+      ? { 'Content-Type': 'application/json', ...options.headers }
+      : { ...options.headers }
+    res = await fetch(`${BASE}${url}`, { ...options, headers })
   } catch {
     throw new Error('API_UNAVAILABLE')
   }

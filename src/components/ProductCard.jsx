@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { memo, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -8,18 +8,21 @@ import { getProductFallbackImage, getProductImages } from '../utils/productImage
 import WishlistButton from './WishlistButton'
 import { FaArrowLeft, FaArrowRight, FaBagShopping, FaMinus, FaPlus, FaStar, FaTrashCan } from 'react-icons/fa6'
 
-export default function ProductCard({ product }) {
+// Memoized: the catalog re-renders on polls, cart changes elsewhere, etc.;
+// a card only needs to update when its own product or cart line changes.
+export default memo(function ProductCard({ product }) {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const user = useSelector((s) => s.auth.user)
-  const cartItems = useSelector((s) => s.cart.items)
+  const isAdmin = useSelector((s) => s.auth.user?.role === 'admin')
+  const cartItem = useSelector((s) => s.cart.items.find((item) => item.productId === product.id))
 
   const [activeImage, setActiveImage] = useState(0)
+  // Only photos the shopper has actually shown are mounted, so a card loads
+  // and decodes one image up front instead of the whole carousel.
+  const [shownImages, setShownImages] = useState(() => new Set([0]))
   const [loadedImages, setLoadedImages] = useState({})
   const [isDragging, setIsDragging] = useState(false)
   const dragStart = useRef(null)
-  const isAdmin = user?.role === 'admin'
-  const cartItem = cartItems.find((item) => item.productId === product.id)
 
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
@@ -27,22 +30,30 @@ export default function ProductCard({ product }) {
 
   const images = getProductImages(product)
 
+  function showImage(index) {
+    setActiveImage(index)
+    setShownImages((shown) => (shown.has(index) ? shown : new Set(shown).add(index)))
+  }
+
+  const prevIndex = activeImage === 0 ? images.length - 1 : activeImage - 1
+  const nextIndex = activeImage === images.length - 1 ? 0 : activeImage + 1
+
   function prevImage(e) {
     e.preventDefault()
     e.stopPropagation()
-    setActiveImage((i) => (i === 0 ? images.length - 1 : i - 1))
+    showImage(prevIndex)
   }
 
   function nextImage(e) {
     e.preventDefault()
     e.stopPropagation()
-    setActiveImage((i) => (i === images.length - 1 ? 0 : i + 1))
+    showImage(nextIndex)
   }
 
   function handleDotClick(e, idx) {
     e.preventDefault()
     e.stopPropagation()
-    setActiveImage(idx)
+    showImage(idx)
   }
 
   function handlePointerDown(e) {
@@ -56,8 +67,7 @@ export default function ProductCard({ product }) {
     dragStart.current = null
     if (Math.abs(delta) > 40) {
       setIsDragging(true)
-      if (delta < 0) setActiveImage((i) => (i === images.length - 1 ? 0 : i + 1))
-      else setActiveImage((i) => (i === 0 ? images.length - 1 : i - 1))
+      showImage(delta < 0 ? nextIndex : prevIndex)
     }
   }
 
@@ -83,7 +93,7 @@ export default function ProductCard({ product }) {
         onPointerUp={handlePointerUp}
       >
         {!loadedImages[activeImage] && <div className="absolute inset-0 z-[1] bg-paper-dim"><span className="skeleton absolute inset-0 rounded-none" aria-hidden="true" /></div>}
-        {images.map((img, idx) => (
+        {images.map((img, idx) => shownImages.has(idx) && (
           <img
             key={idx}
             src={img}
@@ -91,6 +101,7 @@ export default function ProductCard({ product }) {
             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = getProductFallbackImage(product) }}
             onLoad={() => setLoadedImages((loaded) => ({ ...loaded, [idx]: true }))}
             loading="lazy"
+            decoding="async"
             draggable={false}
             className="absolute inset-0 h-full w-full object-contain p-3"
             style={{
@@ -173,15 +184,15 @@ export default function ProductCard({ product }) {
           {product.specs.ram !== '—' && <span className="shrink-0">· {product.specs.ram}</span>}
         </div>
 
-        <div className={`mt-auto flex items-end justify-between gap-x-1.5 gap-y-2 pt-3 sm:gap-x-2 ${cartItem ? 'flex-wrap' : 'flex-nowrap'}`}>
+        <div className={`card-price-row mt-auto flex items-end justify-between gap-x-1.5 gap-y-2 pt-3 sm:gap-x-2 ${cartItem ? 'flex-wrap' : 'flex-nowrap'}`}>
           <div className="min-w-0">
             {product.oldPrice && (
               <div className="whitespace-nowrap font-mono-tabular text-[11px] text-steel line-through sm:text-xs">
                 {formatPrice(product.oldPrice)}
               </div>
             )}
-            <div className="whitespace-nowrap font-mono-tabular text-[12px] font-semibold tracking-tight text-ink-soft sm:text-[15px] sm:tracking-normal">
-              {formatPrice(product.price)} <span className="text-[9px] font-normal text-steel max-[359px]:hidden sm:text-xs">{t('common.currency')}</span>
+            <div className="card-price whitespace-nowrap font-mono-tabular font-semibold text-ink-soft">
+              {formatPrice(product.price)} <span className="text-[0.7em] font-normal text-steel max-[359px]:hidden">{t('common.currency')}</span>
             </div>
           </div>
 
@@ -229,4 +240,4 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   )
-}
+})

@@ -11,7 +11,10 @@ import { ProductGridSkeleton, Skeleton } from '../components/Skeleton'
 export default function WishlistPage() {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const { items, status } = useSelector((s) => s.products)
+  // Select fields separately: the slice also holds fetch bookkeeping that
+  // changes on every poll and shouldn't re-render the page.
+  const items = useSelector((s) => s.products.items)
+  const status = useSelector((s) => s.products.status)
   const ids = useSelector((s) => s.wishlist.ids)
   const user = useSelector((s) => s.auth.user)
 

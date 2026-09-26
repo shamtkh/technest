@@ -5,17 +5,17 @@ import logo from '../assets/technest-logo-footer.png'
 import BrandLogo from './BrandLogo'
 import { FaTelegram, FaPhone, FaInstagram } from 'react-icons/fa6'
 import api from '../api/api'
+import { usePolling } from '../hooks/usePolling'
 
 export default function Footer() {
   const { t } = useTranslation()
   const [supportSettings, setSupportSettings] = useState({ telegram: '', phone: '', instagram: '' })
 
   useEffect(() => {
-    const loadSupportSettings = () => api.getSupportSettings().then(setSupportSettings).catch(() => {})
-    loadSupportSettings()
-    const interval = setInterval(loadSupportSettings, 10000)
-    return () => clearInterval(interval)
+    api.getSupportSettings().then(setSupportSettings).catch(() => {})
   }, [])
+  // Contacts change rarely; a slow refresh is plenty.
+  usePolling(() => api.getSupportSettings().then(setSupportSettings).catch(() => {}), 60000)
 
   return (
     <footer className="border-t border-line-dark bg-ink text-white">

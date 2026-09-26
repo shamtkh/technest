@@ -153,7 +153,7 @@ export default function CheckoutPage() {
       }
       dispatch(setUser({ ...user, name: form.fullName, phone: form.phone, addresses }))
       dispatch(clearCart())
-      dispatch(getProductsThunk())
+      dispatch(getProductsThunk({ force: true }))
       showToast(t('checkout.orderSuccess'), 'success', 5000)
       setPlacedOrder(order)
     } catch (err) {
@@ -166,7 +166,7 @@ export default function CheckoutPage() {
       } else {
         showToast(t('checkout.orderError'), 'error')
       }
-      dispatch(getProductsThunk())
+      dispatch(getProductsThunk({ force: true }))
     }
     setPlacing(false)
   }

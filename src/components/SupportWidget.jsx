@@ -9,6 +9,7 @@ import { markMessageReadThunk } from '../store/thunks/markMessageReadThunk'
 import { useToast } from '../hooks/useToast'
 import api from '../api/api'
 import { FaXmark, FaTelegram, FaPhone, FaInstagram, FaPaperPlane, FaCommentDots, FaHeadset, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
+import { usePolling } from '../hooks/usePolling'
 
 export default function SupportWidget() {
   const { t, i18n } = useTranslation()
@@ -34,18 +35,16 @@ export default function SupportWidget() {
   }
 
   useEffect(() => {
-    const loadSupportSettings = () => api.getSupportSettings().then(setSupportSettings).catch(() => {})
-    loadSupportSettings()
-    const interval = setInterval(loadSupportSettings, 10000)
-    return () => clearInterval(interval)
+    api.getSupportSettings().then(setSupportSettings).catch(() => {})
   }, [])
+  // Contacts change rarely; a slow refresh is plenty.
+  usePolling(() => api.getSupportSettings().then(setSupportSettings).catch(() => {}), 60000)
 
   useEffect(() => {
     if (!user || isAdmin) return
     dispatch(getMyMessagesThunk(user.id))
-    const interval = setInterval(() => dispatch(getMyMessagesThunk(user.id)), 10000)
-    return () => clearInterval(interval)
   }, [user, isAdmin, dispatch])
+  usePolling(() => dispatch(getMyMessagesThunk(user.id)), 10000, Boolean(user && !isAdmin))
 
   useEffect(() => {
     if (!user || isAdmin || unreadCount === undefined) return

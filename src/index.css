@@ -83,11 +83,13 @@ h1, h2, h3, h4, .font-display {
   box-shadow: var(--shadow-realistic);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
-.card-realistic:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-realistic-lg);
-  border-color: var(--color-steel);
-}
+@media (hover: hover) {
+  .card-realistic:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-realistic-lg);
+    border-color: var(--color-steel);
+  }
+  }
 .card-realistic img { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease; }
 .card-realistic:hover img { transform: scale(1.025); }
 
@@ -103,8 +105,11 @@ h1, h2, h3, h4, .font-display {
   transform: translateX(-120%);
   transition: transform 0.7s ease;
 }
-.sheen:hover::after {
-  transform: translateX(120%);
+@media (hover: hover) {
+  .sheen:hover::after { transform: translateX(120%); }
+}
+@media (hover: none) {
+  .sheen::after { display: none; }
 }
 
 ::selection {
@@ -517,12 +522,12 @@ body.confirm-dialog-open {
   width: min(55vw, 15rem);
   flex-direction: column;
   border-left: 1px solid rgba(255, 255, 255, 0.75);
-  background: rgba(247, 250, 255, 0.98);
+  background: #f7faff;
   padding: 1.25rem 1.1rem calc(5rem + env(safe-area-inset-bottom));
   box-shadow: -18px 0 44px rgba(27, 55, 105, 0.18), inset 1px 0 0 rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(24px) saturate(135%);
   opacity: 0;
   transform: translateX(100%);
+  will-change: transform, opacity;
   transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .mobile-drawer-backdrop.is-open .mobile-drawer {
@@ -663,7 +668,9 @@ button, a {
 button:active:not(:disabled):not(.wishlist-btn) {
   transform: scale(0.95);
 }
-button:hover:not(:disabled):not(.wishlist-btn):not(.glass-select-trigger):not(.glass-select-option):not(.support-conversation-row):not(.clear-chat-button) { transform: scale(1.03); }
+@media (hover: hover) {
+  button:hover:not(:disabled):not(.wishlist-btn):not(.glass-select-trigger):not(.glass-select-option):not(.support-conversation-row):not(.clear-chat-button) { transform: scale(1.03); }
+}
 
 .site-header { animation: headerIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
 @keyframes headerIn {
@@ -738,10 +745,6 @@ button:hover:not(:disabled):not(.wishlist-btn):not(.glass-select-trigger):not(.g
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@keyframes shimmer {
-  from { background-position: -400px 0; }
-  to { background-position: 400px 0; }
-}
 
 /* ── Page Transitions ── */
 .page-enter {
@@ -793,13 +796,6 @@ button:hover:not(:disabled):not(.wishlist-btn):not(.glass-select-trigger):not(.g
   animation: fadeIn 0.2s ease both;
 }
 
-/* ── Loading skeleton ── */
-.skeleton {
-  background: linear-gradient(90deg, var(--color-paper-dim) 25%, var(--color-line) 50%, var(--color-paper-dim) 75%);
-  background-size: 400px 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 0.5rem;
-}
 
 /* ── Status badge colours ── */
 .status-pending  { background: rgba(245,158,11,0.12); color: #b45309; border: 1px solid rgba(245,158,11,0.3); }
@@ -859,7 +855,9 @@ button:hover:not(:disabled):not(.wishlist-btn):not(.glass-select-trigger):not(.g
   color: var(--color-steel);
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
-.wishlist-btn:hover { color: #ef4444; transform: scale(1.08); }
+@media (hover: hover) {
+  .wishlist-btn:hover { color: #ef4444; transform: scale(1.08); }
+}
 .wishlist-btn:active { transform: scale(0.88); transition-duration: 0.12s; }
 .wishlist-btn.is-active { color: #ef4444; }
 .wishlist-icon { position: relative; display: grid; place-items: center; }
@@ -908,4 +906,36 @@ button:hover:not(:disabled):not(.wishlist-btn):not(.glass-select-trigger):not(.g
 @media (prefers-reduced-motion: reduce) {
   .wishlist-btn, .wishlist-icon-outline, .wishlist-icon-fill { transition: none; }
   .wishlist-burst { display: none; }
+}
+
+/* ── Product card price: scales with the card so it uses the room next to
+   the bag button (sized for 10-character prices like "14 200 000"). ── */
+.card-price-row { container-type: inline-size; }
+.card-price {
+  font-size: clamp(12px, calc(13.3cqw - 4.5px), 16px);
+  letter-spacing: -0.025em;
+}
+@media (min-width: 640px) {
+  .card-price { font-size: clamp(12px, calc(12.6cqw - 5.5px), 16px); letter-spacing: 0; }
+}
+
+/* ── Touch devices ──
+   backdrop-filter re-blurs whatever scrolls or slides underneath on every
+   frame; on phones it was the main cost while scrolling and opening the
+   menu. Translucent surfaces get near-opaque backgrounds instead, so the
+   look stays the same without the blur. */
+@media (hover: none) and (pointer: coarse) {
+  *, *::before, *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .site-header { background-color: rgba(245, 246, 248, 0.97); }
+  .mobile-tab-bar { background: rgba(247, 250, 255, 0.97); }
+  .glass-select-trigger { background: linear-gradient(135deg, #ffffff, #f2f6ff); }
+  .glass-select-menu { background: rgba(250, 252, 255, 0.99); }
+  .search-glass { background: rgba(255, 255, 255, 0.96); }
+  .language-switch { background: rgba(255, 255, 255, 0.94); }
+  .clear-chat-button { background: rgba(255, 255, 255, 0.92); }
+  .confirm-dialog-panel { background: #ffffff; }
+  .image-picker-button { background: linear-gradient(135deg, #ffffff, #eef3ff); }
 }

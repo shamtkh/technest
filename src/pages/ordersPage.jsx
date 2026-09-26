@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { getMyOrdersThunk } from '../store/thunks/getMyOrdersThunk'
 import { formatPrice } from '../utils/format'
 import { OrdersSkeleton, Skeleton } from '../components/Skeleton'
+import { usePolling } from '../hooks/usePolling'
 
 const STATUS_CONFIG = {
   pending:   { labelKey: 'statusPending', cls: 'status-pending',   icon: '⏳' },
@@ -25,9 +26,8 @@ export default function OrdersPage() {
   useEffect(() => {
     if (!user) return
     dispatch(getMyOrdersThunk(user.id))
-    const interval = setInterval(() => dispatch(getMyOrdersThunk(user.id)), 15000)
-    return () => clearInterval(interval)
   }, [user, dispatch])
+  usePolling(() => dispatch(getMyOrdersThunk(user.id)), 15000, Boolean(user))
 
   if (status === 'loading' && items.length === 0) {
     return <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8 page-enter"><Skeleton className="mb-6 h-8 w-40" /><OrdersSkeleton /></div>

@@ -77,7 +77,7 @@ export default function ProductReviews({ product }) {
       setEditing(false)
       showToast(`${t('reviews.saved')} ✓`, 'success')
       // Rating/review count on the product are recomputed server-side.
-      dispatch(getProductsThunk())
+      dispatch(getProductsThunk({ force: true }))
     } catch {
       showToast(t('common.error'), 'error')
     } finally {
@@ -91,7 +91,7 @@ export default function ProductReviews({ product }) {
       setReviews((current) => current.filter((item) => item.id !== review.id))
       if (review.id === myReview?.id) { setEditing(false); setDraft(EMPTY_DRAFT) }
       showToast(t('reviews.deleted'), 'warning')
-      dispatch(getProductsThunk())
+      dispatch(getProductsThunk({ force: true }))
     } catch {
       showToast(t('common.error'), 'error')
     } finally {

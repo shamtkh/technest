@@ -424,7 +424,7 @@ export default function AdminDashboard() {
   async function handleStatusChange(orderId, status) {
     setStatusUpdating(orderId)
     await dispatch(updateOrderStatusThunk({ orderId, status })).unwrap()
-    await dispatch(getProductsThunk())
+    await dispatch(getProductsThunk({ force: true }))
     setStatusUpdating(null)
     const lbl = t(`admin.status${status[0].toUpperCase()}${status.slice(1)}`)
     showToast(`Buyurtma #${orderId} holati: ${lbl}`, 'success')
@@ -434,7 +434,7 @@ export default function AdminDashboard() {
     const deletedOrder = orders.find((order) => order.id === id)
     await dispatch(deleteOrderThunk(id))
     if (deletedOrder?.status === 'pending') {
-      await dispatch(getProductsThunk())
+      await dispatch(getProductsThunk({ force: true }))
     }
     setDeletingOrderId(null)
     showToast(
