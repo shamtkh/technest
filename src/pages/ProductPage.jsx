@@ -15,13 +15,7 @@ import WishlistButton from '../components/WishlistButton'
 import ProductReviews from '../components/ProductReviews'
 import { addViewed } from '../store/slices/recentlyViewedSlice'
 import api from '../api/api'
-
-// Pick a sensible variant for one-click "add the whole bundle" actions.
-function firstAvailableVariant(product) {
-  const variant = product.variants?.find((item) => Number(item.stock) > 0)
-  if (variant) return { storage: variant.storage, color: variant.color, stock: Number(variant.stock) }
-  return { storage: product.storage?.[0] || '', color: product.colors?.[0]?.name || '', stock: Number(product.stock) || 0 }
-}
+import { firstAvailableVariant } from '../utils/variants'
 
 // Same category first; prefer the same brand and a similar price point.
 function getSimilarProducts(product, items) {
