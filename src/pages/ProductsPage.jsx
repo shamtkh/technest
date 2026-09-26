@@ -122,7 +122,7 @@ export default function ProductsPage() {
 
             <div>
               <h3 className="mb-3 spec-strip uppercase text-steel">{t('products.filterBrand')}</h3>
-              <GlassSelect value={brand} onChange={(value) => updateParam('brand', value)} options={brandOptions} />
+              <GlassSelect value={brand} onChange={(value) => updateParam('brand', value)} options={brandOptions} label={t('products.filterBrand')} />
             </div>
 
             <div>
@@ -151,7 +151,7 @@ export default function ProductsPage() {
 
         <div>
           <div className="mb-4 flex justify-end">
-            <GlassSelect value={sort} onChange={(value) => updateParam('sort', value)} options={sortOptions} className="w-auto min-w-52" />
+            <GlassSelect value={sort} onChange={(value) => updateParam('sort', value)} options={sortOptions} className="w-auto min-w-52" label={t('products.sortBy')} />
           </div>
 
           {filtered.length === 0 ? (

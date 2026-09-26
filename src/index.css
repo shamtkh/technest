@@ -497,7 +497,7 @@ body.confirm-dialog-open {
   max-height: 52rem;
   overflow: visible;
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
 
 .mobile-drawer-backdrop {
@@ -665,7 +665,7 @@ button, a {
 .language-option:hover { color: var(--color-ink-soft); transform: translateY(-1px); }
 .language-option.is-active { color: white; }
 .language-option:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(61, 127, 255, 0.65); }
-button:active:not(:disabled):not(.wishlist-btn) {
+button:active:not(:disabled):not(.wishlist-btn):not(.select-sheet-option) {
   transform: scale(0.95);
 }
 @media (hover: hover) {
@@ -1043,3 +1043,68 @@ button:active:not(:disabled):not(.wishlist-btn) {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .toast-close:hover { background: rgba(136, 145, 163, 0.14); color: #12161f; }
+
+/* ── Select as a bottom sheet on touch devices (see GlassSelect) ── */
+.select-sheet-root { position: fixed; inset: 0; z-index: 130; }
+.select-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 14, 20, 0.42);
+  animation: sheetFadeIn 0.22s ease both;
+}
+.select-sheet {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  max-height: min(70vh, 32rem);
+  flex-direction: column;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: #ffffff;
+  padding: 0.5rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom));
+  box-shadow: 0 -12px 40px rgba(11, 14, 20, 0.18);
+  animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.select-sheet-grabber {
+  width: 2.5rem;
+  height: 4px;
+  margin: 0.25rem auto 0.75rem;
+  border-radius: 999px;
+  background: var(--color-line);
+}
+.select-sheet-title {
+  padding: 0 0.75rem 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+}
+.select-sheet-options { overflow-y: auto; overscroll-behavior: contain; }
+.select-sheet-option {
+  display: flex;
+  width: 100%;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 0.9rem;
+  padding: 0 0.85rem;
+  color: var(--color-ink-soft);
+  font-size: 1rem;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+.select-sheet-option:active { background: rgba(61, 127, 255, 0.08); }
+.select-sheet-option.is-selected { background: rgba(61, 127, 255, 0.1); color: var(--color-accent-dim); font-weight: 600; }
+.select-sheet-option svg { flex-shrink: 0; color: var(--color-accent); font-size: 0.8rem; }
+.select-sheet-root.is-closing .select-sheet { animation: sheetSlideDown 0.22s ease-in both; }
+.select-sheet-root.is-closing .select-sheet-backdrop { animation: sheetFadeOut 0.22s ease both; }
+.select-sheet-root.is-closing .select-sheet-options { pointer-events: none; }
+@keyframes sheetSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes sheetSlideDown { from { transform: translateY(0); } to { transform: translateY(100%); } }
+@keyframes sheetFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sheetFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .select-sheet, .select-sheet-backdrop { animation: none; }
+}

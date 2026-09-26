@@ -1,17 +1,34 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { createPortal } from 'react-dom'
 import { FaCheck, FaChevronDown } from 'react-icons/fa6'
 
-export default function GlassSelect({ value, onChange, options, className = '', disabled = false }) {
+// Phones get a bottom sheet instead of a dropdown: it can't be clipped or
+// covered by surrounding panels and its rows are thumb-sized.
+const TOUCH_QUERY = '(hover: none) and (pointer: coarse)'
+const CLOSE_MS = 220
+
+function subscribeTouch(callback) {
+  const query = window.matchMedia(TOUCH_QUERY)
+  query.addEventListener('change', callback)
+  return () => query.removeEventListener('change', callback)
+}
+const getTouch = () => window.matchMedia(TOUCH_QUERY).matches
+const getTouchOnServer = () => false
+
+export default function GlassSelect({ value, onChange, options, className = '', disabled = false, label = '' }) {
   const [open, setOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const rootRef = useRef(null)
+  const sheetRef = useRef(null)
   const closeTimerRef = useRef(null)
   const openRef = useRef(false)
+  const useSheet = useSyncExternalStore(subscribeTouch, getTouch, getTouchOnServer)
   const selected = options.find((option) => option.value === value) || options[0]
 
   useEffect(() => {
     function handlePointerDown(event) {
-      if (!rootRef.current?.contains(event.target)) closeMenu()
+      // The sheet is portaled to <body>, so it's outside rootRef.
+      if (!rootRef.current?.contains(event.target) && !sheetRef.current?.contains(event.target)) closeMenu()
     }
 
     function handleKeyDown(event) {
@@ -27,18 +44,42 @@ export default function GlassSelect({ value, onChange, options, className = '', 
     }
   }, [])
 
+  // Keep the page from scrolling behind an open sheet.
+  useEffect(() => {
+    if (!useSheet || !open) return undefined
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [useSheet, open])
+
   function closeMenu() {
     if (!openRef.current) return
     openRef.current = false
     setIsClosing(true)
     setOpen(false)
-    closeTimerRef.current = window.setTimeout(() => setIsClosing(false), 180)
+    closeTimerRef.current = window.setTimeout(() => setIsClosing(false), CLOSE_MS)
   }
 
   function choose(option) {
     onChange(option.value)
     closeMenu()
   }
+
+  const optionButtons = (optionClass) => options.map((option) => (
+    <button
+      key={option.value}
+      type="button"
+      role="option"
+      aria-selected={option.value === value}
+      className={`${optionClass} ${option.value === value ? 'is-selected' : ''}`}
+      onClick={() => choose(option)}
+    >
+      <span>{option.label}</span>
+      {option.value === value && <FaCheck aria-hidden="true" />}
+    </button>
+  ))
 
   return (
     <div ref={rootRef} className={`glass-select ${open ? 'is-open' : ''} ${isClosing ? 'is-closing' : ''} ${className}`}>
@@ -61,22 +102,22 @@ export default function GlassSelect({ value, onChange, options, className = '', 
         <span className="glass-select-value">{selected?.label}</span>
         <FaChevronDown className="glass-select-chevron" aria-hidden="true" />
       </button>
-      {(open || isClosing) && (
-        <div className="glass-select-menu" role="listbox" aria-label={selected?.label}>
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              role="option"
-              aria-selected={option.value === value}
-              className={`glass-select-option ${option.value === value ? 'is-selected' : ''}`}
-              onClick={() => choose(option)}
-            >
-              <span>{option.label}</span>
-              {option.value === value && <FaCheck aria-hidden="true" />}
-            </button>
-          ))}
+      {!useSheet && (open || isClosing) && (
+        <div className="glass-select-menu" role="listbox" aria-label={label || selected?.label}>
+          {optionButtons('glass-select-option')}
         </div>
+      )}
+      {useSheet && (open || isClosing) && createPortal(
+        <div className={`select-sheet-root ${isClosing ? 'is-closing' : ''}`}>
+          {/* Stays tappable while closing so a tap can't fall through to the page. */}
+          <div className="select-sheet-backdrop" onClick={closeMenu} aria-hidden="true" />
+          <div ref={sheetRef} className="select-sheet" role="listbox" aria-label={label || selected?.label}>
+            <div className="select-sheet-grabber" aria-hidden="true" />
+            {label && <div className="select-sheet-title">{label}</div>}
+            <div className="select-sheet-options">{optionButtons('select-sheet-option')}</div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   )
