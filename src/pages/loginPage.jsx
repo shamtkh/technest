@@ -72,7 +72,7 @@ export default function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-steel">
         {t('auth.noAccount')}{' '}
-        <Link to="/register" className="font-medium text-accent hover:underline">{t('nav.register')}</Link>
+        <Link to="/register" state={location.state} className="font-medium text-accent hover:underline">{t('nav.register')}</Link>
       </p>
     </div>
   )

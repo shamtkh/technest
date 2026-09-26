@@ -112,7 +112,9 @@
     "loginRequired": "Savatchani ochish uchun kiring",
     "loginRequiredHint": "Mahsulot qo'shish va buyurtma berish uchun kiring yoki ro'yxatdan o'ting.",
     "remove": "O'chirish",
-    "qty": "Miqdor"
+    "qty": "Miqdor",
+    "loginToCheckout": "Kirish va buyurtma berish",
+    "loginToCheckoutHint": "Buyurtma berish uchun akkaunt kerak"
   },
   "checkout": {
     "title": "Buyurtmani rasmiylashtirish",
@@ -144,10 +146,7 @@
     "success": "Buyurtmangiz qabul qilindi!",
     "successHint": "Tez orada operatorimiz siz bilan bog'lanadi.",
     "backToOrders": "Buyurtmalarim",
-    "guestBadge": "Mehmon",
-    "guestNotice": "Siz mehmon sifatida buyurtma bermoqdasiz. Buyurtmalarni kuzatish va manzillarni saqlash uchun kiring.",
-    "guestLogin": "Kirish",
-    "guestSuccessHint": "Buyurtma raqamini saqlab qo'ying. Keyingi buyurtmalarni kuzatish uchun akkaunt yarating."
+    "guestBadge": "Mehmon"
   },
   "validation": {
     "required": "Bu maydon to'ldirilishi shart",

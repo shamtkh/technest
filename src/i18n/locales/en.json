@@ -112,7 +112,9 @@
     "loginRequired": "Sign in to open your cart",
     "loginRequiredHint": "Sign in or create an account to add products and place orders.",
     "remove": "Remove",
-    "qty": "Qty"
+    "qty": "Qty",
+    "loginToCheckout": "Sign in to check out",
+    "loginToCheckoutHint": "An account is required to place an order"
   },
   "checkout": {
     "title": "Checkout",
@@ -144,10 +146,7 @@
     "success": "Your order has been placed!",
     "successHint": "Our team will contact you shortly.",
     "backToOrders": "My orders",
-    "guestBadge": "Guest",
-    "guestNotice": "You are checking out as a guest. Sign in to track orders and save addresses.",
-    "guestLogin": "Sign in",
-    "guestSuccessHint": "Save your order number. Create an account to track future orders."
+    "guestBadge": "Guest"
   },
   "validation": {
     "required": "This field is required",

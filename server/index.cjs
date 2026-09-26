@@ -523,11 +523,9 @@ async function start() {
     const body = { ...req.body }
     const isDemoOrder = Number(body.userId) === Number(demoUser.id)
 
-    // Guest checkout: no account, the contact block is all we have.
-    if (!body.userId) {
-      body.userId = null
-      body.guest = true
-    }
+    // Ordering requires an account.
+    const customer = router.db.get('users').value().find((user) => Number(user.id) === Number(body.userId))
+    if (!body.userId || !customer) return res.status(401).json({ error: 'AUTH_REQUIRED' })
 
     // Recompute money server-side from catalog prices so neither the item
     // prices nor the promo discount can be forged by the client.

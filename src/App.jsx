@@ -31,13 +31,13 @@ function App() {
           <Route path="products" element={<ProductsPage />} />
           <Route path="products/:id" element={<ProductPage />} />
           <Route path="cart" element={<CartPage />} />
-          <Route path="checkout" element={<CheckoutPage />} />
           <Route path="wishlist" element={<WishlistPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="forbidden" element={<ForbiddenPage />} />
 
           <Route element={<ProtectedRoute />}>
+            <Route path="checkout" element={<CheckoutPage />} />
             <Route path="orders" element={<OrdersPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>

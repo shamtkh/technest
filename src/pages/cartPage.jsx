@@ -20,7 +20,7 @@ export default function CartPage() {
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
 
   function handleCheckout() {
-    navigate('/checkout')
+    navigate(user ? '/checkout' : '/login', { state: { from: { pathname: '/checkout' } } })
   }
 
   function handleClearCart() {
@@ -179,8 +179,9 @@ export default function CartPage() {
             onClick={handleCheckout}
             className="btn-glass mt-5 w-full rounded-full bg-accent py-3 text-sm font-semibold text-white hover:bg-accent-dim"
           >
-            {t('cart.checkout')}
+            {user ? t('cart.checkout') : t('cart.loginToCheckout')}
           </button>
+          {!user && <p className="mt-2 text-center text-xs text-steel">{t('cart.loginToCheckoutHint')}</p>}
         </div>
         </div>
       </div>

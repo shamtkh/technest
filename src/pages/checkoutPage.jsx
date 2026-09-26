@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { createOrderThunk } from '../store/thunks/ordersThunk'
@@ -49,12 +49,12 @@ export default function CheckoutPage() {
   const { showToast } = useToast()
   const user = useSelector((s) => s.auth.user)
   const items = useSelector((s) => s.cart.items)
-  const savedAddresses = user?.addresses || []
+  const savedAddresses = user.addresses || []
   const defaultAddress = savedAddresses.find((address) => address.isDefault) || savedAddresses[0]
 
   const [form, setForm] = useState({
-    fullName: user?.name || '',
-    phone: user?.phone || '',
+    fullName: user.name || '',
+    phone: user.phone || '',
     city: defaultAddress?.city || '',
     street: defaultAddress?.street || '',
     house: defaultAddress?.house || '',
@@ -123,7 +123,7 @@ export default function CheckoutPage() {
     setPlacing(true)
     try {
       const order = await dispatch(createOrderThunk({
-        userId: user?.id ?? null,
+        userId: user.id,
         contact: {
           fullName: form.fullName,
           phone: form.phone,
@@ -146,14 +146,12 @@ export default function CheckoutPage() {
         total,
         promoCode: promo?.code || null,
       })).unwrap()
-      if (user) {
-        let addresses = savedAddresses
-        if (saveAddress && isNewAddress) {
-          const address = { id: `addr-${Date.now()}`, label: '', isDefault: !savedAddresses.length, ...Object.fromEntries(ADDRESS_FIELDS.map((key) => [key, form[key].trim()])) }
-          addresses = await api.updateAddresses(user.id, [...savedAddresses, address]).catch(() => savedAddresses)
-        }
-        dispatch(setUser({ ...user, name: form.fullName, phone: form.phone, addresses }))
+      let addresses = savedAddresses
+      if (saveAddress && isNewAddress) {
+        const address = { id: `addr-${Date.now()}`, label: '', isDefault: !savedAddresses.length, ...Object.fromEntries(ADDRESS_FIELDS.map((key) => [key, form[key].trim()])) }
+        addresses = await api.updateAddresses(user.id, [...savedAddresses, address]).catch(() => savedAddresses)
       }
+      dispatch(setUser({ ...user, name: form.fullName, phone: form.phone, addresses }))
       dispatch(clearCart())
       dispatch(getProductsThunk())
       showToast(t('checkout.orderSuccess'), 'success', 5000)
@@ -191,22 +189,12 @@ export default function CheckoutPage() {
         <h1 className="font-display text-2xl font-bold text-ink-soft">{t('checkout.success')}</h1>
         <p className="mt-2 text-sm text-steel">{t('checkout.successHint')}</p>
         <p className="mt-3 font-mono-tabular text-sm text-ink-soft">{t('orders.orderNumber', { id: placedOrder.id })}</p>
-        {user ? (
-          <button
-            onClick={() => navigate('/orders')}
-            className="mt-6 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white hover:-translate-y-0.5"
-          >
-            {t('checkout.backToOrders')}
-          </button>
-        ) : (
-          <div className="mt-6 space-y-3">
-            <p className="text-sm text-steel">{t('checkout.guestSuccessHint')}</p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link to="/register" className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white hover:-translate-y-0.5">{t('auth.registerBtn')}</Link>
-              <Link to="/products" className="rounded-full border border-line bg-white px-6 py-3 text-sm font-semibold text-ink-soft">{t('cart.browse')}</Link>
-            </div>
-          </div>
-        )}
+        <button
+          onClick={() => navigate('/orders')}
+          className="mt-6 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white hover:-translate-y-0.5"
+        >
+          {t('checkout.backToOrders')}
+        </button>
       </div>
     )
   }
@@ -214,12 +202,6 @@ export default function CheckoutPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8 page-enter">
       <h1 className="mb-6 font-display text-2xl font-bold text-ink-soft">{t('checkout.title')}</h1>
-      {!user && (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-5 py-4 text-sm">
-          <span className="text-steel">{t('checkout.guestNotice')}</span>
-          <Link to="/login" state={{ from: { pathname: '/checkout' } }} className="font-semibold text-accent hover:underline">{t('checkout.guestLogin')}</Link>
-        </div>
-      )}
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
         <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-line bg-white p-6">
 
@@ -317,7 +299,7 @@ export default function CheckoutPage() {
                   onChange={(e) => set('landmark', e.target.value)}
                 />
               </Field>
-              {user && isNewAddress && savedAddresses.length < 10 && (
+              {isNewAddress && savedAddresses.length < 10 && (
                 <label className="flex items-center gap-2 text-sm text-ink-soft">
                   <input type="checkbox" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} />
                   {t('addresses.saveForLater')}

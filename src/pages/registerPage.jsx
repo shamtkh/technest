@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { registerThunk } from '../store/thunks/registerThunk'
@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
   const { status, error } = useSelector((s) => s.auth)
 
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' })
@@ -35,7 +36,7 @@ export default function RegisterPage() {
     }
     const result = await dispatch(registerThunk(form))
     if (registerThunk.fulfilled.match(result)) {
-      navigate('/', { replace: true })
+      navigate(location.state?.from?.pathname || '/', { replace: true })
     }
   }
 
@@ -75,7 +76,7 @@ export default function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-steel">
         {t('auth.haveAccount')}{' '}
-        <Link to="/login" className="font-medium text-accent hover:underline">{t('nav.login')}</Link>
+        <Link to="/login" state={location.state} className="font-medium text-accent hover:underline">{t('nav.login')}</Link>
       </p>
     </div>
   )
