@@ -72,10 +72,16 @@ export function ToastProvider({ children }) {
     if (timers.current[id]) clearTimeout(timers.current[id])
   }, [])
 
+  // `key` groups toasts about the same thing (e.g. wishlist toggles): a new
+  // toast with the same key replaces the previous one instead of stacking.
   const showToast = useCallback(
-    (message, type = 'info', duration = 3500) => {
+    (message, type = 'info', duration = 2500, key = null) => {
       const id = ++idCounter
-      setToasts((prev) => [...prev, { id, message, type, exiting: false }])
+      setToasts((prev) => {
+        const replaced = key ? prev.filter((toast) => toast.key === key) : []
+        replaced.forEach((toast) => clearTimeout(timers.current[toast.id]))
+        return [...prev.filter((toast) => !replaced.includes(toast)), { id, key, message, type, exiting: false }]
+      })
       timers.current[id] = setTimeout(() => dismiss(id), duration)
       return id
     },
@@ -89,7 +95,7 @@ export function ToastProvider({ children }) {
         <div
           style={{
             position: 'fixed',
-            top: '1.25rem',
+            top: '5rem',
             right: '1.25rem',
             zIndex: 9999,
             display: 'flex',
