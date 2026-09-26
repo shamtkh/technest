@@ -182,7 +182,7 @@ export default function ProductPage() {
           <span className="text-ink-soft">{product.name}</span>
         </nav>
 
-        <div className="grid gap-10 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           {/* Gallery */}
           <div>
             <div
@@ -385,9 +385,9 @@ export default function ProductPage() {
                       <span>{t('product.inCart')}</span>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:items-center sm:gap-3">
                       {/* Quantity selector */}
-                      <div className="flex h-12 w-32 shrink-0 items-center justify-between rounded-xl border border-line bg-white px-2 shadow-xs sm:w-44 sm:justify-center">
+                      <div className="flex h-12 w-full shrink-0 items-center justify-between rounded-xl border border-line bg-white px-2 shadow-xs sm:w-44 sm:justify-center">
                         <button
                           onClick={() => changeCartQuantity('decrement')}
                           className="flex h-9 w-9 items-center justify-center rounded-lg bg-paper text-ink-soft transition-all hover:bg-paper-dim active:scale-95 cursor-pointer"
@@ -417,7 +417,7 @@ export default function ProductPage() {
                       {/* Go to cart CTA button */}
                       <Link
                         to="/cart"
-                        className="group flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-accent px-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-accent-dim hover:shadow active:scale-[0.99] sm:gap-2.5 sm:px-6"
+                        className="group col-span-2 flex h-12 min-w-0 items-center justify-center gap-2 rounded-xl bg-accent px-3 text-sm font-semibold sm:flex-1 text-white shadow-sm transition-all duration-200 hover:bg-accent-dim hover:shadow active:scale-[0.99] sm:gap-2.5 sm:px-6"
                       >
                         <FaBagShopping size={16} aria-hidden="true" />
                         <span className="truncate">{t('product.goToCart')}</span>
