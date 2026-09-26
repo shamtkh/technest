@@ -80,7 +80,9 @@
     "boughtTogether": "Frequently bought together",
     "bundleAdded": "Bundle added to cart",
     "bundleTotal": "Total for {{count}} items",
-    "addBundle": "Add all to cart"
+    "addBundle": "Add all to cart",
+    "goToCartShort": "View cart",
+    "bundleInCart": "The whole bundle is already in your cart"
   },
   "products": {
     "title": "Catalog",
@@ -114,7 +116,8 @@
     "remove": "Remove",
     "qty": "Qty",
     "loginToCheckout": "Sign in to check out",
-    "loginToCheckoutHint": "An account is required to place an order"
+    "loginToCheckoutHint": "An account is required to place an order",
+    "removedToast": "{{name}} removed from cart"
   },
   "checkout": {
     "title": "Checkout",

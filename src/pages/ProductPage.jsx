@@ -147,11 +147,13 @@ export default function ProductPage() {
   function handleAddBundle() {
     if (isAdmin) return
     const bundleItems = [product, ...bundle]
+    let added = 0
     bundleItems.forEach((item) => {
       const variant = item.id === product.id ? { storage, color, stock: variantStock } : firstAvailableVariant(item)
       if (variant.stock <= 0) return
       const alreadyInCart = cartItems.some((cartEntry) => cartEntry.productId === item.id && cartEntry.storage === variant.storage && cartEntry.color === variant.color)
       if (alreadyInCart) return
+      added += 1
       dispatch(addItem({
         productId: item.id,
         name: item.name,
@@ -160,7 +162,8 @@ export default function ProductPage() {
         ...variant,
       }))
     })
-    showToast(t('product.bundleAdded'), 'success')
+    if (added) showToast(t('product.bundleAdded'), 'success')
+    else showToast(t('product.bundleInCart'), 'info')
   }
 
   function changeCartQuantity(action) {
@@ -385,9 +388,9 @@ export default function ProductPage() {
                       <span>{t('product.inCart')}</span>
                     </div>
 
-                    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:items-center sm:gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       {/* Quantity selector */}
-                      <div className="flex h-12 w-full shrink-0 items-center justify-between rounded-xl border border-line bg-white px-2 shadow-xs sm:w-44 sm:justify-center">
+                      <div className="flex h-12 w-[7.5rem] shrink-0 items-center justify-between rounded-xl border border-line bg-white px-1 shadow-xs sm:w-44 sm:justify-center sm:px-2">
                         <button
                           onClick={() => changeCartQuantity('decrement')}
                           className="flex h-9 w-9 items-center justify-center rounded-lg bg-paper text-ink-soft transition-all hover:bg-paper-dim active:scale-95 cursor-pointer"
@@ -417,11 +420,12 @@ export default function ProductPage() {
                       {/* Go to cart CTA button */}
                       <Link
                         to="/cart"
-                        className="group col-span-2 flex h-12 min-w-0 items-center justify-center gap-2 rounded-xl bg-accent px-3 text-sm font-semibold sm:flex-1 text-white shadow-sm transition-all duration-200 hover:bg-accent-dim hover:shadow active:scale-[0.99] sm:gap-2.5 sm:px-6"
+                        className="group flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-accent px-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-accent-dim hover:shadow active:scale-[0.99] sm:gap-2.5 sm:px-6"
                       >
-                        <FaBagShopping size={16} aria-hidden="true" />
-                        <span className="truncate">{t('product.goToCart')}</span>
-                        <FaArrowRight size={13} className="transition-transform duration-200 group-hover:translate-x-1" />
+                        <FaBagShopping size={16} aria-hidden="true" className="shrink-0 max-[359px]:hidden" />
+                        <span className="truncate sm:hidden">{t('product.goToCartShort')}</span>
+                        <span className="hidden truncate sm:inline">{t('product.goToCart')}</span>
+                        <FaArrowRight size={13} className="shrink-0 transition-transform duration-200 group-hover:translate-x-1 max-[359px]:hidden" />
                       </Link>
                     </div>
                   </div>

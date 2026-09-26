@@ -7,6 +7,13 @@ import { formatPrice } from '../utils/format'
 import { useToast } from '../hooks/useToast'
 import { FaMinus, FaPlus, FaTrashCan } from 'react-icons/fa6'
 
+// Matches the .cart-line transition in index.css (fade/slide, then collapse).
+const REMOVE_ANIMATION_MS = 460
+
+function removalDelay() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : REMOVE_ANIMATION_MS
+}
+
 export default function CartPage() {
   const { t } = useTranslation()
   const dispatch = useDispatch()
@@ -16,6 +23,8 @@ export default function CartPage() {
   const user = useSelector((s) => s.auth.user)
   const isAdmin = user?.role === 'admin'
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
+  // Lines animating out; they leave the store once the animation finishes.
+  const [removingKeys, setRemovingKeys] = useState(() => new Set())
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
 
@@ -23,9 +32,27 @@ export default function CartPage() {
     navigate(user ? '/checkout' : '/login', { state: { from: { pathname: '/checkout' } } })
   }
 
+  function removeLine(item) {
+    if (removingKeys.has(item.key)) return
+    setRemovingKeys((keys) => new Set(keys).add(item.key))
+    setTimeout(() => {
+      dispatch(removeItem(item.key))
+      setRemovingKeys((keys) => {
+        const next = new Set(keys)
+        next.delete(item.key)
+        return next
+      })
+    }, removalDelay())
+    showToast(t('cart.removedToast', { name: item.name }), 'warning')
+  }
+
   function handleClearCart() {
-    dispatch(clearCart())
     setClearConfirmOpen(false)
+    setRemovingKeys(new Set(items.map((item) => item.key)))
+    setTimeout(() => {
+      dispatch(clearCart())
+      setRemovingKeys(new Set())
+    }, removalDelay())
     showToast(t('cart.cleared'), 'warning')
   }
 
@@ -72,12 +99,11 @@ export default function CartPage() {
         <h1 className="mb-6 font-display text-2xl font-bold text-ink-soft">{t('cart.title')}</h1>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-3">
+        <div>
           {items.map((item) => (
-            <div
-              key={item.key}
-              className="card-realistic flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl border border-line bg-white p-4 sm:p-5 transition-all duration-200 hover:border-steel"
-            >
+            <div key={item.key} className={`cart-line ${removingKeys.has(item.key) ? 'is-removing' : ''}`}>
+            <div className="cart-line-inner">
+            <div className="card-realistic flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl border border-line bg-white p-4 sm:p-5 transition-all duration-200 hover:border-steel">
               {/* Product thumbnail */}
               <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-xl border border-line/60 bg-paper-dim p-2 flex items-center justify-center overflow-hidden">
                 <img
@@ -104,10 +130,7 @@ export default function CartPage() {
                   </div>
 
                   <button
-                    onClick={() => {
-                      dispatch(removeItem(item.key))
-                      showToast(`${item.name} savatdan o'chirildi`, 'warning')
-                    }}
+                    onClick={() => removeLine(item)}
                     className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium text-steel transition-colors hover:bg-red-50 hover:text-danger cursor-pointer"
                     aria-label={t('cart.remove')}
                   >
@@ -120,9 +143,9 @@ export default function CartPage() {
                   {/* Modern stepper */}
                   <div className="flex h-9 items-center rounded-xl border border-line bg-paper p-0.5 shadow-inner">
                     <button
-                      onClick={() => dispatch(decrementQty(item.key))}
+                      onClick={() => (item.qty === 1 ? removeLine(item) : dispatch(decrementQty(item.key)))}
                       className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-ink-soft shadow-2xs transition-all hover:bg-paper-dim hover:scale-105 active:scale-95 cursor-pointer"
-                      aria-label="Kamaytirish"
+                      aria-label={item.qty === 1 ? t('cart.remove') : 'Kamaytirish'}
                     >
                       {item.qty === 1 ? (
                         <FaTrashCan size={11} className="text-red-500" />
@@ -150,8 +173,10 @@ export default function CartPage() {
                 </div>
               </div>
             </div>
+            </div>
+            </div>
           ))}
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end">
             <button
               onClick={() => setClearConfirmOpen(true)}
               className="inline-flex items-center gap-2 rounded-full border border-danger px-4 py-2 text-sm font-medium text-danger hover:bg-red-50"
@@ -221,7 +246,7 @@ export default function CartPage() {
                 onClick={handleClearCart}
                 className="rounded-xl bg-danger px-4 py-3 text-sm font-semibold text-white hover:bg-red-600"
               >
-                Подтвердить
+                {t('admin.confirm')}
               </button>
             </div>
           </div>

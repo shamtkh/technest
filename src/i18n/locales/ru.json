@@ -80,7 +80,9 @@
     "boughtTogether": "Часто покупают вместе",
     "bundleAdded": "Комплект добавлен в корзину",
     "bundleTotal": "Итого за {{count}} товара",
-    "addBundle": "Добавить всё в корзину"
+    "addBundle": "Добавить всё в корзину",
+    "goToCartShort": "В корзину",
+    "bundleInCart": "Весь комплект уже в корзине"
   },
   "products": {
     "title": "Каталог",
@@ -114,7 +116,8 @@
     "remove": "Удалить",
     "qty": "Кол-во",
     "loginToCheckout": "Войти и оформить заказ",
-    "loginToCheckoutHint": "Для оформления заказа нужен аккаунт"
+    "loginToCheckoutHint": "Для оформления заказа нужен аккаунт",
+    "removedToast": "{{name}} удалён из корзины"
   },
   "checkout": {
     "title": "Оформление заказа",

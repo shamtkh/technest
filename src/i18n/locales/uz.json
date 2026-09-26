@@ -80,7 +80,9 @@
     "boughtTogether": "Birga tez-tez sotib olinadi",
     "bundleAdded": "To'plam savatchaga qo'shildi",
     "bundleTotal": "{{count}} ta mahsulot uchun jami",
-    "addBundle": "Hammasini savatchaga qo'shish"
+    "addBundle": "Hammasini savatchaga qo'shish",
+    "goToCartShort": "Savatga",
+    "bundleInCart": "Butun to'plam allaqachon savatchada"
   },
   "products": {
     "title": "Katalog",
@@ -114,7 +116,8 @@
     "remove": "O'chirish",
     "qty": "Miqdor",
     "loginToCheckout": "Kirish va buyurtma berish",
-    "loginToCheckoutHint": "Buyurtma berish uchun akkaunt kerak"
+    "loginToCheckoutHint": "Buyurtma berish uchun akkaunt kerak",
+    "removedToast": "{{name}} savatdan o'chirildi"
   },
   "checkout": {
     "title": "Buyurtmani rasmiylashtirish",

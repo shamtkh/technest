@@ -22,6 +22,10 @@ export default memo(function ProductCard({ product }) {
   const [shownImages, setShownImages] = useState(() => new Set([0]))
   const [loadedImages, setLoadedImages] = useState({})
   const [isDragging, setIsDragging] = useState(false)
+  // Removing the last unit animates the stepper out before the cart changes;
+  // the bag button then pops back in.
+  const [removing, setRemoving] = useState(false)
+  const [bagReturned, setBagReturned] = useState(false)
   const dragStart = useRef(null)
 
   const discount = product.oldPrice
@@ -74,10 +78,20 @@ export default memo(function ProductCard({ product }) {
   function changeQuantity(e, action) {
     e.preventDefault()
     e.stopPropagation()
-    if (!cartItem) return
+    if (!cartItem || removing) return
     if (action === 'increment') dispatch(incrementQty(cartItem.key))
-    else if (cartItem.qty === 1) dispatch(removeItem(cartItem.key))
+    else if (cartItem.qty === 1) removeFromCart(cartItem.key)
     else dispatch(decrementQty(cartItem.key))
+  }
+
+  function removeFromCart(key) {
+    setRemoving(true)
+    const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 360
+    setTimeout(() => {
+      dispatch(removeItem(key))
+      setRemoving(false)
+      setBagReturned(true)
+    }, delay)
   }
 
   return (
@@ -184,7 +198,7 @@ export default memo(function ProductCard({ product }) {
           {product.specs.ram !== '—' && <span className="shrink-0">· {product.specs.ram}</span>}
         </div>
 
-        <div className={`card-price-row mt-auto flex items-end justify-between gap-x-1.5 gap-y-2 pt-3 sm:gap-x-2 ${cartItem ? 'flex-wrap' : 'flex-nowrap'}`}>
+        <div className={`card-price-row mt-auto flex items-end justify-between gap-x-1.5 pt-3 sm:gap-x-2 ${cartItem ? 'flex-wrap' : 'flex-nowrap'}`}>
           <div className="min-w-0">
             {product.oldPrice && (
               <div className="whitespace-nowrap font-mono-tabular text-[11px] text-steel line-through sm:text-xs">
@@ -201,15 +215,17 @@ export default memo(function ProductCard({ product }) {
             <span
               aria-hidden="true"
               title={t('product.viewDetails')}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-realistic transition-all duration-200 group-hover:scale-105 group-hover:bg-accent-dim sm:h-9 sm:w-9"
+              className={`${bagReturned ? 'card-bag-pop ' : ''}flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-realistic transition-all duration-200 group-hover:scale-105 group-hover:bg-accent-dim sm:h-9 sm:w-9`}
             >
               <FaBagShopping size={13} />
             </span>
           )}
 
           {!isAdmin && cartItem && (
+            <div className={`card-stepper-wrap ${removing ? 'is-removing' : ''}`}>
+            <div>
             <div
-              className="flex h-9 items-center rounded-xl border border-line bg-paper p-0.5 shadow-inner"
+              className="mt-2 flex h-9 items-center rounded-xl border border-line bg-paper p-0.5 shadow-inner"
               onClick={(e) => e.preventDefault()}
             >
               <button
@@ -234,6 +250,8 @@ export default memo(function ProductCard({ product }) {
               >
                 <FaPlus size={10} />
               </button>
+            </div>
+            </div>
             </div>
           )}
         </div>

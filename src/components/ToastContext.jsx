@@ -31,58 +31,68 @@ const ICONS = {
 
 const TYPE_STYLES = {
   success: {
-    bar: '#22c55e',
     icon: '#22c55e',
-    bg: 'rgba(22,163,74,0.08)',
     border: 'rgba(22,163,74,0.25)',
   },
   error: {
-    bar: '#ef4444',
     icon: '#ef4444',
-    bg: 'rgba(239,68,68,0.08)',
     border: 'rgba(239,68,68,0.25)',
   },
   warning: {
-    bar: '#f59e0b',
     icon: '#f59e0b',
-    bg: 'rgba(245,158,11,0.08)',
     border: 'rgba(245,158,11,0.25)',
   },
   info: {
-    bar: '#3d7fff',
     icon: '#3d7fff',
-    bg: 'rgba(61,127,255,0.08)',
     border: 'rgba(61,127,255,0.25)',
   },
 }
 
 let idCounter = 0
+const MAX_TOASTS = 3
+const EXIT_MS = 300
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([])
   const timers = useRef({})
+  // group key -> id of the toast currently showing it
+  const activeByKey = useRef(new Map())
+  // ids of visible (not exiting) toasts, oldest first
+  const visibleOrder = useRef([])
 
   const dismiss = useCallback((id) => {
-    setToasts((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, exiting: true } : t))
-    )
+    clearTimeout(timers.current[id])
+    delete timers.current[id]
+    for (const [key, value] of activeByKey.current) {
+      if (value === id) activeByKey.current.delete(key)
+    }
+    visibleOrder.current = visibleOrder.current.filter((visibleId) => visibleId !== id)
+    setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, exiting: true } : t)))
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id))
-    }, 380)
-    if (timers.current[id]) clearTimeout(timers.current[id])
+    }, EXIT_MS)
   }, [])
 
-  // `key` groups toasts about the same thing (e.g. wishlist toggles): a new
-  // toast with the same key replaces the previous one instead of stacking.
+  // Toasts about the same thing — an explicit `key` (e.g. wishlist toggles)
+  // or simply the same text — update the visible toast and restart its timer
+  // instead of stacking copies. At most MAX_TOASTS are shown at once.
   const showToast = useCallback(
     (message, type = 'info', duration = 2500, key = null) => {
+      const groupKey = key ?? `${type}:${message}`
+      const existingId = activeByKey.current.get(groupKey)
+      if (existingId !== undefined) {
+        clearTimeout(timers.current[existingId])
+        timers.current[existingId] = setTimeout(() => dismiss(existingId), duration)
+        setToasts((prev) => prev.map((t) => (t.id === existingId ? { ...t, message, type, bump: t.bump + 1 } : t)))
+        return existingId
+      }
+
       const id = ++idCounter
-      setToasts((prev) => {
-        const replaced = key ? prev.filter((toast) => toast.key === key) : []
-        replaced.forEach((toast) => clearTimeout(timers.current[toast.id]))
-        return [...prev.filter((toast) => !replaced.includes(toast)), { id, key, message, type, exiting: false }]
-      })
+      activeByKey.current.set(groupKey, id)
+      visibleOrder.current.push(id)
       timers.current[id] = setTimeout(() => dismiss(id), duration)
+      setToasts((prev) => [...prev, { id, message, type, exiting: false, bump: 0 }])
+      while (visibleOrder.current.length > MAX_TOASTS) dismiss(visibleOrder.current[0])
       return id
     },
     [dismiss]
@@ -92,20 +102,7 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={{ showToast, dismiss }}>
       {children}
       {createPortal(
-        <div
-          style={{
-            position: 'fixed',
-            top: '5rem',
-            right: '1.25rem',
-            zIndex: 9999,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.6rem',
-            maxWidth: '360px',
-            width: 'calc(100vw - 2.5rem)',
-            pointerEvents: 'none',
-          }}
-        >
+        <div className="toast-stack" aria-live="polite">
           {toasts.map((toast) => (
             <ToastItem key={toast.id} toast={toast} onDismiss={dismiss} />
           ))}
@@ -120,75 +117,22 @@ function ToastItem({ toast, onDismiss }) {
   const s = TYPE_STYLES[toast.type] || TYPE_STYLES.info
 
   return (
-    <div
-      className={toast.exiting ? 'toast-exit' : 'toast-enter'}
-      style={{
-        pointerEvents: 'all',
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '0.75rem',
-        padding: '0.85rem 1rem',
-        borderRadius: '1rem',
-        background: 'rgba(255,255,255,0.92)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: `1px solid ${s.border}`,
-        boxShadow: '0 8px 32px -4px rgba(15,18,26,0.18), 0 2px 8px -2px rgba(15,18,26,0.12)',
-        overflow: 'hidden',
-      }}
-    >
-      {/* left color bar */}
+    <div className={toast.exiting ? 'toast-exit' : 'toast-enter'}>
+      {/* Re-keyed on every repeat so the bump animation replays. */}
       <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: '3px',
-          borderRadius: '1rem 0 0 1rem',
-          background: s.bar,
-        }}
-      />
-
-      {/* icon */}
-      <span style={{ color: s.icon, flexShrink: 0, marginTop: '1px' }}>
-        {ICONS[toast.type]}
-      </span>
-
-      {/* message */}
-      <span
-        style={{
-          flex: 1,
-          fontSize: '0.875rem',
-          fontWeight: 500,
-          color: '#12161f',
-          lineHeight: 1.4,
-        }}
+        key={toast.bump}
+        role="status"
+        className={`toast ${toast.bump ? 'toast-bump' : ''}`}
+        style={{ borderColor: s.border }}
       >
-        {toast.message}
-      </span>
-
-      {/* close btn */}
-      <button
-        onClick={() => onDismiss(toast.id)}
-        style={{
-          flexShrink: 0,
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: '#8891a3',
-          padding: '2px',
-          borderRadius: '50%',
-          transition: 'color 0.15s',
-          lineHeight: 1,
-        }}
-        aria-label="Close"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
-      </button>
+        <span className="toast-icon" style={{ color: s.icon }}>{ICONS[toast.type]}</span>
+        <span className="toast-message">{toast.message}</span>
+        <button type="button" className="toast-close" onClick={() => onDismiss(toast.id)} aria-label="Close">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
     </div>
   )
 }
