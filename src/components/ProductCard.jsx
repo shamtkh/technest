@@ -3,17 +3,14 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { formatPrice } from '../utils/format'
-import { addItem, decrementQty, incrementQty, removeItem } from '../store/slices/cartSlice'
+import { decrementQty, incrementQty, removeItem } from '../store/slices/cartSlice'
 import { getProductFallbackImage, getProductImages } from '../utils/productImages'
 import WishlistButton from './WishlistButton'
-import { firstAvailableVariant } from '../utils/variants'
-import { useToast } from '../hooks/useToast'
 import { FaArrowLeft, FaArrowRight, FaBagShopping, FaMinus, FaPlus, FaStar, FaTrashCan } from 'react-icons/fa6'
 
 export default function ProductCard({ product }) {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const { showToast } = useToast()
   const user = useSelector((s) => s.auth.user)
   const cartItems = useSelector((s) => s.cart.items)
 
@@ -62,17 +59,6 @@ export default function ProductCard({ product }) {
       if (delta < 0) setActiveImage((i) => (i === images.length - 1 ? 0 : i + 1))
       else setActiveImage((i) => (i === 0 ? images.length - 1 : i - 1))
     }
-  }
-
-  // One-click add from the card uses the first in-stock variant; the
-  // product page is still where a specific storage/color is chosen.
-  function handleAddToCart(e) {
-    e.preventDefault()
-    e.stopPropagation()
-    const variant = firstAvailableVariant(product)
-    if (variant.stock <= 0) return
-    dispatch(addItem({ productId: product.id, name: product.name, image: images[0], price: product.price, ...variant }))
-    showToast(`${product.name} (${[variant.color, variant.storage].filter(Boolean).join(', ')}) ${t('product.addedToast')}`, 'success')
   }
 
   function changeQuantity(e, action) {
@@ -200,15 +186,14 @@ export default function ProductCard({ product }) {
           </div>
 
           {!isAdmin && !cartItem && product.stock > 0 && (
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              aria-label={t('product.addToCart')}
-              title={t('product.addToCart')}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-realistic transition-all duration-200 hover:scale-105 hover:bg-accent-dim active:scale-95"
+            // Part of the card link: opens the product page to pick storage/color.
+            <span
+              aria-hidden="true"
+              title={t('product.viewDetails')}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-realistic transition-all duration-200 group-hover:scale-105 group-hover:bg-accent-dim"
             >
-              <FaBagShopping size={15} aria-hidden="true" />
-            </button>
+              <FaBagShopping size={15} />
+            </span>
           )}
 
           {!isAdmin && cartItem && (
