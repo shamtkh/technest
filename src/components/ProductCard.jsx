@@ -156,7 +156,7 @@ export default function ProductCard({ product }) {
       </div>
 
       {/* Card body */}
-      <div className="flex flex-1 flex-col gap-2 p-4">
+      <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
         <div className="flex items-center justify-between spec-strip text-steel">
           <span>{product.brand}</span>
           <span className="flex items-center gap-1">
@@ -173,15 +173,15 @@ export default function ProductCard({ product }) {
           {product.specs.ram !== '—' && <span className="shrink-0">· {product.specs.ram}</span>}
         </div>
 
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-2 gap-y-2 pt-3">
-          <div>
+        <div className={`mt-auto flex items-end justify-between gap-x-1.5 gap-y-2 pt-3 sm:gap-x-2 ${cartItem ? 'flex-wrap' : 'flex-nowrap'}`}>
+          <div className="min-w-0">
             {product.oldPrice && (
-              <div className="whitespace-nowrap font-mono-tabular text-xs text-steel line-through">
+              <div className="whitespace-nowrap font-mono-tabular text-[11px] text-steel line-through sm:text-xs">
                 {formatPrice(product.oldPrice)}
               </div>
             )}
-            <div className="whitespace-nowrap font-mono-tabular text-base font-semibold text-ink-soft">
-              {formatPrice(product.price)} <span className="text-xs font-normal text-steel">{t('common.currency')}</span>
+            <div className="whitespace-nowrap font-mono-tabular text-[12px] font-semibold tracking-tight text-ink-soft sm:text-[15px] sm:tracking-normal">
+              {formatPrice(product.price)} <span className="text-[9px] font-normal text-steel max-[359px]:hidden sm:text-xs">{t('common.currency')}</span>
             </div>
           </div>
 
@@ -190,9 +190,9 @@ export default function ProductCard({ product }) {
             <span
               aria-hidden="true"
               title={t('product.viewDetails')}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-realistic transition-all duration-200 group-hover:scale-105 group-hover:bg-accent-dim"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-realistic transition-all duration-200 group-hover:scale-105 group-hover:bg-accent-dim sm:h-9 sm:w-9"
             >
-              <FaBagShopping size={15} />
+              <FaBagShopping size={13} />
             </span>
           )}
 

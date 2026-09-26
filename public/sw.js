@@ -3,12 +3,13 @@
 // - Navigations: network first, falling back to the cached app shell so the
 //   SPA still boots offline.
 // - Built assets (/assets/*, hashed by Vite), product images and icons:
-//   cache first — their URLs change whenever their content does.
+//   cache first. Hashed assets change URL with content; for /icons and
+//   /products files, bump VERSION below when replacing them in place.
 // - Public catalog API reads (products, categories, banners, reviews):
 //   network first, falling back to the last good response. Private data
 //   (users, orders, messages) is never cached.
 
-const VERSION = 'v1'
+const VERSION = 'v2'
 const SHELL_CACHE = `technest-shell-${VERSION}`
 const STATIC_CACHE = `technest-static-${VERSION}`
 const API_CACHE = `technest-api-${VERSION}`
