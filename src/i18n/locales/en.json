@@ -317,7 +317,11 @@
     "soldQty": "Sold",
     "exportOrders": "Export CSV",
     "chatCleared": "Conversation cleared",
-    "noOrdersInPeriod": "No orders in this period"
+    "noOrdersInPeriod": "No orders in this period",
+    "statusBackward": "An order can't be moved back to an earlier status",
+    "statusFinal": "A delivered order's status can't be changed",
+    "orderStatusToast": "Order #{{id}}: {{status}}",
+    "orderSearchPlaceholder": "Search (ID, name, phone)..."
   },
   "support": {
     "title": "Need help?",

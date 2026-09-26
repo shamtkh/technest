@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { FaCheck, FaChevronDown } from 'react-icons/fa6'
+import { useScrollLock } from '../hooks/useScrollLock'
 
-// Phones get a bottom sheet instead of a dropdown: it can't be clipped or
-// covered by surrounding panels and its rows are thumb-sized.
+// With `sheet`, phones get a bottom sheet instead of the dropdown: it can't
+// be clipped or covered by surrounding panels and its rows are thumb-sized.
+// Used for the catalog filters; elsewhere the dropdown stays.
 const TOUCH_QUERY = '(hover: none) and (pointer: coarse)'
 const CLOSE_MS = 220
 
@@ -15,14 +17,15 @@ function subscribeTouch(callback) {
 const getTouch = () => window.matchMedia(TOUCH_QUERY).matches
 const getTouchOnServer = () => false
 
-export default function GlassSelect({ value, onChange, options, className = '', disabled = false, label = '' }) {
+export default function GlassSelect({ value, onChange, options, className = '', disabled = false, label = '', sheet = false }) {
   const [open, setOpen] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const rootRef = useRef(null)
   const sheetRef = useRef(null)
   const closeTimerRef = useRef(null)
   const openRef = useRef(false)
-  const useSheet = useSyncExternalStore(subscribeTouch, getTouch, getTouchOnServer)
+  const isTouch = useSyncExternalStore(subscribeTouch, getTouch, getTouchOnServer)
+  const useSheet = sheet && isTouch
   const selected = options.find((option) => option.value === value) || options[0]
 
   useEffect(() => {
@@ -45,14 +48,7 @@ export default function GlassSelect({ value, onChange, options, className = '', 
   }, [])
 
   // Keep the page from scrolling behind an open sheet.
-  useEffect(() => {
-    if (!useSheet || !open) return undefined
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = previous
-    }
-  }, [useSheet, open])
+  useScrollLock(useSheet && open)
 
   function closeMenu() {
     if (!openRef.current) return
@@ -63,6 +59,7 @@ export default function GlassSelect({ value, onChange, options, className = '', 
   }
 
   function choose(option) {
+    if (option.disabled) return
     onChange(option.value)
     closeMenu()
   }
@@ -73,6 +70,7 @@ export default function GlassSelect({ value, onChange, options, className = '', 
       type="button"
       role="option"
       aria-selected={option.value === value}
+      disabled={option.disabled}
       className={`${optionClass} ${option.value === value ? 'is-selected' : ''}`}
       onClick={() => choose(option)}
     >

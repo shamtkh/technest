@@ -25,7 +25,7 @@ There is no `.env` requirement to run locally; `VITE_API_URL` optionally overrid
 **Fake backend (`server/index.cjs`).** Wraps `json-server` around `src/data/db.json` (collections: `products`, `categories`, `users`, `orders`, `messages`, `reviews`, `promoCodes`, `banners`; the last three are created on boot if a restored snapshot predates them). Custom routes are registered *before* the generic `json-server` router so they take precedence:
 - `POST /auth/login`, `POST /auth/register` — hand-rolled auth against the `users` collection (passwords in plaintext in `db.json`, stripped from responses). No real sessions/tokens — the client just stores the returned user object.
 - `POST /orders` — assigns id/status/createdAt, re-prices items from the catalog and applies `promoCode` server-side (`subtotal`/`discount`/`total`), rejects orders without a valid `userId` (`401 AUTH_REQUIRED`), then decrements stock on the matching product **variant** (matched by `storage` + `color`) for each line item.
-- `PATCH /orders/:id` — updates order status.
+- `PATCH /orders/:id` — updates order status, forward only (`pending` → `accepted` → `transit` → `delivered`; going back returns `409 STATUS_BACKWARD`). The admin status select disables earlier statuses to match.
 - `POST /promo/validate`, `POST /promoCodes`, `PATCH /promoCodes/:id` — promo code checks and normalized admin CRUD (GET/DELETE fall through to json-server).
 - `GET/POST /reviews`, `DELETE /reviews/:id?userId=` — one review per customer per product; recomputes `product.rating`/`reviews` (falls back to `seedRating`).
 - `PUT /users/:id/wishlist`, `PUT /users/:id/addresses` — per-account wishlist and saved delivery addresses.

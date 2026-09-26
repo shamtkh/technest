@@ -9,6 +9,7 @@ import logo from '../assets/technest-logo-navbar.png'
 import BrandLogo from './BrandLogo'
 import BurgerMenu from './BurgerMenu'
 import ConfirmDialog from './ConfirmDialog'
+import { useScrollLock } from '../hooks/useScrollLock'
 
 const LANGS = [
   { code: 'uz', label: "UZ" },
@@ -27,6 +28,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
+  useScrollLock(mobileOpen)
 
   const isAdmin = user?.role === 'admin'
 

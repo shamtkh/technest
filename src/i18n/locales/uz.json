@@ -317,7 +317,11 @@
     "soldQty": "Sotildi",
     "exportOrders": "CSV eksport",
     "chatCleared": "Yozishma tozalandi",
-    "noOrdersInPeriod": "Bu davrda buyurtmalar yo'q"
+    "noOrdersInPeriod": "Bu davrda buyurtmalar yo'q",
+    "statusBackward": "Buyurtmani oldingi holatga qaytarib bo'lmaydi",
+    "statusFinal": "Yetkazilgan buyurtma holatini o'zgartirib bo'lmaydi",
+    "orderStatusToast": "Buyurtma #{{id}} holati: {{status}}",
+    "orderSearchPlaceholder": "Qidirish (ID, ism, tel)..."
   },
   "support": {
     "title": "Yordam kerakmi?",

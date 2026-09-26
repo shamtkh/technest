@@ -228,6 +228,11 @@ body.confirm-dialog-open {
 .confirm-dialog-overlay {
   overscroll-behavior: contain;
 }
+/* Nothing to scroll on these backdrops: don't let a drag reach the page. */
+.confirm-dialog-overlay,
+.select-sheet-backdrop {
+  touch-action: none;
+}
 
 .admin-modal-overlay {
   z-index: 1000;
@@ -429,6 +434,9 @@ body.confirm-dialog-open {
 .glass-select-option:hover, .glass-select-option.is-selected { background: rgba(61, 127, 255, 0.14); color: var(--color-accent-dim); }
 .glass-select-option.is-selected { font-weight: 600; }
 .glass-select-option svg { color: var(--color-accent); font-size: 0.7rem; }
+.glass-select-option:disabled,
+.select-sheet-option:disabled { opacity: 0.38; cursor: not-allowed; }
+.glass-select-option:disabled:hover { background: transparent; color: inherit; }
 
 @keyframes glassSelectIn {
   from { opacity: 0; transform: translateY(-0.2rem); }
@@ -445,7 +453,7 @@ body.confirm-dialog-open {
 
 @keyframes cartActionsIn {
   from { opacity: 0; transform: translateY(0.5rem); }
-  to { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -525,6 +533,9 @@ body.confirm-dialog-open {
   background: #f7faff;
   padding: 1.25rem 1.1rem calc(5rem + env(safe-area-inset-bottom));
   box-shadow: -18px 0 44px rgba(27, 55, 105, 0.18), inset 1px 0 0 rgba(255, 255, 255, 0.6);
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   opacity: 0;
   transform: translateX(100%);
   will-change: transform, opacity;
@@ -675,7 +686,7 @@ button:active:not(:disabled):not(.wishlist-btn):not(.select-sheet-option) {
 .site-header { animation: headerIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
 @keyframes headerIn {
   from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: none; }
 }
 
 .scroll-reveal {
@@ -684,7 +695,7 @@ button:active:not(:disabled):not(.wishlist-btn):not(.select-sheet-option) {
   transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: var(--reveal-delay, 0ms);
 }
-.scroll-reveal.is-visible { opacity: 1; transform: translateY(0); }
+.scroll-reveal.is-visible { opacity: 1; transform: none; }
 
 /* ── Keyframe Animations ── */
 @keyframes fadeInUp {
@@ -694,7 +705,7 @@ button:active:not(:disabled):not(.wishlist-btn):not(.select-sheet-option) {
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
@@ -761,7 +772,6 @@ button:active:not(:disabled):not(.wishlist-btn):not(.select-sheet-option) {
 
 .page-transition {
   width: 100%;
-  will-change: opacity, transform;
 }
 .page-transition.page-enter {
   animation: pageEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -772,7 +782,7 @@ button:active:not(:disabled):not(.wishlist-btn):not(.select-sheet-option) {
 
 @keyframes pageEnter {
   from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: none; }
 }
 @keyframes pageExit {
   from { opacity: 1; transform: translateY(0); }
@@ -846,7 +856,7 @@ button:active:not(:disabled):not(.wishlist-btn):not(.select-sheet-option) {
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 

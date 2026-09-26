@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { removeItem, incrementQty, decrementQty, clearCart } from '../store/slices/cartSlice'
 import { formatPrice } from '../utils/format'
 import { useToast } from '../hooks/useToast'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { FaMinus, FaPlus, FaTrashCan } from 'react-icons/fa6'
 
 // Matches the .cart-line transition in index.css (fade/slide, then collapse).
@@ -212,45 +213,14 @@ export default function CartPage() {
       </div>
 
       {clearConfirmOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/65 p-4 modal-overlay-enter"
-          onClick={() => setClearConfirmOpen(false)}
-          role="presentation"
-        >
-          <div
-            className="w-full max-w-md rounded-2xl border border-line bg-white p-6 shadow-realistic-lg modal-enter sm:p-7"
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="clear-cart-title"
-          >
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-danger">
-              <FaTrashCan size={20} aria-hidden="true" />
-            </div>
-            <h2 id="clear-cart-title" className="mt-4 text-center font-display text-xl font-bold text-ink-soft">
-              {t('cart.clear')}
-            </h2>
-            <p className="mt-2 text-center text-sm leading-relaxed text-steel">
-              {t('cart.clearConfirm')}
-            </p>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setClearConfirmOpen(false)}
-                className="rounded-xl border border-line px-4 py-3 text-sm font-semibold text-ink-soft hover:bg-paper"
-              >
-                {t('admin.cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={handleClearCart}
-                className="rounded-xl bg-danger px-4 py-3 text-sm font-semibold text-white hover:bg-red-600"
-              >
-                {t('admin.confirm')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title={t('cart.clear')}
+          message={t('cart.clearConfirm')}
+          confirmLabel={t('admin.confirm')}
+          cancelLabel={t('admin.cancel')}
+          onConfirm={handleClearCart}
+          onCancel={() => setClearConfirmOpen(false)}
+        />
       )}
     </div>
   )

@@ -1,8 +1,11 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { FaTriangleExclamation } from 'react-icons/fa6'
+import { useScrollLock } from '../hooks/useScrollLock'
 
 export default function ConfirmDialog({ title, message, confirmLabel, cancelLabel, onConfirm, onCancel, danger = true }) {
+  useScrollLock(true)
+
   useEffect(() => {
     document.body.classList.add('confirm-dialog-open')
 

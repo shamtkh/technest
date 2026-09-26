@@ -10,6 +10,7 @@ import { getProductsThunk } from '../store/thunks/getProductsThunk'
 import { useToast } from '../hooks/useToast'
 import { Skeleton } from './Skeleton'
 import ConfirmDialog from './ConfirmDialog'
+import { useScrollLock } from '../hooks/useScrollLock'
 
 const MAX_PHOTOS = 3
 const EMPTY_DRAFT = { rating: 0, text: '', images: [] }
@@ -29,6 +30,7 @@ export default function ProductReviews({ product }) {
   const [saving, setSaving] = useState(false)
   const [hoverRating, setHoverRating] = useState(0)
   const [lightbox, setLightbox] = useState(null)
+  useScrollLock(Boolean(lightbox))
   const [deleting, setDeleting] = useState(null)
   const fileInputRef = useRef(null)
 

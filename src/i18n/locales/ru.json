@@ -317,7 +317,11 @@
     "soldQty": "Продано",
     "exportOrders": "Экспорт CSV",
     "chatCleared": "Переписка очищена",
-    "noOrdersInPeriod": "За этот период заказов нет"
+    "noOrdersInPeriod": "За этот период заказов нет",
+    "statusBackward": "Заказ нельзя вернуть в предыдущий статус",
+    "statusFinal": "Статус доставленного заказа изменить нельзя",
+    "orderStatusToast": "Заказ #{{id}}: {{status}}",
+    "orderSearchPlaceholder": "Поиск (ID, имя, телефон)..."
   },
   "support": {
     "title": "Нужна помощь?",

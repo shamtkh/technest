@@ -644,12 +644,20 @@ async function start() {
     res.status(201).json(record)
   })
 
-  // ── PATCH /orders/:id — update status ──
+  // ── PATCH /orders/:id — update status, forward only ──
+  const STATUS_FLOW = ['pending', 'accepted', 'transit', 'delivered']
+  const LEGACY_STATUS = { new: 'pending', processing: 'accepted' }
   server.patch('/orders/:id', (req, res) => {
     const id = Number(req.params.id)
     const { status } = req.body
     const order = router.db.get('orders').find({ id }).value()
     if (!order) return res.status(404).json({ error: 'Order not found' })
+    const next = STATUS_FLOW.indexOf(status)
+    if (next === -1) return res.status(400).json({ error: 'INVALID_STATUS' })
+    const current = STATUS_FLOW.indexOf(LEGACY_STATUS[order.status] || order.status)
+    // pending → accepted → transit → delivered; never back (e.g. delivered → pending).
+    if (next < current) return res.status(409).json({ error: 'STATUS_BACKWARD' })
+    if (next === current) return res.json(order)
 
     router.db
       .get('orders')

@@ -24,6 +24,7 @@ import api from '../api/api'
 import { FaBoxOpen, FaBoxesStacked, FaChartLine, FaClock, FaDollarSign, FaTriangleExclamation, FaUsers, FaXmark, FaPaperPlane, FaHeadset } from 'react-icons/fa6'
 import { AdminDashboardSkeleton } from './Skeleton'
 import ConfirmDialog from './ConfirmDialog'
+import { useScrollLock } from '../hooks/useScrollLock'
 import SalesAnalytics from './admin/SalesAnalytics'
 import PromoCodesPanel from './admin/PromoCodesPanel'
 import BannersPanel from './admin/BannersPanel'
@@ -36,6 +37,14 @@ const ORDER_STATUSES = [
   { value: 'transit', labelKey: 'statusTransit', cls: 'status-transit' },
   { value: 'delivered', labelKey: 'statusDelivered', cls: 'status-delivered' },
 ]
+// Older orders may carry legacy status names.
+const STATUS_ALIASES = { new: 'pending', processing: 'accepted' }
+
+// Position in the pipeline; orders can only move forward along it.
+function statusRank(status) {
+  const index = ORDER_STATUSES.findIndex((item) => item.value === (STATUS_ALIASES[status] || status))
+  return index === -1 ? 0 : index
+}
 
 const EMPTY_FORM = {
   name: '', brand: '', category: 'phones', price: '', oldPrice: '',
@@ -122,11 +131,14 @@ export default function AdminDashboard() {
     }
   }, [dispatch])
 
+  const hasOpenOverlay = modalOpen || activeConversationId !== null || clearConversationConfirmOpen || deletingId !== null || deletingOrderId !== null || deletingCategory !== null || deletingUser !== null || selectedStat !== null
+  useScrollLock(hasOpenOverlay)
+
+  // Body classes drive overlay-specific CSS (e.g. hiding the mobile tab bar
+  // under the product editor); scrolling is handled by useScrollLock above.
   useEffect(() => {
-    const hasOpenOverlay = modalOpen || activeConversationId !== null || clearConversationConfirmOpen || deletingId !== null || deletingOrderId !== null || deletingCategory !== null || deletingUser !== null
     if (!hasOpenOverlay) {
       document.body.classList.remove('admin-modal-open', 'product-editor-open')
-      if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
       return undefined
     }
 
@@ -138,15 +150,13 @@ export default function AdminDashboard() {
       return () => {
         document.body.classList.remove('admin-modal-open')
         if (!wasEditorOpen) document.body.classList.remove('product-editor-open')
-        if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
       }
     }
 
     return () => {
       document.body.classList.remove('admin-modal-open')
-      if (!document.body.classList.contains('confirm-dialog-open')) document.body.style.removeProperty('overflow')
     }
-  }, [activeConversationId, clearConversationConfirmOpen, deletingCategory, deletingId, deletingOrderId, deletingUser, modalOpen])
+  }, [hasOpenOverlay, modalOpen])
 
   // ── Notify admin of new support messages ──
   useEffect(() => {
@@ -421,13 +431,21 @@ export default function AdminDashboard() {
     showToast(t('admin.userDeleted'), 'warning')
   }
 
-  async function handleStatusChange(orderId, status) {
-    setStatusUpdating(orderId)
-    await dispatch(updateOrderStatusThunk({ orderId, status })).unwrap()
-    await dispatch(getProductsThunk({ force: true }))
-    setStatusUpdating(null)
-    const lbl = t(`admin.status${status[0].toUpperCase()}${status.slice(1)}`)
-    showToast(`Buyurtma #${orderId} holati: ${lbl}`, 'success')
+  async function handleStatusChange(order, status) {
+    // Orders only move forward: pending → accepted → in transit → delivered.
+    if (statusRank(status) <= statusRank(order.status)) return
+    setStatusUpdating(order.id)
+    try {
+      await dispatch(updateOrderStatusThunk({ orderId: order.id, status })).unwrap()
+      dispatch(getProductsThunk({ force: true }))
+      const label = t(`admin.${ORDER_STATUSES[statusRank(status)].labelKey}`)
+      showToast(t('admin.orderStatusToast', { id: order.id, status: label }), 'success')
+    } catch (err) {
+      showToast(err === 'STATUS_BACKWARD' ? t('admin.statusBackward') : t('common.error'), 'error')
+      dispatch(getAllOrdersThunk())
+    } finally {
+      setStatusUpdating(null)
+    }
   }
 
   async function handleOrderDelete(id) {
@@ -725,7 +743,7 @@ export default function AdminDashboard() {
               <input
                 className="input w-auto"
                 style={{ maxWidth: '260px' }}
-                placeholder="Qidirish (ID, ism, tel)..."
+                placeholder={t('admin.orderSearchPlaceholder')}
                 value={orderSearch}
                 onChange={(e) => setOrderSearch(e.target.value)}
               />
@@ -749,6 +767,8 @@ export default function AdminDashboard() {
             <div className="space-y-3">
               {filteredOrders.map((order) => {
                 const si = statusInfo(order.status)
+                const rank = statusRank(order.status)
+                const isFinal = rank === ORDER_STATUSES.length - 1
                 return (
                   <div key={order.id} className="rounded-2xl border border-line bg-white p-5" style={{ transition: 'box-shadow 0.2s ease' }}>
                     <div className="flex flex-wrap items-start justify-between gap-3">
@@ -768,9 +788,12 @@ export default function AdminDashboard() {
                                 <span aria-hidden="true">📍</span>
                                 <span>
                                   {order.contact.city && `${order.contact.city}, `}
-                                  {order.contact.address || [order.contact.street, order.contact.house].filter(Boolean).join(', ')}
-                                  {order.contact.apartment && `, kv. ${order.contact.apartment}`}
-                                  {order.contact.landmark && `, ${order.contact.landmark}`}
+                                  {order.contact.address || [
+                                    order.contact.street,
+                                    order.contact.house,
+                                    order.contact.apartment && `kv. ${order.contact.apartment}`,
+                                    order.contact.landmark,
+                                  ].filter(Boolean).join(', ')}
                                 </span>
                               </div>
                             )}
@@ -783,13 +806,15 @@ export default function AdminDashboard() {
                         <span className={`rounded-full px-3 py-1 spec-strip text-xs font-medium ${si.cls}`}>
                           {si.label}
                         </span>
-                        <GlassSelect
-                          value={order.status}
-                          disabled={statusUpdating === order.id}
-                          onChange={(value) => handleStatusChange(order.id, value)}
-                          options={ORDER_STATUSES.map((s) => ({ value: s.value, label: t(`admin.${s.labelKey}`) }))}
-                          className="status-select min-w-36 text-xs"
-                        />
+                        <div title={isFinal ? t('admin.statusFinal') : undefined}>
+                          <GlassSelect
+                            value={ORDER_STATUSES[rank].value}
+                            disabled={statusUpdating === order.id || isFinal}
+                            onChange={(value) => handleStatusChange(order, value)}
+                            options={ORDER_STATUSES.map((s, index) => ({ value: s.value, label: t(`admin.${s.labelKey}`), disabled: index < rank }))}
+                            className="status-select min-w-36 text-xs"
+                          />
+                        </div>
                       </div>
                     </div>
 
