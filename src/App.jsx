@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import Layout from './components/Layout'
@@ -12,10 +13,14 @@ import CheckoutPage from './pages/checkoutPage'
 import LoginPage from './pages/loginPage'
 import RegisterPage from './pages/registerPage'
 import OrdersPage from './pages/ordersPage'
-import AdminPage from './pages/adminPage'
 import NotFoundPage from './pages/NotFoundPage'
 import ForbiddenPage from './pages/forbiddenPage'
 import ProfilePage from './pages/ProfilePage'
+import WishlistPage from './pages/WishlistPage'
+import { AdminDashboardSkeleton } from './components/Skeleton'
+
+// Admin-only code (incl. chart.js) is split out so customers never download it.
+const AdminPage = lazy(() => import('./pages/adminPage'))
 
 function App() {
   return (
@@ -26,18 +31,26 @@ function App() {
           <Route path="products" element={<ProductsPage />} />
           <Route path="products/:id" element={<ProductPage />} />
           <Route path="cart" element={<CartPage />} />
+          <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="wishlist" element={<WishlistPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="forbidden" element={<ForbiddenPage />} />
 
           <Route element={<ProtectedRoute />}>
-            <Route path="checkout" element={<CheckoutPage />} />
             <Route path="orders" element={<OrdersPage />} />
-                      <Route path="profile" element={<ProfilePage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
 
           <Route element={<AdminRoute />}>
-            <Route path="admin" element={<AdminPage />} />
+            <Route
+              path="admin"
+              element={(
+                <Suspense fallback={<div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"><AdminDashboardSkeleton /></div>}>
+                  <AdminPage />
+                </Suspense>
+              )}
+            />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />

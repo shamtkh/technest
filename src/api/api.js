@@ -12,7 +12,9 @@ async function request(url, options = {}) {
   }
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
-    throw new Error(data.error || `HTTP ${res.status}`)
+    const error = new Error(data.error || `HTTP ${res.status}`)
+    error.data = data
+    throw error
   }
   if (res.status === 204) return null
   return res.json()
@@ -171,6 +173,96 @@ export const api = {
   async clearConversation(userId) {
     const messages = await request(`/messages?userId=${encodeURIComponent(userId)}`)
     await Promise.all(messages.map((message) => request(`/messages/${message.id}`, { method: 'DELETE' })))
+  },
+
+  // ---------- wishlist / saved addresses ----------
+  async updateWishlist(userId, productIds) {
+    const { wishlist } = await request(`/users/${encodeURIComponent(userId)}/wishlist`, {
+      method: 'PUT',
+      body: JSON.stringify({ productIds }),
+    })
+    return wishlist
+  },
+
+  async updateAddresses(userId, addresses) {
+    const result = await request(`/users/${encodeURIComponent(userId)}/addresses`, {
+      method: 'PUT',
+      body: JSON.stringify({ addresses }),
+    })
+    return result.addresses
+  },
+
+  // ---------- reviews ----------
+  async getReviews(productId) {
+    return request(`/reviews?productId=${encodeURIComponent(productId)}`)
+  },
+
+  async saveReview(payload) {
+    return request('/reviews', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  async deleteReview(reviewId, userId) {
+    await request(`/reviews/${reviewId}?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
+    return { id: Number(reviewId) }
+  },
+
+  // ---------- recommendations ----------
+  async getBoughtTogether(productId) {
+    return request(`/products/${productId}/bought-together`)
+  },
+
+  async bulkUpdateStock(updates) {
+    return request('/products/bulk-stock', {
+      method: 'POST',
+      body: JSON.stringify({ updates }),
+    })
+  },
+
+  // ---------- promo codes ----------
+  async validatePromo(code, subtotal) {
+    return request('/promo/validate', {
+      method: 'POST',
+      body: JSON.stringify({ code, subtotal }),
+    })
+  },
+
+  async getPromoCodes() {
+    return request('/promoCodes?_sort=id&_order=desc')
+  },
+
+  async createPromoCode(payload) {
+    return request('/promoCodes', { method: 'POST', body: JSON.stringify(payload) })
+  },
+
+  async updatePromoCode(id, payload) {
+    return request(`/promoCodes/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
+  },
+
+  async deletePromoCode(id) {
+    await request(`/promoCodes/${id}`, { method: 'DELETE' })
+    return { id: Number(id) }
+  },
+
+  // ---------- hero banners ----------
+  async getBanners() {
+    const banners = await request('/banners')
+    return [...banners].sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
+  },
+
+  async createBanner(payload) {
+    return request('/banners', { method: 'POST', body: JSON.stringify(payload) })
+  },
+
+  async updateBanner(id, payload) {
+    return request(`/banners/${id}`, { method: 'PATCH', body: JSON.stringify(payload) })
+  },
+
+  async deleteBanner(id) {
+    await request(`/banners/${id}`, { method: 'DELETE' })
+    return { id: Number(id) }
   },
 
   async getUsers() {

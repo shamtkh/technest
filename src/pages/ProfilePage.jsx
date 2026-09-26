@@ -6,6 +6,8 @@ import { FaCalendar, FaLock, FaPhone, FaUser } from 'react-icons/fa6'
 import api from '../api/api'
 import { logout, setUser } from '../store/slices/authSlice'
 import ConfirmDialog from '../components/ConfirmDialog'
+import SavedAddresses from '../components/SavedAddresses'
+import { setWishlist } from '../store/slices/wishlistSlice'
 import { useToast } from '../hooks/useToast'
 import { formatPrice } from '../utils/format'
 
@@ -38,6 +40,8 @@ export default function ProfilePage() {
       const freshUser = users.find((item) => String(item.id) === String(userId))
       if (freshUser) {
         dispatch(setUser(freshUser))
+        // Pick up wishlist changes made on the user's other devices.
+        if (Array.isArray(freshUser.wishlist)) dispatch(setWishlist(freshUser.wishlist))
         setForm((current) => ({ ...current, name: freshUser.name || '', email: freshUser.email || '', phone: freshUser.phone || '' }))
       }
     }).catch(() => {})
@@ -137,6 +141,8 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
+
+      {!isAdmin && <SavedAddresses />}
 
       {!isAdmin && <section className="mt-6 rounded-2xl border border-line bg-white p-5 sm:p-6">
         <div className="mb-4 flex items-center justify-between gap-3">

@@ -16,6 +16,8 @@ import productReducer from './slices/productSlice'
 import ordersReducer from './slices/ordersSlice'
 import cartReducer from './slices/cartSlice'
 import chatReducer from './slices/chatSlice'
+import wishlistReducer from './slices/wishlistSlice'
+import recentlyViewedReducer from './slices/recentlyViewedSlice'
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -23,12 +25,14 @@ const rootReducer = combineReducers({
   orders: ordersReducer,
   cart: cartReducer,
   chat: chatReducer,
+  wishlist: wishlistReducer,
+  recentlyViewed: recentlyViewedReducer,
 })
 
 const persistConfig = {
   key: 'technest_root',
   storage: storageModule.default ?? storageModule,
-  whitelist: ['auth', 'cart'],
+  whitelist: ['auth', 'cart', 'wishlist', 'recentlyViewed'],
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

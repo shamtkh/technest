@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { getProductsThunk } from '../store/thunks/getProductsThunk'
@@ -11,12 +11,36 @@ import { formatPrice } from '../utils/format'
 import { getProductFallbackImage, getProductImages } from '../utils/productImages'
 import { FaArrowRight, FaBagShopping, FaCheck, FaMinus, FaPlus, FaTrashCan } from 'react-icons/fa6'
 import { ProductDetailSkeleton } from '../components/Skeleton'
+import WishlistButton from '../components/WishlistButton'
+import ProductReviews from '../components/ProductReviews'
+import { addViewed } from '../store/slices/recentlyViewedSlice'
+import api from '../api/api'
+
+// Pick a sensible variant for one-click "add the whole bundle" actions.
+function firstAvailableVariant(product) {
+  const variant = product.variants?.find((item) => Number(item.stock) > 0)
+  if (variant) return { storage: variant.storage, color: variant.color, stock: Number(variant.stock) }
+  return { storage: product.storage?.[0] || '', color: product.colors?.[0]?.name || '', stock: Number(product.stock) || 0 }
+}
+
+// Same category first; prefer the same brand and a similar price point.
+function getSimilarProducts(product, items) {
+  return items
+    .filter((item) => item.id !== product.id && item.category === product.category)
+    .map((item) => {
+      const priceGap = Math.abs(item.price - product.price) / Math.max(product.price, 1)
+      const score = (item.brand === product.brand ? 1 : 0) + Math.max(0, 1 - priceGap) + (item.stock > 0 ? 0.5 : 0)
+      return { item, score }
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4)
+    .map(({ item }) => item)
+}
 
 export default function ProductPage() {
   const { id } = useParams()
   const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const { showToast } = useToast()
   const { items, status } = useSelector((s) => s.products)
   const cartItems = useSelector((s) => s.cart.items)
@@ -31,12 +55,22 @@ export default function ProductPage() {
   const [color, setColor] = useState('')
   const [loadedProductId, setLoadedProductId] = useState(null)
   const [loadedImages, setLoadedImages] = useState({})
+  const [boughtTogether, setBoughtTogether] = useState({ productId: null, items: [] })
 
   useEffect(() => {
     dispatch(getProductsThunk())
     const interval = setInterval(() => dispatch(getProductsThunk()), 15000)
     return () => clearInterval(interval)
   }, [dispatch])
+
+  useEffect(() => {
+    dispatch(addViewed(id))
+    let cancelled = false
+    api.getBoughtTogether(id)
+      .then((items) => { if (!cancelled) setBoughtTogether({ productId: Number(id), items }) })
+      .catch(() => { if (!cancelled) setBoughtTogether({ productId: Number(id), items: [] }) })
+    return () => { cancelled = true }
+  }, [dispatch, id])
 
   if (product && product.id !== loadedProductId) {
     setLoadedProductId(product.id)
@@ -63,7 +97,7 @@ export default function ProductPage() {
     return product.stock || 0
   })()
 
-  const selectedColor = product.colors?.find((item) => item.name === color)
+  const selectedColor = product?.colors?.find((item) => item.name === color)
   const colorLabel = selectedColor?.names?.[i18n.language] || selectedColor?.names?.ru || color
 
   const cartItem = cartItems.find(
@@ -89,14 +123,17 @@ export default function ProductPage() {
     )
   }
 
-  const related = items.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
+  const related = getSimilarProducts(product, items)
   const images = getProductImages(product)
+  const bundle = boughtTogether.productId === product.id
+    ? boughtTogether.items
+      .map(({ productId }) => items.find((item) => item.id === productId))
+      .filter((item) => item && item.stock > 0)
+      .slice(0, 3)
+    : []
+  const bundleTotal = bundle.reduce((sum, item) => sum + item.price, product.price)
 
   function handleAddToCart() {
-    if (!user) {
-      navigate('/login', { state: { from: { pathname: `/products/${product.id}` } } })
-      return
-    }
     if (isAdmin) return
     dispatch(addItem({
       productId: product.id,
@@ -108,6 +145,25 @@ export default function ProductPage() {
       stock: variantStock,
     }))
     showToast(`${product.name} (${color}, ${storage}) ${t('product.addedToast')}`, 'success')
+  }
+
+  function handleAddBundle() {
+    if (isAdmin) return
+    const bundleItems = [product, ...bundle]
+    bundleItems.forEach((item) => {
+      const variant = item.id === product.id ? { storage, color, stock: variantStock } : firstAvailableVariant(item)
+      if (variant.stock <= 0) return
+      const alreadyInCart = cartItems.some((cartEntry) => cartEntry.productId === item.id && cartEntry.storage === variant.storage && cartEntry.color === variant.color)
+      if (alreadyInCart) return
+      dispatch(addItem({
+        productId: item.id,
+        name: item.name,
+        image: getProductImages(item)[0],
+        price: item.price,
+        ...variant,
+      }))
+    })
+    showToast(t('product.bundleAdded'), 'success')
   }
 
   function changeCartQuantity(action) {
@@ -221,14 +277,15 @@ export default function ProductPage() {
             </h1>
 
             {/* Rating */}
-            <div className="mt-3 flex items-center gap-2">
+            <a href="#reviews" className="mt-3 flex w-fit items-center gap-2 hover:opacity-80">
               <div className="flex gap-1 text-amber">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className={i < Math.floor(product.rating) ? 'text-amber' : 'text-line'}>★</span>
+                  <span key={i} className={i < Math.round(product.rating) ? 'text-amber' : 'text-line'}>★</span>
                 ))}
               </div>
-              <span className="spec-strip text-steel">{t('product.reviews', { count: product.reviewsCount })}</span>
-            </div>
+              <span className="font-mono-tabular text-sm text-ink-soft">{product.rating}</span>
+              <span className="spec-strip text-steel">{t('product.reviews', { count: product.reviews || 0 })}</span>
+            </a>
 
             {/* Price block */}
             <div className="mt-6 flex items-baseline gap-3">
@@ -358,6 +415,8 @@ export default function ProductPage() {
                         </button>
                       </div>
 
+                      <WishlistButton productId={product.id} variant="button" />
+
                       {/* Go to cart CTA button */}
                       <Link
                         to="/cart"
@@ -370,14 +429,17 @@ export default function ProductPage() {
                     </div>
                   </div>
                 ) : (
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={variantStock === 0}
-                    className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-accent px-8 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-accent-dim hover:shadow active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-                  >
-                    <FaBagShopping size={18} aria-hidden="true" />
-                    <span>{t('product.addToCart')}</span>
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={variantStock === 0}
+                      className="flex h-12 min-w-0 flex-1 items-center justify-center gap-2.5 rounded-xl bg-accent px-8 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-accent-dim hover:shadow active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                    >
+                      <FaBagShopping size={18} aria-hidden="true" />
+                      <span>{t('product.addToCart')}</span>
+                    </button>
+                    <WishlistButton productId={product.id} variant="button" />
+                  </div>
                 )}
               </div>
             )}
@@ -400,6 +462,43 @@ export default function ProductPage() {
             </div>
           </div>
         </div>
+
+        {/* Frequently bought together */}
+        {bundle.length > 0 && (
+          <section className="mt-16">
+            <h2 className="mb-5 font-display text-xl font-bold text-ink-soft">{t('product.boughtTogether')}</h2>
+            <div className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 lg:flex-row lg:items-center">
+              <div className="flex flex-1 flex-wrap items-center gap-3">
+                {[product, ...bundle].map((item, index) => (
+                  <div key={item.id} className="flex items-center gap-3">
+                    {index > 0 && <FaPlus size={12} className="text-steel" aria-hidden="true" />}
+                    <Link to={`/products/${item.id}`} className="flex w-28 flex-col items-center gap-2 text-center sm:w-32">
+                      <img
+                        src={getProductImages(item)[0]}
+                        alt={item.name}
+                        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = getProductFallbackImage(item) }}
+                        className="h-24 w-24 rounded-xl border border-line object-contain p-2"
+                      />
+                      <span className="line-clamp-2 text-xs font-medium text-ink-soft">{item.name}</span>
+                      <span className="font-mono-tabular text-xs text-steel">{formatPrice(item.price)}</span>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+              <div className="shrink-0 border-t border-line pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+                <div className="text-xs text-steel">{t('product.bundleTotal', { count: bundle.length + 1 })}</div>
+                <div className="mt-1 font-mono-tabular text-xl font-bold text-ink-soft">{formatPrice(bundleTotal)} <span className="text-xs font-normal text-steel">{t('common.currency')}</span></div>
+                {!isAdmin && (
+                  <button onClick={handleAddBundle} className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-ink px-5 text-sm font-semibold text-white hover:bg-ink-soft">
+                    <FaBagShopping size={14} aria-hidden="true" /> {t('product.addBundle')}
+                  </button>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        <ProductReviews key={product.id} product={product} />
 
         {/* Related products */}
         {related.length > 0 && (

@@ -24,6 +24,11 @@ import api from '../api/api'
 import { FaBoxOpen, FaBoxesStacked, FaChartLine, FaClock, FaDollarSign, FaTriangleExclamation, FaUsers, FaXmark, FaPaperPlane, FaHeadset } from 'react-icons/fa6'
 import { AdminDashboardSkeleton } from './Skeleton'
 import ConfirmDialog from './ConfirmDialog'
+import SalesAnalytics from './admin/SalesAnalytics'
+import PromoCodesPanel from './admin/PromoCodesPanel'
+import BannersPanel from './admin/BannersPanel'
+import BulkStockImport from './admin/BulkStockImport'
+import { exportOrdersCsv } from '../utils/exports'
 
 const ORDER_STATUSES = [
   { value: 'pending', labelKey: 'statusPending', cls: 'status-pending' },
@@ -60,7 +65,7 @@ export default function AdminDashboard() {
   const [supportSettings, setSupportSettings] = useState({ telegram: '', phone: '', instagram: '' })
   const [supportSettingsStatus, setSupportSettingsStatus] = useState('idle')
 
-  const [tab, setTab] = useState('products') // 'products' | 'orders' | 'support'
+  const [tab, setTab] = useState('products') // 'products' | 'orders' | 'analytics' | 'promo' | 'banners' | 'support'
   const [activeConversationId, setActiveConversationId] = useState(null)
   const [replyText, setReplyText] = useState('')
   const supportMessagesRef = useRef(null)
@@ -571,10 +576,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* Tab switcher */}
-      <div className="mb-5 flex gap-2">
+      <div className="mb-5 flex flex-wrap gap-2">
         {[
           { key: 'products', label: t('admin.products'), badge: 0 },
           { key: 'orders', label: `${t('admin.orders')}${newOrdersCount > 0 ? ` (+${newOrdersCount} ${t('admin.new')})` : ''}`, badge: newOrdersCount },
+          { key: 'analytics', label: t('admin.analytics'), badge: 0 },
+          { key: 'promo', label: t('promo.tab'), badge: 0 },
+          { key: 'banners', label: t('banners.tab'), badge: 0 },
           { key: 'support', label: `${t('admin.support')}${adminUnreadCount > 0 ? ` (+${adminUnreadCount})` : ''}`, badge: adminUnreadCount },
         ].map((tab_) => (
           <button
@@ -604,6 +612,7 @@ export default function AdminDashboard() {
       {/* ── PRODUCTS TAB ── */}
       {tab === 'products' && (
         <>
+          <BulkStockImport products={products} />
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold text-ink-soft">{t('admin.products')}</h2>
             <button
@@ -712,13 +721,23 @@ export default function AdminDashboard() {
         <>
           <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
             <h2 className="font-display text-lg font-semibold text-ink-soft">{t('admin.allOrders')}</h2>
-            <input
-              className="input w-auto"
-              style={{ maxWidth: '260px' }}
-              placeholder="Qidirish (ID, ism, tel)..."
-              value={orderSearch}
-              onChange={(e) => setOrderSearch(e.target.value)}
-            />
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                className="input w-auto"
+                style={{ maxWidth: '260px' }}
+                placeholder="Qidirish (ID, ism, tel)..."
+                value={orderSearch}
+                onChange={(e) => setOrderSearch(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => exportOrdersCsv(filteredOrders)}
+                disabled={!filteredOrders.length}
+                className="btn-glass rounded-full border border-line bg-white px-4 py-2.5 text-xs font-semibold text-ink-soft hover:border-accent hover:text-accent disabled:opacity-40"
+              >
+                {t('admin.exportOrders')}
+              </button>
+            </div>
           </div>
 
           {filteredOrders.length === 0 ? (
@@ -736,6 +755,7 @@ export default function AdminDashboard() {
                       <div>
                         <div className="font-display text-sm font-semibold text-ink-soft">
                           {t('admin.order')} #{order.id}
+                          {order.guest && <span className="ml-2 rounded-full bg-paper-dim px-2 py-0.5 text-[10px] font-semibold uppercase text-steel">{t('checkout.guestBadge')}</span>}
                         </div>
                         <div className="spec-strip text-steel mt-0.5">
                           {new Date(order.createdAt).toLocaleString(i18n.language)}
@@ -788,6 +808,12 @@ export default function AdminDashboard() {
                       ))}
                     </div>
 
+                    {Number(order.discount) > 0 && (
+                      <div className="mt-3 flex justify-between border-t border-line pt-3 text-sm text-emerald-700">
+                        <span>{t('promo.discount')}{order.promoCode ? ` · ${order.promoCode}` : ''}</span>
+                        <span className="font-mono-tabular">−{formatPrice(order.discount)}</span>
+                      </div>
+                    )}
                     <div className="mt-3 flex justify-between border-t border-line pt-3 font-display text-sm font-semibold text-ink-soft">
                       <span>{t('admin.total')}</span>
                       <span className="font-mono-tabular">{formatPrice(order.total)} {t('common.currency')}</span>
@@ -804,6 +830,10 @@ export default function AdminDashboard() {
           )}
         </>
       )}
+
+      {tab === 'analytics' && <SalesAnalytics orders={orders} />}
+      {tab === 'promo' && <PromoCodesPanel />}
+      {tab === 'banners' && <BannersPanel />}
 
       {/* ── SUPPORT TAB ── */}
       {tab === 'support' && (

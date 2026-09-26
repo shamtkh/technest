@@ -126,6 +126,13 @@ export default function OrdersPage() {
                 ))}
               </div>
 
+              {Number(order.discount) > 0 && (
+                <div className="mt-4 flex justify-between border-t border-line pt-4 text-sm text-emerald-700">
+                  <span>{t('promo.discount')}{order.promoCode ? ` · ${order.promoCode}` : ''}</span>
+                  <span className="font-mono-tabular">−{formatPrice(order.discount)}</span>
+                </div>
+              )}
+
               {/* Total */}
               <div className="mt-4 flex justify-between border-t border-line pt-4 font-display text-sm font-semibold text-ink-soft">
                 <span>{t('orders.total')}</span>

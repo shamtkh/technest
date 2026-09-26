@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { formatPrice } from '../utils/format'
 import { decrementQty, incrementQty, removeItem } from '../store/slices/cartSlice'
 import { getProductFallbackImage, getProductImages } from '../utils/productImages'
+import WishlistButton from './WishlistButton'
 import { FaArrowLeft, FaArrowRight, FaBagShopping, FaMinus, FaPlus, FaStar, FaTrashCan } from 'react-icons/fa6'
 
 export default function ProductCard({ product }) {
@@ -107,15 +108,20 @@ export default function ProductCard({ product }) {
           </span>
         )}
 
-        {/* Quick view button */}
-        {!isAdmin && !cartItem && (
-          <span
-            aria-label={t('product.viewDetails')}
-            title={t('product.viewDetails')}
-            className="absolute right-3 top-3 z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-realistic transition-all duration-200 group-hover:bg-accent-dim group-hover:scale-105"
-          >
-            <FaBagShopping size={15} aria-hidden="true" />
-          </span>
+        {/* Wishlist + quick view */}
+        {!isAdmin && (
+          <div className="absolute right-3 top-3 z-20 flex flex-col gap-2">
+            <WishlistButton productId={product.id} />
+            {!cartItem && (
+              <span
+                aria-label={t('product.viewDetails')}
+                title={t('product.viewDetails')}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-white shadow-realistic transition-all duration-200 group-hover:bg-accent-dim group-hover:scale-105"
+              >
+                <FaBagShopping size={15} aria-hidden="true" />
+              </span>
+            )}
+          </div>
         )}
 
         {/* Out of stock overlay */}

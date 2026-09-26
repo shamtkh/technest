@@ -1,12 +1,26 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { getProductsThunk } from '../store/thunks/getProductsThunk'
+import { clearViewed } from '../store/slices/recentlyViewedSlice'
 import ProductCard from '../components/ProductCard'
 import PageTransition from '../components/PageTransition'
 import Reveal from '../components/Reveal'
 import { HomePageSkeleton } from '../components/Skeleton'
+import api from '../api/api'
+
+const BANNER_INTERVAL_MS = 6000
+
+// Banner links are set by admins and may point off-site.
+function SmartLink({ to, ...props }) {
+  return /^https?:\/\//i.test(to) ? <a href={to} target="_blank" rel="noreferrer" {...props} /> : <Link to={to} {...props} />
+}
+
+function localized(value, language) {
+  if (!value || typeof value !== 'object') return value || ''
+  return value[language] || value.uz || value.ru || value.en || ''
+}
 
 const CATEGORY_IMAGES = {
   phones: '/HomePageImg.jpg',
@@ -16,9 +30,12 @@ const CATEGORY_IMAGES = {
 }
 
 export default function HomePage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const dispatch = useDispatch()
   const { items, status } = useSelector((s) => s.products)
+  const recentIds = useSelector((s) => s.recentlyViewed.ids)
+  const [banners, setBanners] = useState([])
+  const [activeBanner, setActiveBanner] = useState(0)
 
   useEffect(() => {
     dispatch(getProductsThunk())
@@ -26,7 +43,24 @@ export default function HomePage() {
     return () => clearInterval(interval)
   }, [dispatch])
 
+  useEffect(() => {
+    api.getBanners()
+      .then((data) => setBanners(data.filter((banner) => banner.active && banner.image)))
+      .catch(() => setBanners([]))
+  }, [])
+
+  useEffect(() => {
+    if (banners.length < 2) return undefined
+    const interval = setInterval(() => setActiveBanner((index) => (index + 1) % banners.length), BANNER_INTERVAL_MS)
+    return () => clearInterval(interval)
+  }, [banners.length, activeBanner])
+
   const featured = items.filter((p) => p.featured).slice(0, 4)
+  const recentlyViewed = recentIds.map((id) => items.find((product) => product.id === id)).filter(Boolean).slice(0, 4)
+  const banner = banners.length ? banners[activeBanner % banners.length] : null
+  const heroTitle = banner ? localized(banner.title, i18n.language) || t('hero.title') : t('hero.title')
+  const heroSubtitle = banner ? localized(banner.subtitle, i18n.language) : t('hero.subtitle')
+  const heroLink = banner?.link || '/products'
 
   if (status === 'loading' && items.length === 0) return <HomePageSkeleton />
   if (status === 'failed' && items.length === 0) {
@@ -43,14 +77,14 @@ export default function HomePage() {
             <span className="spec-strip inline-block rounded-full border border-white/15 px-3 py-1 uppercase text-accent">
               {t('hero.eyebrow')}
             </span>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
-              {t('hero.title')}
+            <h1 key={`title-${banner?.id ?? 'default'}`} className="mt-5 font-display text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl modal-enter">
+              {heroTitle}
             </h1>
-            <p className="mt-5 max-w-md text-white/70">{t('hero.subtitle')}</p>
+            {heroSubtitle && <p className="mt-5 max-w-md text-white/70">{heroSubtitle}</p>}
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/products" className="btn-glass rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white hover:bg-accent-dim">
+              <SmartLink to={heroLink} className="btn-glass rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white hover:bg-accent-dim">
                 {t('hero.cta')}
-              </Link>
+              </SmartLink>
               <Link to="/products?sort=discount" className="btn-glass rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:border-white/40">
                 {t('hero.secondaryCta')}
               </Link>
@@ -73,15 +107,42 @@ export default function HomePage() {
 
           <div className="relative">
             <div className="absolute -inset-6 rounded-[2rem] bg-accent/20 blur-3xl" aria-hidden />
-            <img
-              src="/HomePageImg.jpg"
-              alt="Flagship smartphone"
-              className="relative w-full rounded-[1.75rem] object-cover shadow-realistic-lg"
-            />
-            <div className="absolute -bottom-5 -left-5 hidden rounded-2xl bg-white p-4 text-ink-soft shadow-realistic-lg sm:block">
-              <div className="spec-strip text-steel">A17 PRO · 48MP</div>
-              <div className="font-mono-tabular text-sm font-semibold">iPhone 15 Pro</div>
-            </div>
+            {banner ? (
+              <SmartLink to={heroLink} className="relative block">
+                <img
+                  key={banner.id}
+                  src={banner.image}
+                  alt={heroTitle}
+                  className="relative aspect-[4/3] w-full rounded-[1.75rem] object-cover shadow-realistic-lg modal-enter"
+                />
+              </SmartLink>
+            ) : (
+              <>
+                <img
+                  src="/HomePageImg.jpg"
+                  alt="Flagship smartphone"
+                  className="relative w-full rounded-[1.75rem] object-cover shadow-realistic-lg"
+                />
+                <div className="absolute -bottom-5 -left-5 hidden rounded-2xl bg-white p-4 text-ink-soft shadow-realistic-lg sm:block">
+                  <div className="spec-strip text-steel">A17 PRO · 48MP</div>
+                  <div className="font-mono-tabular text-sm font-semibold">iPhone 15 Pro</div>
+                </div>
+              </>
+            )}
+            {banners.length > 1 && (
+              <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2">
+                {banners.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setActiveBanner(index)}
+                    aria-label={`${t('home.banner')} ${index + 1}`}
+                    aria-current={index === activeBanner % banners.length}
+                    className={`h-2 rounded-full transition-all ${index === activeBanner % banners.length ? 'w-6 bg-accent' : 'w-2 bg-white/30 hover:bg-white/60'}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -117,6 +178,24 @@ export default function HomePage() {
           {featured.map((p, index) => <Reveal key={p.id} delay={index * 65}><ProductCard product={p} /></Reveal>)}
         </div>
       </Reveal>
+
+      {/* Recently viewed */}
+      {recentlyViewed.length > 0 && (
+        <Reveal as="section" className="mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8">
+          <div className="mb-6 flex items-end justify-between">
+            <div>
+              <h2 className="font-display text-2xl font-bold text-ink-soft">{t('home.recentTitle')}</h2>
+              <p className="mt-1 text-sm text-steel">{t('home.recentSubtitle')}</p>
+            </div>
+            <button type="button" onClick={() => dispatch(clearViewed())} className="text-sm font-medium text-steel hover:text-danger">
+              {t('home.recentClear')}
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {recentlyViewed.map((p, index) => <Reveal key={p.id} delay={index * 65}><ProductCard product={p} /></Reveal>)}
+          </div>
+        </Reveal>
+      )}
 
       {/* Why us */}
       <Reveal as="section" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">

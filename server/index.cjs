@@ -51,9 +51,20 @@ async function backupToCloud() {
 async function start() {
   await restoreFromCloud()
 
+  // json-server only builds its generic REST routes for collections that
+  // exist when the router is created, so make sure newer collections are in
+  // db.json (a restored cloud snapshot may predate them) before that happens.
+  const rawDb = JSON.parse(fs.readFileSync(dbPath, 'utf-8'))
+  const missingCollections = ['reviews', 'promoCodes', 'banners'].filter((key) => !Array.isArray(rawDb[key]))
+  if (missingCollections.length) {
+    missingCollections.forEach((key) => { rawDb[key] = [] })
+    fs.writeFileSync(dbPath, JSON.stringify(rawDb, null, 2) + '\n')
+  }
+
   const server = jsonServer.create()
   const router = jsonServer.router(dbPath)
   const demoUser = ensureDemoUser(router)
+  if (missingCollections.length) await backupToCloud()
 
   const legacyAdmin = router.db.get('users').find({ email: 'bexruz@gmail.com' }).value()
   if (legacyAdmin) {
@@ -158,6 +169,245 @@ async function start() {
     router.db.set('supportSettings', [defaults]).write()
     return defaults
   }
+
+  function nextIdOf(collection) {
+    const items = router.db.get(collection).value()
+    return items.length ? Math.max(...items.map((item) => Number(item.id) || 0)) + 1 : 1
+  }
+
+  function findUser(userId) {
+    return router.db.get('users').value().find((user) => Number(user.id) === Number(userId))
+  }
+
+  function safeUser(user) {
+    const { password: _, ...safe } = user
+    return safe
+  }
+
+  // ── Promo codes ──
+  function normalizePromoCode(code) {
+    return String(code || '').trim().toUpperCase().replace(/\s+/g, '')
+  }
+
+  function evaluatePromo(code, subtotal) {
+    const normalized = normalizePromoCode(code)
+    const promo = router.db.get('promoCodes').value().find((item) => item.code === normalized)
+    if (!normalized || !promo || !promo.active) return { error: 'PROMO_INVALID' }
+    // expiresAt is a calendar date; the code stays valid through the end of that day.
+    if (promo.expiresAt && new Date(`${promo.expiresAt}T23:59:59`) < new Date()) return { error: 'PROMO_EXPIRED' }
+    if (promo.maxUses && (Number(promo.uses) || 0) >= Number(promo.maxUses)) return { error: 'PROMO_USED_UP' }
+    if (promo.minTotal && subtotal < Number(promo.minTotal)) return { error: 'PROMO_MIN_TOTAL', minTotal: Number(promo.minTotal) }
+    const discount = promo.type === 'percent'
+      ? Math.round((subtotal * Math.min(100, Number(promo.value) || 0)) / 100)
+      : Math.min(Number(promo.value) || 0, subtotal)
+    return { promo, discount }
+  }
+
+  function normalizePromoPayload(body, current = {}) {
+    const merged = { ...current, ...body }
+    return {
+      code: normalizePromoCode(merged.code),
+      type: merged.type === 'fixed' ? 'fixed' : 'percent',
+      value: Math.max(0, Number(merged.value) || 0),
+      minTotal: Math.max(0, Number(merged.minTotal) || 0),
+      maxUses: Math.max(0, Number(merged.maxUses) || 0),
+      expiresAt: merged.expiresAt ? String(merged.expiresAt).slice(0, 10) : '',
+      active: merged.active !== false,
+      uses: Number(current.uses) || 0,
+    }
+  }
+
+  server.post('/promo/validate', (req, res) => {
+    const result = evaluatePromo(req.body.code, Math.max(0, Number(req.body.subtotal) || 0))
+    if (result.error) return res.status(400).json({ error: result.error, minTotal: result.minTotal })
+    const { code, type, value } = result.promo
+    res.json({ code, type, value, discount: result.discount })
+  })
+
+  server.post('/promoCodes', (req, res) => {
+    const promo = normalizePromoPayload(req.body)
+    if (!promo.code || promo.value <= 0) return res.status(400).json({ error: 'PROMO_INVALID' })
+    if (promo.type === 'percent' && promo.value > 100) return res.status(400).json({ error: 'PROMO_INVALID' })
+    if (router.db.get('promoCodes').find({ code: promo.code }).value()) return res.status(409).json({ error: 'PROMO_EXISTS' })
+    const record = { ...promo, id: nextIdOf('promoCodes'), createdAt: new Date().toISOString() }
+    router.db.get('promoCodes').push(record).write()
+    res.status(201).json(record)
+  })
+
+  server.patch('/promoCodes/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const current = router.db.get('promoCodes').find({ id }).value()
+    if (!current) return res.status(404).json({ error: 'Promo code not found' })
+    const promo = normalizePromoPayload(req.body, current)
+    const duplicate = router.db.get('promoCodes').value().some((item) => item.id !== id && item.code === promo.code)
+    if (duplicate) return res.status(409).json({ error: 'PROMO_EXISTS' })
+    router.db.get('promoCodes').find({ id }).assign(promo).write()
+    res.json(router.db.get('promoCodes').find({ id }).value())
+  })
+
+  // ── Reviews ──
+  function recomputeProductRating(productId) {
+    const product = findProduct(productId)
+    if (!product) return
+    const reviews = router.db.get('reviews').value().filter((review) => Number(review.productId) === Number(productId))
+    // Products ship with a seeded rating. Remember it the first time real
+    // reviews take over, so deleting every review falls back to it.
+    const seedRating = product.seedRating ?? product.rating ?? 0
+    const rating = reviews.length
+      ? Math.round((reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length) * 10) / 10
+      : seedRating
+    router.db.get('products').find((entry) => Number(entry.id) === Number(productId))
+      .assign({ rating, reviews: reviews.length, seedRating })
+      .write()
+  }
+
+  function userBoughtProduct(userId, productId) {
+    return router.db.get('orders').value().some((order) => (
+      Number(order.userId) === Number(userId)
+      && (order.items || []).some((item) => Number(item.productId) === Number(productId))
+    ))
+  }
+
+  server.get('/reviews', (req, res) => {
+    const productId = req.query.productId
+    const reviews = router.db.get('reviews').value()
+      .filter((review) => productId === undefined || Number(review.productId) === Number(productId))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    res.json(reviews)
+  })
+
+  server.post('/reviews', (req, res) => {
+    const user = findUser(req.body.userId)
+    const product = findProduct(req.body.productId)
+    const rating = Math.round(Number(req.body.rating))
+    const text = String(req.body.text || '').trim().slice(0, 2000)
+    const images = (Array.isArray(req.body.images) ? req.body.images : [])
+      .filter((image) => typeof image === 'string' && image.startsWith('data:image/') && image.length < 400_000)
+      .slice(0, 3)
+    if (!user || user.role === 'admin') return res.status(403).json({ error: 'REVIEW_FORBIDDEN' })
+    if (!product) return res.status(404).json({ error: 'Product not found' })
+    if (!(rating >= 1 && rating <= 5) || text.length < 3) return res.status(400).json({ error: 'REVIEW_INVALID' })
+
+    // One review per customer per product: posting again edits the old one.
+    const existing = router.db.get('reviews').value()
+      .find((review) => Number(review.productId) === product.id && Number(review.userId) === user.id)
+    const record = {
+      productId: product.id,
+      userId: user.id,
+      userName: user.name,
+      rating,
+      text,
+      images,
+      verified: userBoughtProduct(user.id, product.id),
+    }
+    if (existing) {
+      router.db.get('reviews').find({ id: existing.id }).assign({ ...record, updatedAt: new Date().toISOString() }).write()
+    } else {
+      router.db.get('reviews').push({ ...record, id: nextIdOf('reviews'), createdAt: new Date().toISOString() }).write()
+    }
+    recomputeProductRating(product.id)
+    const saved = router.db.get('reviews').value()
+      .find((review) => Number(review.productId) === product.id && Number(review.userId) === user.id)
+    res.status(existing ? 200 : 201).json(saved)
+  })
+
+  server.delete('/reviews/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const review = router.db.get('reviews').find({ id }).value()
+    if (!review) return res.status(404).json({ error: 'Review not found' })
+    const requester = findUser(req.query.userId)
+    if (!requester || (requester.role !== 'admin' && requester.id !== Number(review.userId))) {
+      return res.status(403).json({ error: 'REVIEW_FORBIDDEN' })
+    }
+    router.db.get('reviews').remove({ id }).write()
+    recomputeProductRating(review.productId)
+    res.status(204).end()
+  })
+
+  // ── Per-user wishlist and saved addresses (synced across devices) ──
+  server.put('/users/:id/wishlist', (req, res) => {
+    const user = findUser(req.params.id)
+    if (!user) return res.status(404).json({ error: 'USER_NOT_FOUND' })
+    const productIds = [...new Set((Array.isArray(req.body.productIds) ? req.body.productIds : []).map(Number))]
+      .filter((productId) => findProduct(productId))
+      .slice(0, 200)
+    router.db.get('users').find({ id: user.id }).assign({ wishlist: productIds }).write()
+    res.json({ wishlist: productIds })
+  })
+
+  server.put('/users/:id/addresses', (req, res) => {
+    const user = findUser(req.params.id)
+    if (!user) return res.status(404).json({ error: 'USER_NOT_FOUND' })
+    const clean = (value) => String(value || '').trim().slice(0, 200)
+    const addresses = (Array.isArray(req.body.addresses) ? req.body.addresses : [])
+      .slice(0, 10)
+      .map((address, index) => ({
+        id: clean(address.id) || `addr-${Date.now()}-${index}`,
+        label: clean(address.label),
+        city: clean(address.city),
+        street: clean(address.street),
+        house: clean(address.house),
+        apartment: clean(address.apartment),
+        landmark: clean(address.landmark),
+        isDefault: Boolean(address.isDefault),
+      }))
+      .filter((address) => address.city && address.street && address.house)
+    if (addresses.length && !addresses.some((address) => address.isDefault)) addresses[0].isDefault = true
+    router.db.get('users').find({ id: user.id }).assign({ addresses }).write()
+    res.json({ addresses })
+  })
+
+  // ── Recommendations: products that appear in the same orders ──
+  server.get('/products/:id/bought-together', (req, res) => {
+    const productId = Number(req.params.id)
+    const counts = new Map()
+    router.db.get('orders').value().forEach((order) => {
+      const ids = new Set((order.items || []).map((item) => Number(item.productId)))
+      if (!ids.has(productId)) return
+      ids.forEach((otherId) => {
+        if (otherId !== productId) counts.set(otherId, (counts.get(otherId) || 0) + 1)
+      })
+    })
+    const result = [...counts.entries()]
+      .filter(([otherId]) => findProduct(otherId))
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([otherId, count]) => ({ productId: otherId, count }))
+    res.json(result)
+  })
+
+  // ── Bulk stock update (CSV import from the admin panel) ──
+  // All rows are validated first; nothing is written unless every row is valid.
+  server.post('/products/bulk-stock', (req, res) => {
+    const updates = Array.isArray(req.body.updates) ? req.body.updates : []
+    if (!updates.length) return res.status(400).json({ error: 'BULK_EMPTY', errors: [] })
+
+    const errors = []
+    const resolved = updates.map((update, index) => {
+      const product = findProduct(update.productId)
+      const stock = Number(update.stock)
+      if (!product) { errors.push({ row: index, error: 'PRODUCT_NOT_FOUND' }); return null }
+      if (!Number.isInteger(stock) || stock < 0) { errors.push({ row: index, error: 'INVALID_STOCK' }); return null }
+      const variantIdx = (product.variants || []).findIndex(
+        (variant) => variant.storage === String(update.storage ?? '').trim() && variant.color === String(update.color ?? '').trim()
+      )
+      if (variantIdx === -1) { errors.push({ row: index, error: 'VARIANT_NOT_FOUND' }); return null }
+      return { productId: product.id, variantIdx, stock }
+    })
+    if (errors.length) return res.status(400).json({ error: 'BULK_INVALID', errors })
+
+    const touched = new Set()
+    resolved.forEach(({ productId, variantIdx, stock }) => {
+      router.db.get('products').find({ id: productId }).get('variants').nth(variantIdx).assign({ stock }).write()
+      touched.add(productId)
+    })
+    touched.forEach((productId) => {
+      const product = findProduct(productId)
+      const total = product.variants.reduce((sum, variant) => sum + (Number(variant.stock) || 0), 0)
+      router.db.get('products').find({ id: productId }).assign({ stock: total }).write()
+    })
+    res.json({ updated: resolved.length, products: touched.size })
+  })
 
   server.get('/supportSettings/:id', (req, res) => {
     const settings = getSupportSettings()
@@ -270,8 +520,35 @@ async function start() {
 
   // ── POST /orders — custom: decrement variant stock ──
   server.post('/orders', (req, res) => {
-    const body = req.body
+    const body = { ...req.body }
     const isDemoOrder = Number(body.userId) === Number(demoUser.id)
+
+    // Guest checkout: no account, the contact block is all we have.
+    if (!body.userId) {
+      body.userId = null
+      body.guest = true
+    }
+
+    // Recompute money server-side from catalog prices so neither the item
+    // prices nor the promo discount can be forged by the client.
+    body.items = (body.items || []).map((item) => {
+      const product = findProduct(item.productId)
+      return product ? { ...item, price: Number(product.price) || 0 } : item
+    })
+    const subtotal = body.items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 0), 0)
+    let discount = 0
+    let appliedPromo = null
+    if (body.promoCode) {
+      const result = evaluatePromo(body.promoCode, subtotal)
+      if (result.error) return res.status(400).json({ error: result.error, minTotal: result.minTotal })
+      discount = result.discount
+      appliedPromo = result.promo
+    }
+    body.subtotal = subtotal
+    body.discount = discount
+    body.promoCode = appliedPromo ? appliedPromo.code : null
+    body.total = subtotal - discount
+
     if (body.userId && body.contact?.phone) {
       router.db.get('users').find({ id: Number(body.userId) }).assign({
         phone: String(body.contact.phone).trim(),
@@ -355,6 +632,11 @@ async function start() {
     }
 
     router.db.get('orders').push(record).write()
+    if (appliedPromo) {
+      router.db.get('promoCodes').find({ id: appliedPromo.id })
+        .assign({ uses: (Number(appliedPromo.uses) || 0) + 1 })
+        .write()
+    }
     res.status(201).json(record)
   })
 

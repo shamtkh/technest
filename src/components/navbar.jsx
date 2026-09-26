@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import SearchBar from './searchBar'
 import { logout } from '../store/slices/authSlice'
-import { FaBell, FaHouse, FaMagnifyingGlass, FaBagShopping, FaTableCellsLarge, FaClipboardList, FaUser } from 'react-icons/fa6'
+import { FaBell, FaHouse, FaMagnifyingGlass, FaBagShopping, FaTableCellsLarge, FaClipboardList, FaUser, FaHeart } from 'react-icons/fa6'
 import logo from '../assets/technest-logo-navbar.png'
 import BrandLogo from './BrandLogo'
 import BurgerMenu from './BurgerMenu'
@@ -23,6 +23,7 @@ export default function Navbar() {
   const user = useSelector((s) => s.auth.user)
   const cartCount = useSelector((s) => s.cart.items.reduce((sum, i) => sum + i.qty, 0))
   const newOrdersCount = useSelector((s) => s.orders.newOrdersCount)
+  const wishlistCount = useSelector((s) => s.wishlist.ids.length)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
@@ -100,6 +101,24 @@ export default function Navbar() {
               <FaTableCellsLarge size={12} className="opacity-80" />
               <span>{t('nav.admin')}</span>
             </NavLink>
+          )}
+
+          {/* Wishlist icon — hidden for admin */}
+          {!isAdmin && (
+            <Link
+              to="/wishlist"
+              className="navbar-icon relative hidden h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-white text-ink-soft lg:flex"
+              aria-label={t('nav.wishlist')}
+              title={t('nav.wishlist')}
+              style={{ transition: 'border-color 0.2s ease, transform 0.2s ease' }}
+            >
+              <FaHeart size={16} aria-hidden="true" />
+              {wishlistCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-red-500 px-1 font-mono-tabular text-[10px] font-semibold text-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
           )}
 
           {/* Cart icon — hidden for admin */}
@@ -251,6 +270,24 @@ export default function Navbar() {
                     )}
                   </div>
                   <span>{t('nav.cart')}</span>
+                </NavLink>
+              )}
+
+              {!isAdmin && (
+                <NavLink
+                  to="/wishlist"
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) =>
+                    `btn-glass flex h-11 items-center gap-3 rounded-xl border px-4 text-sm font-semibold transition-all duration-200 ${
+                      isActive
+                        ? 'border-ink-soft/20 bg-paper-dim/95 text-ink-soft shadow-realistic'
+                        : 'border-line bg-white/80 text-steel hover:text-ink-soft hover:bg-paper/50'
+                    }`
+                  }
+                >
+                  <FaHeart size={14} className="opacity-80" />
+                  <span>{t('nav.wishlist')}</span>
+                  {wishlistCount > 0 && <span className="ml-auto font-mono-tabular text-xs text-steel">{wishlistCount}</span>}
                 </NavLink>
               )}
             <div className="mobile-drawer-section">

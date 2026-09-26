@@ -17,33 +17,10 @@ export default function CartPage() {
   const isAdmin = user?.role === 'admin'
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
 
-  if (!user) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-24 text-center page-enter">
-        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-accent-soft text-accent">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M6 6h15l-1.5 9h-12z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-            <path d="M6 6L4.5 3H2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-        </div>
-        <h1 className="font-display text-xl font-bold text-ink-soft">{t('cart.loginRequired')}</h1>
-        <p className="mt-2 text-sm text-steel">{t('cart.loginRequiredHint')}</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link to="/login" state={{ from: { pathname: '/cart' } }} className="btn-glass rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white">
-            {t('auth.loginBtn')}
-          </Link>
-          <Link to="/register" className="btn-glass rounded-full border border-line bg-white px-6 py-3 text-sm font-semibold text-ink-soft">
-            {t('auth.registerBtn')}
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
 
   function handleCheckout() {
-    navigate(user ? '/checkout' : '/login', { state: { from: { pathname: '/checkout' } } })
+    navigate('/checkout')
   }
 
   function handleClearCart() {
