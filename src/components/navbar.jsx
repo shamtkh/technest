@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import SearchBar from './searchBar'
 import { logout } from '../store/slices/authSlice'
-import { FaBell, FaHouse, FaMagnifyingGlass, FaBagShopping, FaTableCellsLarge, FaClipboardList, FaUser, FaHeart } from 'react-icons/fa6'
+import { FaArrowRightFromBracket, FaBell, FaChevronRight, FaGaugeHigh, FaHouse, FaBagShopping, FaTableCellsLarge, FaClipboardList, FaUser, FaHeart } from 'react-icons/fa6'
 import logo from '../assets/technest-logo-navbar.png'
 import BrandLogo from './BrandLogo'
 import BurgerMenu from './BurgerMenu'
@@ -50,6 +50,8 @@ export default function Navbar() {
     setUserMenuOpen(false)
     setLogoutConfirmOpen(true)
   }
+
+  const closeDrawer = () => setMobileOpen(false)
 
   const linkClass = ({ isActive }) =>
     `text-sm font-medium transition-colors ${isActive ? 'text-ink-soft' : 'text-steel hover:text-ink-soft'}`
@@ -206,95 +208,57 @@ export default function Navbar() {
       </div>
       </header>
 
+      {/* Phone/tablet menu: account, search and settings. Primary sections
+          live in the bottom tab bar, so they aren't repeated here. */}
       <div
         className={`mobile-drawer-backdrop lg:hidden ${mobileOpen ? 'is-open' : ''}`}
-        onClick={() => setMobileOpen(false)}
+        onClick={closeDrawer}
         aria-hidden={!mobileOpen}
       >
-          <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
-            <div className="mobile-drawer-header">
-              <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-drawer-logo h-9 w-32 object-cover object-center" />
-              <BurgerMenu checked={mobileOpen} onChange={setMobileOpen} />
-            </div>
-            <div className="mb-5">
-            <SearchBar compact onSubmit={() => setMobileOpen(false)} />
-            </div>
-            <div className="flex flex-col gap-4">
-              <NavLink
-                to="/"
-                end
-                onClick={() => setMobileOpen(false)}
-                className={({ isActive }) =>
-                  `btn-glass flex h-11 items-center gap-3 rounded-xl border px-4 text-sm font-semibold transition-all duration-200 ${
-                    isActive
-                      ? 'border-ink-soft/20 bg-paper-dim/95 text-ink-soft shadow-realistic'
-                      : 'border-line bg-white/80 text-steel hover:text-ink-soft hover:bg-paper/50'
-                  }`
-                }
-              >
-                <FaHouse size={15} className="opacity-80" />
-                <span>{t('nav.home')}</span>
-              </NavLink>
+        <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
+          <div className="mobile-drawer-header">
+            <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-drawer-logo h-9 w-32 object-cover object-center" />
+            <BurgerMenu checked={mobileOpen} onChange={setMobileOpen} />
+          </div>
 
-              <NavLink
-                to="/products"
-                onClick={() => setMobileOpen(false)}
-                className={({ isActive }) =>
-                  `btn-glass flex h-11 items-center gap-3 rounded-xl border px-4 text-sm font-semibold transition-all duration-200 ${
-                    isActive
-                      ? 'border-ink-soft/20 bg-paper-dim/95 text-ink-soft shadow-realistic'
-                      : 'border-line bg-white/80 text-steel hover:text-ink-soft hover:bg-paper/50'
-                  }`
-                }
-              >
-                <FaMagnifyingGlass size={14} className="opacity-80" />
-                <span>{t('nav.products')}</span>
-              </NavLink>
+          <SearchBar compact onSubmit={closeDrawer} />
 
-              {!isAdmin && (
-                <NavLink
-                  to="/cart"
-                  onClick={() => setMobileOpen(false)}
-                  className={({ isActive }) =>
-                    `btn-glass flex h-11 items-center gap-3 rounded-xl border px-4 text-sm font-semibold transition-all duration-200 ${
-                      isActive
-                        ? 'border-ink-soft/20 bg-paper-dim/95 text-ink-soft shadow-realistic'
-                        : 'border-line bg-white/80 text-steel hover:text-ink-soft hover:bg-paper/50'
-                    }`
-                  }
-                >
-                  <div className="relative flex items-center justify-center">
-                    <FaBagShopping size={14} className="opacity-80" />
-                    {cartCount > 0 && (
-                      <span className="absolute -right-1.5 -top-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-accent px-0.5 font-mono-tabular text-[8px] font-semibold text-white">
-                        {cartCount}
-                      </span>
-                    )}
-                  </div>
-                  <span>{t('nav.cart')}</span>
-                </NavLink>
+          <div className="mt-5">
+            {user ? (
+              <Link to="/profile" onClick={closeDrawer} className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent-soft font-display text-base font-bold text-accent-dim">
+                  {(user.name || '?').trim().charAt(0).toUpperCase()}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-ink-soft">{user.name}</span>
+                  <span className="block truncate text-xs text-steel">{user.email}</span>
+                </span>
+                <FaChevronRight size={12} className="shrink-0 text-steel" aria-hidden="true" />
+              </Link>
+            ) : (
+              <div className="rounded-2xl border border-line bg-white p-4">
+                <p className="text-sm leading-relaxed text-steel">{t('nav.accountHint')}</p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <Link to="/login" onClick={closeDrawer} className="rounded-full bg-ink py-2.5 text-center text-sm font-semibold text-white">{t('nav.login')}</Link>
+                  <Link to="/register" onClick={closeDrawer} className="rounded-full border border-line py-2.5 text-center text-sm font-semibold text-ink-soft">{t('nav.register')}</Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {user && (
+            <nav className="mt-2 flex flex-col gap-1" aria-label={t('nav.profile')}>
+              {isAdmin ? (
+                <DrawerLink to="/admin" icon={FaGaugeHigh} badge={newOrdersCount} onClick={closeDrawer}>{t('nav.admin')}</DrawerLink>
+              ) : (
+                <DrawerLink to="/orders" icon={FaClipboardList} onClick={closeDrawer}>{t('nav.myOrders')}</DrawerLink>
               )}
+            </nav>
+          )}
 
-              {!isAdmin && (
-                <NavLink
-                  to="/wishlist"
-                  onClick={() => setMobileOpen(false)}
-                  className={({ isActive }) =>
-                    `btn-glass flex h-11 items-center gap-3 rounded-xl border px-4 text-sm font-semibold transition-all duration-200 ${
-                      isActive
-                        ? 'border-ink-soft/20 bg-paper-dim/95 text-ink-soft shadow-realistic'
-                        : 'border-line bg-white/80 text-steel hover:text-ink-soft hover:bg-paper/50'
-                    }`
-                  }
-                >
-                  <FaHeart size={14} className="opacity-80" />
-                  <span>{t('nav.wishlist')}</span>
-                  {wishlistCount > 0 && <span className="ml-auto font-mono-tabular text-xs text-steel">{wishlistCount}</span>}
-                </NavLink>
-              )}
-            <div className="mobile-drawer-section">
-              <div className="mb-2 spec-strip uppercase text-steel">Language</div>
-              <div className="language-switch w-fit">
+          <div className="mobile-drawer-section mt-5">
+            <div className="mb-2 spec-strip uppercase text-steel">{t('nav.language')}</div>
+            <div className="language-switch w-fit">
               <span className="language-active-pill" style={{ transform: `translateX(${activeLanguageIndex * 100}%)` }} aria-hidden="true" />
               {LANGS.map((l) => (
                 <button
@@ -307,41 +271,34 @@ export default function Navbar() {
                   {l.label}
                 </button>
               ))}
-              </div>
             </div>
-            {user ? (
-              <div className="mobile-profile-section">
-                <button type="button" className="btn-glass flex w-full items-center gap-3 rounded-2xl border border-line bg-white p-3 text-left" onClick={() => setUserMenuOpen((value) => !value)}>
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-paper-dim text-ink-soft"><FaUser size={14} aria-hidden="true" /></span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-ink-soft">{user.name}</span>
-                  <span className={`text-steel transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true">⌄</span>
-                </button>
-                {userMenuOpen && (
-                  <div className="mobile-profile-dropdown">
-                    <Link to="/profile" onClick={() => setMobileOpen(false)}>{t('nav.profile')}</Link>
-                    {!isAdmin && (
-                      <Link to="/orders" onClick={() => setMobileOpen(false)}>{t('nav.orders')}</Link>
-                    )}
-                    <button type="button" onClick={handleLogout}>{t('nav.logout')}</button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link to="/login" onClick={() => setMobileOpen(false)} className="btn-glass rounded-full bg-ink px-4 py-3 text-center text-sm font-semibold text-white">{t('nav.login')}</Link>
-            )}
-            </div>
-          </aside>
+          </div>
+
+          {user && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="mt-auto flex h-11 w-full items-center justify-center gap-2 rounded-full border border-line bg-white text-sm font-semibold text-danger"
+            >
+              <FaArrowRightFromBracket size={14} aria-hidden="true" />
+              {t('nav.logout')}
+            </button>
+          )}
+        </aside>
       </div>
 
       <nav className="mobile-tab-bar lg:hidden" aria-label="Mobile navigation">
-        <NavLink to="/" end className={({ isActive }) => `mobile-tab${isActive ? ' active' : ''}`}><FaHouse aria-hidden="true" /><span>{t('nav.home')}</span></NavLink>
-        <NavLink to="/products" className={({ isActive }) => `mobile-tab${isActive ? ' active' : ''}`}><FaMagnifyingGlass aria-hidden="true" /><span>{t('nav.products')}</span></NavLink>
+        <TabLink to="/" end icon={FaHouse} label={t('nav.homeShort')} />
+        <TabLink to="/products" icon={FaTableCellsLarge} label={t('nav.products')} />
         {isAdmin ? (
-          <NavLink to="/admin" className={({ isActive }) => `mobile-tab${isActive ? ' active' : ''}`}><FaTableCellsLarge aria-hidden="true" /><span>{t('nav.admin')}</span></NavLink>
+          <TabLink to="/admin" icon={FaGaugeHigh} label={t('nav.adminShort')} badge={newOrdersCount} />
         ) : (
-          <NavLink to="/cart" className={({ isActive }) => `mobile-tab${isActive ? ' active' : ''}`}><FaBagShopping aria-hidden="true" /><span>{t('nav.cart')}</span></NavLink>
+          <>
+            <TabLink to="/wishlist" icon={FaHeart} label={t('nav.wishlist')} badge={wishlistCount} />
+            <TabLink to="/cart" icon={FaBagShopping} label={t('nav.cart')} badge={cartCount} badgeTone="accent" />
+          </>
         )}
-        {user && !isAdmin && <NavLink to="/orders" className={({ isActive }) => `mobile-tab${isActive ? ' active' : ''}`}><FaClipboardList aria-hidden="true" /><span>{t('nav.orders')}</span></NavLink>}
+        <TabLink to={user ? '/profile' : '/login'} icon={FaUser} label={user ? t('nav.profileShort') : t('nav.login')} />
       </nav>
 
       {logoutConfirmOpen && (
@@ -358,3 +315,28 @@ export default function Navbar() {
   )
 }
 
+function TabLink({ to, end = false, icon: Icon, label, badge = 0, badgeTone = 'red' }) {
+  return (
+    <NavLink to={to} end={end} className={({ isActive }) => `mobile-tab${isActive ? ' active' : ''}`}>
+      <span className="mobile-tab-icon">
+        <Icon aria-hidden="true" />
+        {badge > 0 && <span className={`mobile-tab-badge is-${badgeTone}`}>{badge > 99 ? '99+' : badge}</span>}
+      </span>
+      <span className="mobile-tab-label">{label}</span>
+    </NavLink>
+  )
+}
+
+function DrawerLink({ to, icon: Icon, badge = 0, onClick, children }) {
+  return (
+    <NavLink
+      to={to}
+      onClick={onClick}
+      className={({ isActive }) => `flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors ${isActive ? 'bg-accent-soft text-accent-dim' : 'text-ink-soft active:bg-paper-dim'}`}
+    >
+      <Icon size={15} className="shrink-0 opacity-70" aria-hidden="true" />
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      {badge > 0 && <span className="rounded-full bg-red-500 px-1.5 font-mono-tabular text-[10px] font-semibold text-white">{badge}</span>}
+    </NavLink>
+  )
+}

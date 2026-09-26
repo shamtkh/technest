@@ -18,7 +18,14 @@
     "logoutConfirmTitle": "Sign out of your account?",
     "logoutConfirmMessage": "Are you sure you want to end your current session?",
     "searchPlaceholder": "Search phones, laptops, accessories...",
-    "wishlist": "Wishlist"
+    "wishlist": "Wishlist",
+    "language": "Language",
+    "homeShort": "Home",
+    "profileShort": "Profile",
+    "adminShort": "Admin",
+    "myOrders": "My orders",
+    "accountHint": "Sign in to track your orders and keep your wishlist on every device.",
+    "searchShort": "Search products"
   },
   "categories": {
     "all": "All",
@@ -96,7 +103,8 @@
     "filterPrice": "Price range",
     "noResults": "Nothing found",
     "noResultsHint": "Try clearing your filters",
-    "clearFilters": "Clear filters"
+    "clearFilters": "Clear filters",
+    "filters": "Filters"
   },
   "cart": {
     "title": "Cart",

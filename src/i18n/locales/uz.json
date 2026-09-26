@@ -18,7 +18,14 @@
     "logoutConfirmTitle": "Hisobdan chiqilsinmi?",
     "logoutConfirmMessage": "Joriy sessiyani yakunlashni xohlaysizmi?",
     "searchPlaceholder": "Telefon, noutbuk, aksessuar qidirish...",
-    "wishlist": "Sevimlilar"
+    "wishlist": "Sevimlilar",
+    "language": "Til",
+    "homeShort": "Asosiy",
+    "profileShort": "Profil",
+    "adminShort": "Admin",
+    "myOrders": "Buyurtmalarim",
+    "accountHint": "Buyurtmalarni kuzatish va sevimlilarni barcha qurilmalarda ko'rish uchun kiring.",
+    "searchShort": "Mahsulot qidirish"
   },
   "categories": {
     "all": "Barchasi",
@@ -96,7 +103,8 @@
     "filterPrice": "Narx oralig'i",
     "noResults": "Hech narsa topilmadi",
     "noResultsHint": "Filtrlarni tozalab qayta urinib ko'ring",
-    "clearFilters": "Filtrlarni tozalash"
+    "clearFilters": "Filtrlarni tozalash",
+    "filters": "Filtrlar"
   },
   "cart": {
     "title": "Savatcha",

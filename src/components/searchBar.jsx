@@ -24,7 +24,7 @@ export default function SearchBar({ compact = false, onSubmit }) {
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder={t('nav.searchPlaceholder')}
+          placeholder={compact ? t('nav.searchShort') : t('nav.searchPlaceholder')}
           className="w-full bg-transparent text-sm text-ink-soft placeholder:text-steel focus:outline-none"
         />
       </div>

@@ -92,7 +92,7 @@ export default function ProductsPage() {
           onClick={() => setMobileFiltersOpen((v) => !v)}
           className="rounded-full border border-line px-4 py-2 text-sm font-medium lg:hidden"
         >
-          Filters
+          {t('products.filters')}
         </button>
       </div>
 

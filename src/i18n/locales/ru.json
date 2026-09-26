@@ -18,7 +18,14 @@
     "logoutConfirmTitle": "Выйти из аккаунта?",
     "logoutConfirmMessage": "Вы уверены, что хотите завершить текущий сеанс?",
     "searchPlaceholder": "Поиск телефонов, ноутбуков, аксессуаров...",
-    "wishlist": "Избранное"
+    "wishlist": "Избранное",
+    "language": "Язык",
+    "homeShort": "Главная",
+    "profileShort": "Профиль",
+    "adminShort": "Админ",
+    "myOrders": "Мои заказы",
+    "accountHint": "Войдите, чтобы следить за заказами и видеть избранное на всех устройствах.",
+    "searchShort": "Поиск товаров"
   },
   "categories": {
     "all": "Все",
@@ -96,7 +103,8 @@
     "filterPrice": "Диапазон цен",
     "noResults": "Ничего не найдено",
     "noResultsHint": "Попробуйте очистить фильтры",
-    "clearFilters": "Очистить фильтры"
+    "clearFilters": "Очистить фильтры",
+    "filters": "Фильтры"
   },
   "cart": {
     "title": "Корзина",
