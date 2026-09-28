@@ -83,7 +83,18 @@ async function start() {
     },
   })
 
-  const demoUser = ensureDemoUser(router)
+  // The shared demo account is off unless DEMO_ACCOUNT=true: its password is
+  // public, and while it existed it came back after every restart. When off,
+  // any existing demo account is removed (its data goes with the orphan
+  // cleanup further down).
+  let demoUser = null
+  if (process.env.DEMO_ACCOUNT === 'true') {
+    demoUser = ensureDemoUser(router)
+  } else if (router.db.get('users').value().some((user) => user.role === 'demo')) {
+    router.db.get('users').remove({ role: 'demo' }).write()
+    await backupToCloud()
+    console.log('  Removed the demo account (set DEMO_ACCOUNT=true to keep one)')
+  }
   if (missingCollections.length) await backupToCloud()
 
   // Accounts created before password hashing still hold plaintext passwords.
@@ -658,7 +669,7 @@ async function start() {
 
   // Demo orders live outside the real orders collection and never reserve stock.
   server.get('/orders', (req, res, next) => {
-    if (String(req.query.userId) !== String(demoUser.id)) return next()
+    if (!demoUser || String(req.query.userId) !== String(demoUser.id)) return next()
     const demoOrders = router.db.get('demoOrders').value()
       .filter((order) => String(order.userId) === String(demoUser.id))
       .sort((a, b) => Number(b.id) - Number(a.id))
@@ -705,7 +716,7 @@ async function start() {
     // Ordering requires an account (enforced by access control); the order
     // always belongs to the signed-in user, whatever the body says.
     const body = { ...req.body, userId: req.user.id }
-    const isDemoOrder = Number(body.userId) === Number(demoUser.id)
+    const isDemoOrder = Boolean(demoUser) && Number(body.userId) === Number(demoUser.id)
 
     // Recompute money server-side from catalog prices so neither the item
     // prices nor the promo discount can be forged by the client.
