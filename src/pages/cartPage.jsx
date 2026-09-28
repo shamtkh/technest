@@ -6,6 +6,7 @@ import { removeItem, incrementQty, decrementQty, clearCart } from '../store/slic
 import { formatPrice } from '../utils/format'
 import { useToast } from '../hooks/useToast'
 import ConfirmDialog from '../components/ConfirmDialog'
+import { useScrollToTop } from '../hooks/useScrollToTop'
 import { FaMinus, FaPlus, FaTrashCan } from 'react-icons/fa6'
 
 // Matches the .cart-line transition in index.css (fade/slide, then collapse).
@@ -28,6 +29,8 @@ export default function CartPage() {
   const [removingKeys, setRemovingKeys] = useState(() => new Set())
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
+  // Removing the last line swaps the cart for a short empty state.
+  useScrollToTop(items.length === 0)
 
   function handleCheckout() {
     navigate(user ? '/checkout' : '/login', { state: { from: { pathname: '/checkout' } } })

@@ -1,6 +1,7 @@
 const jsonServer = require('json-server')
 const path = require('path')
 const fs = require('fs')
+const crypto = require('crypto')
 const { Pool } = require('pg')
 const { ensureDemoUser } = require('./demoUser.cjs')
 
@@ -195,10 +196,20 @@ async function start() {
     return String(code || '').trim().toUpperCase().replace(/\s+/g, '')
   }
 
-  function evaluatePromo(code, subtotal) {
+  // Each customer may use a given code once. Usage is read from their orders,
+  // so deleting an order frees the code again. The shared demo account's
+  // orders live in demoOrders and are deliberately not counted.
+  function hasUsedPromo(userId, code) {
+    return router.db.get('orders').value().some((order) => (
+      Number(order.userId) === Number(userId) && normalizePromoCode(order.promoCode) === code
+    ))
+  }
+
+  function evaluatePromo(code, subtotal, userId) {
     const normalized = normalizePromoCode(code)
     const promo = router.db.get('promoCodes').value().find((item) => item.code === normalized)
     if (!normalized || !promo || !promo.active) return { error: 'PROMO_INVALID' }
+    if (userId && hasUsedPromo(userId, promo.code)) return { error: 'PROMO_ALREADY_USED' }
     // expiresAt is a calendar date; the code stays valid through the end of that day.
     if (promo.expiresAt && new Date(`${promo.expiresAt}T23:59:59`) < new Date()) return { error: 'PROMO_EXPIRED' }
     if (promo.maxUses && (Number(promo.uses) || 0) >= Number(promo.maxUses)) return { error: 'PROMO_USED_UP' }
@@ -224,7 +235,7 @@ async function start() {
   }
 
   server.post('/promo/validate', (req, res) => {
-    const result = evaluatePromo(req.body.code, Math.max(0, Number(req.body.subtotal) || 0))
+    const result = evaluatePromo(req.body.code, Math.max(0, Number(req.body.subtotal) || 0), req.body.userId)
     if (result.error) return res.status(400).json({ error: result.error, minTotal: result.minTotal })
     const { code, type, value } = result.promo
     res.json({ code, type, value, discount: result.discount })
@@ -249,6 +260,48 @@ async function start() {
     if (duplicate) return res.status(409).json({ error: 'PROMO_EXISTS' })
     router.db.get('promoCodes').find({ id }).assign(promo).write()
     res.json(router.db.get('promoCodes').find({ id }).value())
+  })
+
+  // ── Hero banners ──
+  // Images are stored as base64 data URIs. Inlining them made GET /banners
+  // weigh hundreds of KB on every home page load (and uncacheable, given the
+  // no-cache defaults above), so the list carries a versioned image URL and
+  // the image itself is served as a long-cached binary.
+  const DATA_URI = /^data:(image\/[\w.+-]+);base64,(.*)$/
+
+  function bannerImageUrl(banner) {
+    if (!DATA_URI.test(banner.image || '')) return banner.image || ''
+    const version = crypto.createHash('sha1').update(banner.image).digest('hex').slice(0, 12)
+    return `/banners/${banner.id}/image?v=${version}`
+  }
+
+  server.get('/banners', (req, res) => {
+    const banners = router.db.get('banners').value()
+      .map((banner) => ({ ...banner, image: bannerImageUrl(banner) }))
+      .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
+    res.json(banners)
+  })
+
+  server.get('/banners/:id/image', (req, res) => {
+    const banner = router.db.get('banners').value().find((item) => Number(item.id) === Number(req.params.id))
+    const match = DATA_URI.exec(banner?.image || '')
+    if (!match) return res.status(404).end()
+    // The URL is versioned by content hash, so it can be cached for good.
+    res.removeHeader('Pragma')
+    res.removeHeader('Expires')
+    res.set('Cache-Control', 'public, max-age=31536000, immutable')
+    res.type(match[1]).send(Buffer.from(match[2], 'base64'))
+  })
+
+  // Only a freshly uploaded data URI may set a banner's image: edit forms echo
+  // back the served /banners/:id/image URL, which would otherwise overwrite
+  // the stored picture with a link to itself. The rest falls through to
+  // json-server.
+  server.use('/banners', (req, res, next) => {
+    if (req.method !== 'POST' && req.method !== 'PATCH') return next()
+    if (req.body && 'image' in req.body && !DATA_URI.test(req.body.image || '')) delete req.body.image
+    if (req.method === 'POST' && !req.body?.image) return res.status(400).json({ error: 'IMAGE_REQUIRED' })
+    next()
   })
 
   // ── Reviews ──
@@ -543,7 +596,7 @@ async function start() {
     let discount = 0
     let appliedPromo = null
     if (body.promoCode) {
-      const result = evaluatePromo(body.promoCode, subtotal)
+      const result = evaluatePromo(body.promoCode, subtotal, isDemoOrder ? null : body.userId)
       if (result.error) return res.status(400).json({ error: result.error, minTotal: result.minTotal })
       discount = result.discount
       appliedPromo = result.promo

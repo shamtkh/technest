@@ -7,7 +7,8 @@
 //   /products files, bump VERSION below when replacing them in place.
 // - Public catalog API reads (products, categories, banners, reviews):
 //   network first, falling back to the last good response. Private data
-//   (users, orders, messages) is never cached.
+//   (users, orders, messages) is never cached. Banner images are
+//   content-versioned (?v=hash), so they're cache first.
 
 const VERSION = 'v2'
 const SHELL_CACHE = `technest-shell-${VERSION}`
@@ -66,7 +67,9 @@ self.addEventListener('fetch', (event) => {
   const apiPath = url.origin === self.location.origin ? url.pathname.replace(/^\/api(?=\/)/, '') : url.pathname
   const isApi = url.origin !== self.location.origin || url.pathname.startsWith('/api/')
   if (isApi) {
-    if (CATALOG_API.test(apiPath + url.search)) event.respondWith(networkFirst(request, API_CACHE))
+    // Banner image URLs carry a content hash (?v=), so a cached copy never goes stale.
+    if (/^\/banners\/\d+\/image$/.test(apiPath)) event.respondWith(cacheFirst(request))
+    else if (CATALOG_API.test(apiPath + url.search)) event.respondWith(networkFirst(request, API_CACHE))
     return
   }
 

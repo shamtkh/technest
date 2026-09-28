@@ -7,6 +7,7 @@ import { getProductsThunk } from '../store/thunks/getProductsThunk'
 import ProductCard from '../components/ProductCard'
 import PageTransition from '../components/PageTransition'
 import { ProductGridSkeleton, Skeleton } from '../components/Skeleton'
+import { useScrollToTop } from '../hooks/useScrollToTop'
 
 export default function WishlistPage() {
   const { t } = useTranslation()
@@ -24,6 +25,8 @@ export default function WishlistPage() {
 
   // Keep wishlist order (most recently added first); skip deleted products.
   const products = ids.map((id) => items.find((product) => product.id === id)).filter(Boolean)
+  // Removing the last item swaps the grid for a short empty state.
+  useScrollToTop(products.length === 0)
 
   if (status === 'loading' && items.length === 0) {
     return <PageTransition><div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"><Skeleton className="mb-6 h-8 w-48" /><ProductGridSkeleton count={4} /></div></PageTransition>

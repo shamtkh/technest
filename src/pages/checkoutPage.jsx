@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -8,6 +8,7 @@ import { clearCart } from '../store/slices/cartSlice'
 import { setUser } from '../store/slices/authSlice'
 import { formatPrice } from '../utils/format'
 import { useToast } from '../hooks/useToast'
+import { useScrollToTop } from '../hooks/useScrollToTop'
 import api from '../api/api'
 
 const ADDRESS_FIELDS = ['city', 'street', 'house', 'apartment', 'landmark']
@@ -70,6 +71,16 @@ export default function CheckoutPage() {
   const [promo, setPromo] = useState(null) // { code, type, value, discount }
   const [promoError, setPromoError] = useState('')
   const [promoChecking, setPromoChecking] = useState(false)
+  // The submit button sits at the bottom of a long form; the success screen
+  // is short, so without this the window stays scrolled to the footer.
+  useScrollToTop(placedOrder?.id)
+
+  // Empty the cart only once the success screen is up. Clearing it right after
+  // the order resolves lets Redux (a sync update) render first with an empty
+  // cart and no placedOrder yet, which hits the redirect to /cart below.
+  useEffect(() => {
+    if (placedOrder) dispatch(clearCart())
+  }, [placedOrder, dispatch])
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
   const discount = promo ? Math.min(promo.discount, subtotal) : 0
@@ -79,7 +90,7 @@ export default function CheckoutPage() {
   function promoErrorText(err) {
     const code = err?.message
     if (code === 'PROMO_MIN_TOTAL') return t('promo.PROMO_MIN_TOTAL', { amount: formatPrice(err.data?.minTotal || 0) })
-    if (['PROMO_INVALID', 'PROMO_EXPIRED', 'PROMO_USED_UP'].includes(code)) return t(`promo.${code}`)
+    if (['PROMO_INVALID', 'PROMO_EXPIRED', 'PROMO_USED_UP', 'PROMO_ALREADY_USED'].includes(code)) return t(`promo.${code}`)
     return t('common.error')
   }
 
@@ -89,7 +100,7 @@ export default function CheckoutPage() {
     setPromoChecking(true)
     setPromoError('')
     try {
-      const result = await api.validatePromo(code, subtotal)
+      const result = await api.validatePromo(code, subtotal, user.id)
       setPromo(result)
       setPromoInput('')
       showToast(`${t('promo.applied')}: ${result.code}`, 'success')
@@ -152,7 +163,6 @@ export default function CheckoutPage() {
         addresses = await api.updateAddresses(user.id, [...savedAddresses, address]).catch(() => savedAddresses)
       }
       dispatch(setUser({ ...user, name: form.fullName, phone: form.phone, addresses }))
-      dispatch(clearCart())
       dispatch(getProductsThunk({ force: true }))
       showToast(t('checkout.orderSuccess'), 'success', 5000)
       setPlacedOrder(order)

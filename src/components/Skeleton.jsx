@@ -63,7 +63,7 @@ export function OrdersSkeleton({ count = 3 }) {
 export function HomePageSkeleton() {
   return (
     <div aria-label="Loading home page" aria-busy="true">
-      <section className="bg-ink"><div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-24"><div><Skeleton className="h-6 w-40" /><Skeleton className="mt-5 h-20 w-full max-w-xl" /><SkeletonText lines={2} className="mt-5 max-w-md" /><div className="mt-8 flex gap-3"><Skeleton className="h-12 w-36 rounded-full" /><Skeleton className="h-12 w-36 rounded-full" /></div></div><SkeletonImage className="aspect-square w-full rounded-[1.75rem]" /></div></section>
+      <section className="bg-ink"><div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-24"><div><Skeleton className="h-6 w-40" /><Skeleton className="mt-5 h-20 w-full max-w-xl" /><SkeletonText lines={2} className="mt-5 max-w-md" /><div className="mt-8 flex gap-3"><Skeleton className="h-12 w-36 rounded-full" /><Skeleton className="h-12 w-36 rounded-full" /></div></div><SkeletonImage className="aspect-[4/3] w-full rounded-[1.75rem]" /></div></section>
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"><Skeleton className="mb-6 h-7 w-56" /><div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{Array.from({ length: 4 }, (_, index) => <SkeletonImage key={index} className="aspect-[4/5] rounded-2xl" />)}</div></section>
       <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8"><Skeleton className="mb-6 h-7 w-48" /><ProductGridSkeleton count={4} /></section>
     </div>

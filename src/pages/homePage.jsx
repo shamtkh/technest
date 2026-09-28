@@ -7,16 +7,11 @@ import { clearViewed } from '../store/slices/recentlyViewedSlice'
 import ProductCard from '../components/ProductCard'
 import PageTransition from '../components/PageTransition'
 import Reveal from '../components/Reveal'
-import { HomePageSkeleton } from '../components/Skeleton'
-import api from '../api/api'
+import { HomePageSkeleton, SkeletonImage } from '../components/Skeleton'
+import HeroCarousel from '../components/HeroCarousel'
+import SmartLink from '../components/SmartLink'
 import { usePolling } from '../hooks/usePolling'
-
-const BANNER_INTERVAL_MS = 6000
-
-// Banner links are set by admins and may point off-site.
-function SmartLink({ to, ...props }) {
-  return /^https?:\/\//i.test(to) ? <a href={to} target="_blank" rel="noreferrer" {...props} /> : <Link to={to} {...props} />
-}
+import { useBanners } from '../hooks/useBanners'
 
 function localized(value, language) {
   if (!value || typeof value !== 'object') return value || ''
@@ -38,7 +33,7 @@ export default function HomePage() {
   const items = useSelector((s) => s.products.items)
   const status = useSelector((s) => s.products.status)
   const recentIds = useSelector((s) => s.recentlyViewed.ids)
-  const [banners, setBanners] = useState([])
+  const banners = useBanners() // null until the admin's banners are known
   const [activeBanner, setActiveBanner] = useState(0)
 
   useEffect(() => {
@@ -46,24 +41,16 @@ export default function HomePage() {
   }, [dispatch])
   usePolling(() => dispatch(getProductsThunk()), 15000)
 
-  useEffect(() => {
-    api.getBanners()
-      .then((data) => setBanners(data.filter((banner) => banner.active && banner.image)))
-      .catch(() => setBanners([]))
-  }, [])
-
-  useEffect(() => {
-    if (banners.length < 2) return undefined
-    const interval = setInterval(() => setActiveBanner((index) => (index + 1) % banners.length), BANNER_INTERVAL_MS)
-    return () => clearInterval(interval)
-  }, [banners.length, activeBanner])
-
   const featured = items.filter((p) => p.featured).slice(0, 4)
   const recentlyViewed = recentIds.map((id) => items.find((product) => product.id === id)).filter(Boolean).slice(0, 4)
-  const banner = banners.length ? banners[activeBanner % banners.length] : null
-  const heroTitle = banner ? localized(banner.title, i18n.language) || t('hero.title') : t('hero.title')
-  const heroSubtitle = banner ? localized(banner.subtitle, i18n.language) : t('hero.subtitle')
-  const heroLink = banner?.link || '/products'
+  const bannersReady = banners !== null
+  const bannerTitle = (banner) => localized(banner.title, i18n.language) || t('hero.title')
+  // Without banners the hero shows the built-in copy and picture.
+  const heroSlides = banners?.length
+    ? banners.map((banner) => ({ id: banner.id, title: bannerTitle(banner), subtitle: localized(banner.subtitle, i18n.language), link: banner.link || '/products' }))
+    : [{ id: 'default', title: t('hero.title'), subtitle: t('hero.subtitle'), link: '/products' }]
+  const activeIndex = activeBanner < heroSlides.length ? activeBanner : 0
+  const heroLink = heroSlides[activeIndex].link
 
   if (status === 'loading' && items.length === 0) return <HomePageSkeleton />
   if (status === 'failed' && items.length === 0) {
@@ -80,10 +67,25 @@ export default function HomePage() {
             <span className="spec-strip inline-block rounded-full border border-white/15 px-3 py-1 uppercase text-accent">
               {t('hero.eyebrow')}
             </span>
-            <h1 key={`title-${banner?.id ?? 'default'}`} className="mt-5 font-display text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl modal-enter">
-              {heroTitle}
-            </h1>
-            {heroSubtitle && <p className="mt-5 max-w-md text-white/70">{heroSubtitle}</p>}
+            {/* Hidden until the banners are known, so the default copy never flashes before a custom one. */}
+            <div className={`transition-opacity duration-500 ${bannersReady ? 'opacity-100' : 'opacity-0'}`}>
+              <h1 className="mt-5 grid font-display text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl">
+                {heroSlides.map((slide, index) => (
+                  <span key={slide.id} aria-hidden={index !== activeIndex} className={`hero-slide-text ${index === activeIndex ? 'is-active' : ''}`}>
+                    {slide.title}
+                  </span>
+                ))}
+              </h1>
+              {heroSlides.some((slide) => slide.subtitle) && (
+                <p className="mt-5 grid max-w-md text-white/70">
+                  {heroSlides.map((slide, index) => (
+                    <span key={slide.id} aria-hidden={index !== activeIndex} className={`hero-slide-text ${index === activeIndex ? 'is-active' : ''}`}>
+                      {slide.subtitle}
+                    </span>
+                  ))}
+                </p>
+              )}
+            </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <SmartLink to={heroLink} className="btn-glass rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white hover:bg-accent-dim">
                 {t('hero.cta')}
@@ -110,15 +112,12 @@ export default function HomePage() {
 
           <div className="relative">
             <div className="absolute -inset-6 rounded-[2rem] bg-accent/20 blur-3xl" aria-hidden />
-            {banner ? (
-              <SmartLink to={heroLink} className="relative block">
-                <img
-                  key={banner.id}
-                  src={banner.image}
-                  alt={heroTitle}
-                  className="relative aspect-[4/3] w-full rounded-[1.75rem] object-cover shadow-realistic-lg modal-enter"
-                />
-              </SmartLink>
+            {!bannersReady ? (
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.75rem]">
+                <SkeletonImage className="h-full w-full" />
+              </div>
+            ) : banners.length ? (
+              <HeroCarousel banners={banners} active={activeIndex} onActiveChange={setActiveBanner} altFor={bannerTitle} />
             ) : (
               <>
                 <img
@@ -131,20 +130,6 @@ export default function HomePage() {
                   <div className="font-mono-tabular text-sm font-semibold">iPhone 15 Pro</div>
                 </div>
               </>
-            )}
-            {banners.length > 1 && (
-              <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2">
-                {banners.map((item, index) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setActiveBanner(index)}
-                    aria-label={`${t('home.banner')} ${index + 1}`}
-                    aria-current={index === activeBanner % banners.length}
-                    className={`h-2 rounded-full transition-all ${index === activeBanner % banners.length ? 'w-6 bg-accent' : 'w-2 bg-white/30 hover:bg-white/60'}`}
-                  />
-                ))}
-              </div>
             )}
           </div>
         </div>

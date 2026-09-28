@@ -6,14 +6,13 @@ import SupportWidget from './SupportWidget'
 import PageTransition from './PageTransition'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useScrollToTop } from '../hooks/useScrollToTop'
 
 export default function Layout() {
   const { t } = useTranslation()
   const isDemo = useSelector((state) => state.auth.user?.role === 'demo')
   const location = useLocation()
   const outlet = useOutlet()
-  const [displayedPage, setDisplayedPage] = useState({ key: location.key, outlet })
-  const phase = location.key === displayedPage.key ? 'enter' : 'exit'
   const [online, setOnline] = useState(() => navigator.onLine)
 
   useEffect(() => {
@@ -26,19 +25,9 @@ export default function Layout() {
     }
   }, [])
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [location.pathname])
-
-  useEffect(() => {
-    if (location.key === displayedPage.key) return undefined
-
-    const timeoutId = window.setTimeout(() => {
-      setDisplayedPage({ key: location.key, outlet })
-    }, 160)
-
-    return () => window.clearTimeout(timeoutId)
-  }, [displayedPage.key, location.key, outlet])
+  // Search-param changes (product filters) stay on the same page and keep
+  // their scroll position; a new path starts at the top.
+  useScrollToTop(location.pathname)
 
   return (
     <div className="flex min-h-screen flex-col bg-paper">
@@ -55,8 +44,13 @@ export default function Layout() {
         </div>
       )}
       <main className="flex-1 pb-20 lg:pb-0">
-        <PageTransition key={displayedPage.key} phase={phase}>
-          {displayedPage.outlet}
+        {/* The new page replaces the old one right away. Keeping the previous
+            page mounted for an exit animation let it react to the new URL and
+            auth state: on logout its ProtectedRoute kept redirecting to
+            /login in a loop and remounting the login form. Keyed by path so
+            filter changes don't remount the page. */}
+        <PageTransition key={location.pathname}>
+          {outlet}
         </PageTransition>
       </main>
       <Footer />

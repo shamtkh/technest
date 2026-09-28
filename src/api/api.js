@@ -225,10 +225,10 @@ export const api = {
   },
 
   // ---------- promo codes ----------
-  async validatePromo(code, subtotal) {
+  async validatePromo(code, subtotal, userId) {
     return request('/promo/validate', {
       method: 'POST',
-      body: JSON.stringify({ code, subtotal }),
+      body: JSON.stringify({ code, subtotal, userId }),
     })
   },
 
@@ -252,7 +252,10 @@ export const api = {
   // ---------- hero banners ----------
   async getBanners() {
     const banners = await request('/banners')
-    return [...banners].sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
+    return banners
+      // The server links images as API paths (/banners/:id/image?v=…).
+      .map((banner) => (banner.image?.startsWith('/') ? { ...banner, image: `${BASE}${banner.image}` } : banner))
+      .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
   },
 
   async createBanner(payload) {

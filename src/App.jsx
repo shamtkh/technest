@@ -24,7 +24,11 @@ const AdminPage = lazy(() => import('./pages/adminPage'))
 
 function App() {
   return (
-    <BrowserRouter>
+    // Router updates are plain (not transition) updates so they render in the
+    // same batch as Redux changes made in the same handler. With transitions,
+    // `dispatch(logout()); navigate('/')` rendered the logout first, still on
+    // the protected page, whose guard then redirected to /login instead.
+    <BrowserRouter useTransitions={false}>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />

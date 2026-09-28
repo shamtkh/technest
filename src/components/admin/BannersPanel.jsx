@@ -21,6 +21,8 @@ export default function BannersPanel() {
   const [banners, setBanners] = useState([])
   const [form, setForm] = useState(EMPTY_BANNER)
   const [editingId, setEditingId] = useState(null)
+  // Listed banners link their image by URL; only a newly picked file is sent.
+  const [imageChanged, setImageChanged] = useState(false)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(null)
   const fileInputRef = useRef(null)
@@ -36,10 +38,12 @@ export default function BannersPanel() {
     // Hero images are shown large, so keep more detail than product thumbnails.
     const image = await resizeImage(file, 1400, 0.78)
     setForm((current) => ({ ...current, image }))
+    setImageChanged(true)
   }
 
   function startEdit(banner) {
     setEditingId(banner.id)
+    setImageChanged(false)
     setForm({
       image: banner.image,
       title: { ...EMPTY_BANNER.title, ...banner.title },
@@ -52,6 +56,7 @@ export default function BannersPanel() {
 
   function resetForm() {
     setEditingId(null)
+    setImageChanged(false)
     setForm(EMPTY_BANNER)
   }
 
@@ -64,6 +69,7 @@ export default function BannersPanel() {
     setSaving(true)
     try {
       const payload = { ...form, link: form.link.trim() || '/products' }
+      if (editingId && !imageChanged) delete payload.image
       if (editingId) {
         const updated = await api.updateBanner(editingId, payload)
         setBanners((current) => current.map((item) => (item.id === updated.id ? updated : item)))
@@ -179,7 +185,8 @@ export default function BannersPanel() {
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {banners.map((banner, index) => (
             <article key={banner.id} className={`overflow-hidden rounded-2xl border border-line bg-white ${banner.active === false ? 'opacity-55' : ''}`}>
-              <img src={banner.image} alt="" className="aspect-[16/9] w-full object-cover" />
+              {/* Same crop as the home page hero. */}
+              <img src={banner.image} alt="" className="aspect-[4/3] w-full bg-paper object-cover" />
               <div className="space-y-2 p-4">
                 <div className="line-clamp-1 font-display text-sm font-semibold text-ink-soft">{banner.title?.ru || banner.title?.uz || banner.title?.en || t('banners.untitled')}</div>
                 <div className="truncate text-xs text-steel">{banner.link}</div>

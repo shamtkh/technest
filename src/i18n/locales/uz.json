@@ -60,6 +60,8 @@
     "why3Text": "0% ulush bilan 3, 6, 12 oyga bo'lib to'lov imkoniyati.",
     "viewAll": "Barchasini ko'rish",
     "banner": "Banner",
+    "bannerPrev": "Oldingi banner",
+    "bannerNext": "Keyingi banner",
     "recentTitle": "Yaqinda ko'rilganlar",
     "recentSubtitle": "To'xtagan joyingizdan davom eting",
     "recentClear": "Tarixni tozalash"
@@ -452,6 +454,7 @@
     "PROMO_INVALID": "Bunday promokod yo'q yoki o'chirilgan",
     "PROMO_EXPIRED": "Promokod muddati tugagan",
     "PROMO_USED_UP": "Promokoddan foydalanish limiti tugagan",
+    "PROMO_ALREADY_USED": "Siz bu promokoddan allaqachon foydalangansiz. Boshqasini sinab ko'ring",
     "PROMO_MIN_TOTAL": "Bu kod uchun minimal buyurtma summasi — {{amount}} so'm"
   },
   "banners": {
