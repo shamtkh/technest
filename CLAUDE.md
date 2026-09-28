@@ -33,6 +33,8 @@ There is no `.env` requirement to run locally; `VITE_API_URL` optionally overrid
 - `PUT /users/:id/wishlist`, `PUT /users/:id/addresses` — per-account wishlist and saved delivery addresses.
 - `GET /products/:id/bought-together`, `POST /products/bulk-stock` — co-purchase recommendations and all-or-nothing CSV stock import.
 - `DELETE /orders/:id` — deletes the order and, if it was `pending`, restores the reserved variant stock.
+- `GET /users/:id`, `DELETE /users/:id` — the GET strips `password`; the DELETE removes the account with all its orders (pending stock released), `demoOrders`, messages and reviews (ratings recomputed), and refuses admins. On boot, the same cleanup removes data whose `userId` points at no existing user. Clients poll `GET /users/:id` (`src/hooks/useAccountCheck.js`) and sign out if their account is gone.
+- json-server's generic DELETE cascades: afterwards it scans every collection for `…Id` fields and drops documents whose reference is missing. `router.db._.getById` is overridden so a `null` reference neither throws (that used to 500 every generic DELETE after removing the record in memory only) nor counts as orphaned.
 - `GET /users` — strips `password` from every record server-side (unlike `/auth/*`, json-server's default `/users` route would otherwise leak plaintext passwords to anyone querying the API directly, not just through `src/api/api.js`'s client-side strip).
 - Everything else (`POST/PATCH/DELETE /users`, `GET/POST/PATCH/DELETE /products`, `/categories`, `/messages`, etc.) falls through to json-server's default REST behavior, writing straight back to `db.json` on disk. The support-chat `messages` collection (see below) relies entirely on this default behavior — there's no custom route for it.
 

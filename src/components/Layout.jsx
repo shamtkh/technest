@@ -7,6 +7,7 @@ import PageTransition from './PageTransition'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useScrollToTop } from '../hooks/useScrollToTop'
+import { useAccountCheck } from '../hooks/useAccountCheck'
 
 export default function Layout() {
   const { t } = useTranslation()
@@ -28,6 +29,7 @@ export default function Layout() {
   // Search-param changes (product filters) stay on the same page and keep
   // their scroll position; a new path starts at the top.
   useScrollToTop(location.pathname)
+  useAccountCheck()
 
   return (
     <div className="flex min-h-screen flex-col bg-paper">

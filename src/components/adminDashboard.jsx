@@ -425,10 +425,20 @@ export default function AdminDashboard() {
   }
 
   async function handleUserDelete(user) {
-    await api.deleteUser(user.id)
-    setUsers((current) => current.filter((item) => item.id !== user.id))
-    setDeletingUser(null)
-    showToast(t('admin.userDeleted'), 'warning')
+    try {
+      await api.deleteUser(user.id)
+      setUsers((current) => current.filter((item) => item.id !== user.id))
+      showToast(t('admin.userDeleted'), 'warning')
+      // The server removed their orders, chats and reviews too (and gave
+      // pending orders' stock back), so refresh everything that shows them.
+      dispatch(getAllOrdersThunk())
+      dispatch(getAllMessagesThunk())
+      dispatch(getProductsThunk({ force: true }))
+    } catch {
+      showToast(t('common.error'), 'error')
+    } finally {
+      setDeletingUser(null)
+    }
   }
 
   async function handleStatusChange(order, status) {
@@ -1202,7 +1212,8 @@ export default function AdminDashboard() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 modal-overlay-enter" onClick={() => setDeletingUser(null)}>
             <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-2xl bg-white p-6 text-center modal-enter">
               <p className="mb-2 font-display text-lg font-semibold text-ink-soft">{t('admin.deleteUserConfirm')}</p>
-              <p className="mb-5 text-sm text-steel">{deletingUser.name} · {deletingUser.email}</p>
+              <p className="text-sm text-steel">{deletingUser.name} · {deletingUser.email}</p>
+              <p className="mb-5 mt-2 text-xs text-danger">{t('admin.deleteUserHint')}</p>
               <div className="flex justify-center gap-2">
                 <button onClick={() => setDeletingUser(null)} className="rounded-full border border-line px-4 py-2 text-sm font-medium">{t('admin.cancel')}</button>
                 <button onClick={() => handleUserDelete(deletingUser)} className="rounded-full bg-danger px-4 py-2 text-sm font-medium text-white">{t('admin.confirm')}</button>

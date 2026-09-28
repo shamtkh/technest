@@ -169,6 +169,7 @@
     "minLength": "Kamida {{min}} ta belgi bo'lishi kerak"
   },
   "auth": {
+    "accountDeleted": "Akkauntingiz o'chirildi. Siz tizimdan chiqarildingiz",
     "loginTitle": "Hisobingizga kiring",
     "loginSubtitle": "TechNest xaridlarini davom ettiring",
     "registerTitle": "Ro'yxatdan o'ting",
@@ -252,6 +253,7 @@
     "usersEmpty": "Foydalanuvchilar topilmadi",
     "userDeleted": "Foydalanuvchi o'chirildi",
     "deleteUserConfirm": "Bu foydalanuvchi o'chirilsinmi?",
+    "deleteUserHint": "Uning barcha buyurtmalari, yozishmalari va sharhlari ham o'chiriladi",
     "allOrders": "Barcha buyurtmalar",
     "ordersEmpty": "Buyurtmalar yo'q",
     "ordersEmptyHint": "Foydalanuvchi buyurtmalari bu yerda ko'rinadi",

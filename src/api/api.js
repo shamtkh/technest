@@ -280,6 +280,10 @@ export const api = {
     })
   },
 
+  async getUser(id) {
+    return request(`/users/${encodeURIComponent(id)}`)
+  },
+
   async deleteUser(id) {
     await request(`/users/${encodeURIComponent(id)}`, { method: 'DELETE' })
     return { id: Number(id) }

@@ -64,6 +64,22 @@ async function start() {
 
   const server = jsonServer.create()
   const router = jsonServer.router(dbPath)
+
+  // After every DELETE, json-server scans all collections for `…Id` fields
+  // and removes documents whose referenced record no longer exists. A null
+  // reference (e.g. userId on a guest order placed before accounts were
+  // required) made that scan throw, so every DELETE on a json-server route
+  // (banners, promo codes, products…) failed with a 500 — after already
+  // removing the record in memory. A null reference is "no reference": return
+  // null (not undefined) so the scan neither crashes nor treats it as orphaned.
+  const baseGetById = router.db._.getById
+  router.db._.mixin({
+    getById(collection, id) {
+      if (id === null || id === undefined) return null
+      return baseGetById.call(this, collection.filter((doc) => doc?.id != null), id)
+    },
+  })
+
   const demoUser = ensureDemoUser(router)
   if (missingCollections.length) await backupToCloud()
 
@@ -723,12 +739,9 @@ async function start() {
   })
 
   // ── DELETE /orders/:id — admin test cleanup ──
-  server.delete('/orders/:id', (req, res) => {
-    const id = Number(req.params.id)
-    const order = router.db.get('orders').find({ id }).value()
-    if (!order) return res.status(404).json({ error: 'Order not found' })
-
-    // A pending order reserved stock. Release those reservations when the admin cancels it.
+  // A pending order reserved stock; deleting it releases those reservations.
+  // Accepted and later orders keep their stock consumed.
+  function releaseOrderStock(order) {
     if (order.status === 'pending' && order.items?.length) {
       order.items.forEach((item) => {
         const product = router.db.get('products').find({ id: item.productId }).value()
@@ -757,10 +770,56 @@ async function start() {
           .write()
       })
     }
+  }
 
+  server.delete('/orders/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const order = router.db.get('orders').find({ id }).value()
+    if (!order) return res.status(404).json({ error: 'Order not found' })
+    releaseOrderStock(order)
     router.db.get('orders').remove({ id }).write()
     res.status(204).end()
   })
+
+  // ── Users: deleting an account removes everything tied to it ──
+  // Orders (pending ones give their stock back), support messages and reviews
+  // (product ratings are recomputed) go with the account.
+  // Returns how many documents were removed.
+  function removeUserData(isOwnedBy) {
+    router.db.get('orders').value().filter(isOwnedBy).forEach(releaseOrderStock)
+    const reviewedProducts = new Set(router.db.get('reviews').value().filter(isOwnedBy).map((review) => review.productId))
+    const removed = ['orders', 'demoOrders', 'messages', 'reviews']
+      .reduce((sum, name) => sum + router.db.get(name).remove(isOwnedBy).write().length, 0)
+    reviewedProducts.forEach(recomputeProductRating)
+    return removed
+  }
+
+  // Unlike json-server's default, never exposes the password.
+  server.get('/users/:id', (req, res) => {
+    const user = router.db.get('users').value().find((item) => Number(item.id) === Number(req.params.id))
+    if (!user) return res.status(404).json({ error: 'USER_NOT_FOUND' })
+    const { password: _, ...safeUser } = user
+    res.json(safeUser)
+  })
+
+  server.delete('/users/:id', (req, res) => {
+    const id = Number(req.params.id)
+    const user = router.db.get('users').value().find((item) => Number(item.id) === id)
+    if (!user) return res.status(404).json({ error: 'USER_NOT_FOUND' })
+    if (user.role === 'admin') return res.status(403).json({ error: 'CANNOT_DELETE_ADMIN' })
+    removeUserData((doc) => Number(doc.userId) === id)
+    router.db.get('users').remove((item) => Number(item.id) === id).write()
+    res.status(204).end()
+  })
+
+  // Data left behind by accounts deleted before the cascade above (or by
+  // guest checkouts from before accounts were required) is cleaned up once.
+  const userIds = new Set(router.db.get('users').value().map((user) => Number(user.id)))
+  const orphaned = removeUserData((doc) => !userIds.has(Number(doc.userId)))
+  if (orphaned) {
+    console.log(`  🧹 Removed ${orphaned} order(s)/message(s)/review(s) of deleted accounts`)
+    await backupToCloud()
+  }
 
   // Clear one shared support conversation for both the admin and customer.
   server.delete('/messages/user/:userId', (req, res) => {

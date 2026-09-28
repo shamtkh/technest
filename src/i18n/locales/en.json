@@ -169,6 +169,7 @@
     "minLength": "Must be at least {{min}} characters"
   },
   "auth": {
+    "accountDeleted": "Your account was deleted. You have been signed out",
     "loginTitle": "Sign in to your account",
     "loginSubtitle": "Continue shopping at TechNest",
     "registerTitle": "Create an account",
@@ -252,6 +253,7 @@
     "usersEmpty": "No users found",
     "userDeleted": "User deleted",
     "deleteUserConfirm": "Delete this user?",
+    "deleteUserHint": "All of their orders, chats and reviews will be deleted too",
     "allOrders": "All orders",
     "ordersEmpty": "No orders",
     "ordersEmptyHint": "User orders will appear here",
