@@ -55,7 +55,9 @@ export default function LoginPage() {
           <p className="text-sm text-danger">
               {error === 'INVALID_CREDENTIALS'
                 ? t('auth.invalidCredentials')
-                : error === 'API_UNAVAILABLE'
+                : error === 'TOO_MANY_ATTEMPTS'
+                  ? t('auth.tooManyAttempts')
+                  : error === 'API_UNAVAILABLE'
                   ? 'Сервер недоступен. Запустите backend и попробуйте снова.'
                   : t('common.error')}
           </p>

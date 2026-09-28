@@ -170,6 +170,8 @@
   },
   "auth": {
     "accountDeleted": "Your account was deleted. You have been signed out",
+    "sessionExpired": "Your session has ended. Please sign in again",
+    "tooManyAttempts": "Too many attempts. Try again in 15 minutes",
     "loginTitle": "Sign in to your account",
     "loginSubtitle": "Continue shopping at TechNest",
     "registerTitle": "Create an account",

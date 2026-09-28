@@ -4,6 +4,7 @@ const fs = require('fs')
 const crypto = require('crypto')
 const { Pool } = require('pg')
 const { ensureDemoUser } = require('./demoUser.cjs')
+const { isHashed, hashPassword, verifyPassword, createToken, readToken, createRateLimiter } = require('./auth.cjs')
 
 const dbPath = path.join(__dirname, '..', 'src', 'data', 'db.json')
 
@@ -63,6 +64,8 @@ async function start() {
   }
 
   const server = jsonServer.create()
+  // Render sits behind a proxy; req.ip must be the client for rate limiting.
+  server.set('trust proxy', 1)
   const router = jsonServer.router(dbPath)
 
   // After every DELETE, json-server scans all collections for `…Id` fields
@@ -82,6 +85,16 @@ async function start() {
 
   const demoUser = ensureDemoUser(router)
   if (missingCollections.length) await backupToCloud()
+
+  // Accounts created before password hashing still hold plaintext passwords.
+  const plaintextUsers = router.db.get('users').value().filter((user) => user.password && !isHashed(user.password))
+  if (plaintextUsers.length) {
+    plaintextUsers.forEach((user) => {
+      router.db.get('users').find({ id: user.id }).assign({ password: hashPassword(user.password) }).write()
+    })
+    await backupToCloud()
+    console.log(`  🔒 Hashed ${plaintextUsers.length} plaintext password(s)`)
+  }
 
   const legacyAdmin = router.db.get('users').find({ email: 'bexruz@gmail.com' }).value()
   if (legacyAdmin) {
@@ -148,6 +161,80 @@ async function start() {
     res.on('finish', () => {
       if (req.method !== 'GET' && res.statusCode < 400) backupToCloud()
     })
+    next()
+  })
+
+  // ── Access control ──
+  // Requests carry "Authorization: Bearer <token>" from /auth/login or
+  // /auth/register. Public routes need nothing; the customer routes below
+  // need a signed-in user and are narrowed to that user's own data; anything
+  // else (json-server's generic CRUD included) is admin-only.
+  const PUBLIC_ROUTES = [
+    ['GET', /^\/products(\/\d+(\/bought-together)?)?$/],
+    ['GET', /^\/categories(\/[^/]+)?$/],
+    ['GET', /^\/banners(\/\d+\/image)?$/],
+    ['GET', /^\/reviews$/],
+    ['GET', /^\/supportSettings\/\d+$/],
+    ['POST', /^\/auth\/(login|register)$/],
+  ]
+  const CUSTOMER_ROUTES = [
+    ['POST', /^\/promo\/validate$/],
+    ['GET', /^\/orders$/],
+    ['POST', /^\/orders$/],
+    ['GET', /^\/messages$/],
+    ['POST', /^\/messages$/],
+    ['PATCH', /^\/messages\/\d+$/],
+    ['DELETE', /^\/messages\/user\/\d+$/],
+    ['GET', /^\/users\/\d+$/],
+    ['PATCH', /^\/users\/\d+$/],
+    ['PUT', /^\/users\/\d+\/(wishlist|addresses)$/],
+    ['POST', /^\/reviews$/],
+    ['DELETE', /^\/reviews\/\d+$/],
+  ]
+  const matchesRoute = (routes, method, urlPath) => routes.some(([m, pattern]) => m === method && pattern.test(urlPath))
+
+  function authenticate(req) {
+    const header = req.get('authorization') || ''
+    if (!header.startsWith('Bearer ')) return {}
+    const payload = readToken(header.slice(7))
+    if (!payload) return { error: 'AUTH_REQUIRED' }
+    const user = findUser(payload.uid)
+    if (!user) return { error: 'ACCOUNT_DELETED' }
+    if ((user.sessionVersion || 0) !== payload.v) return { error: 'AUTH_REQUIRED' }
+    return { user }
+  }
+
+  server.use((req, res, next) => {
+    if (req.method === 'OPTIONS') return next()
+    // json-server extras that would hand out whole records, password hashes
+    // included: the full database dump and relation expansion.
+    if (req.path === '/db') return res.status(404).end()
+    delete req.query._expand
+    delete req.query._embed
+
+    const method = req.method === 'HEAD' ? 'GET' : req.method
+    const { user, error } = authenticate(req)
+    req.user = user || null
+    if (matchesRoute(PUBLIC_ROUTES, method, req.path)) return next()
+    if (!user) return res.status(401).json({ error: error || 'AUTH_REQUIRED' })
+    if (user.role === 'admin') return next()
+    if (!matchesRoute(CUSTOMER_ROUTES, method, req.path)) return res.status(403).json({ error: 'FORBIDDEN' })
+
+    // A customer only ever reads or changes their own data.
+    const forbidden = () => res.status(403).json({ error: 'FORBIDDEN' })
+    const pathUserId = req.path.match(/^\/(?:users|messages\/user)\/(\d+)/)?.[1]
+    if (pathUserId && Number(pathUserId) !== user.id) return forbidden()
+    if (method === 'GET' && (req.path === '/orders' || req.path === '/messages')) {
+      req.query.userId = String(user.id)
+    }
+    if (method === 'POST' && req.path === '/messages') {
+      req.body = { text: String(req.body?.text || '').slice(0, 4000), userId: user.id, userName: user.name, sender: 'user', createdAt: new Date().toISOString() }
+    }
+    if (method === 'PATCH' && req.path.startsWith('/messages/')) {
+      const message = router.db.get('messages').value().find((item) => Number(item.id) === Number(req.path.split('/')[2]))
+      if (!message || Number(message.userId) !== user.id) return forbidden()
+      req.body = { readAt: new Date().toISOString() }
+    }
     next()
   })
 
@@ -251,7 +338,7 @@ async function start() {
   }
 
   server.post('/promo/validate', (req, res) => {
-    const result = evaluatePromo(req.body.code, Math.max(0, Number(req.body.subtotal) || 0), req.body.userId)
+    const result = evaluatePromo(req.body.code, Math.max(0, Number(req.body.subtotal) || 0), req.user.id)
     if (result.error) return res.status(400).json({ error: result.error, minTotal: result.minTotal })
     const { code, type, value } = result.promo
     res.json({ code, type, value, discount: result.discount })
@@ -352,7 +439,7 @@ async function start() {
   })
 
   server.post('/reviews', (req, res) => {
-    const user = findUser(req.body.userId)
+    const user = req.user
     const product = findProduct(req.body.productId)
     const rating = Math.round(Number(req.body.rating))
     const text = String(req.body.text || '').trim().slice(0, 2000)
@@ -390,8 +477,8 @@ async function start() {
     const id = Number(req.params.id)
     const review = router.db.get('reviews').find({ id }).value()
     if (!review) return res.status(404).json({ error: 'Review not found' })
-    const requester = findUser(req.query.userId)
-    if (!requester || (requester.role !== 'admin' && requester.id !== Number(review.userId))) {
+    const requester = req.user
+    if (requester.role !== 'admin' && requester.id !== Number(review.userId)) {
       return res.status(403).json({ error: 'REVIEW_FORBIDDEN' })
     }
     router.db.get('reviews').remove({ id }).write()
@@ -522,36 +609,51 @@ async function start() {
     res.json(router.db.get('products').find({ id }).value())
   })
 
-  // ── POST /auth/login ──
+  // ── Auth ──
+  // Signed-in responses carry the session token alongside the user.
+  const withToken = (user) => ({ ...safeUser(user), token: createToken(user) })
+  // Brute force: 8 wrong passwords per account per IP, 30 per IP, per 15 min.
+  const accountFailures = createRateLimiter({ limit: 8, windowMs: 15 * 60 * 1000 })
+  const ipFailures = createRateLimiter({ limit: 30, windowMs: 15 * 60 * 1000 })
+  const registrations = createRateLimiter({ limit: 5, windowMs: 60 * 60 * 1000 })
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const MIN_PASSWORD_LENGTH = 6
+
   server.post('/auth/login', (req, res) => {
-    const { email, password } = req.body
-    const users = router.db.get('users').value()
-    const normalizedEmail = String(email || '').trim().toLowerCase()
-    const user = users.find(
-      (u) => u.email.toLowerCase() === normalizedEmail && u.password === password
-    )
-    if (!user) return res.status(401).json({ error: 'INVALID_CREDENTIALS' })
-    const { password: _, ...safe } = user
-    res.json(safe)
+    const email = String(req.body.email || '').trim().toLowerCase()
+    const accountKey = `${req.ip}|${email}`
+    if (accountFailures.blocked(accountKey) || ipFailures.blocked(req.ip)) {
+      return res.status(429).json({ error: 'TOO_MANY_ATTEMPTS' })
+    }
+    const user = router.db.get('users').value().find((u) => String(u.email).toLowerCase() === email)
+    // Hash even for unknown emails so response time doesn't reveal which exist.
+    const valid = verifyPassword(req.body.password, user?.password || hashPassword(''))
+    if (!user || !valid) {
+      accountFailures.hit(accountKey)
+      ipFailures.hit(req.ip)
+      return res.status(401).json({ error: 'INVALID_CREDENTIALS' })
+    }
+    accountFailures.reset(accountKey)
+    res.json(withToken(user))
   })
 
-  // ── POST /auth/register ──
   server.post('/auth/register', (req, res) => {
-    const { name, password } = req.body
+    if (registrations.blocked(req.ip)) return res.status(429).json({ error: 'TOO_MANY_ATTEMPTS' })
     // Normalize the same way /auth/login does, otherwise an email saved with
     // stray whitespace/casing here can never match a trimmed login attempt.
     const email = String(req.body.email || '').trim().toLowerCase()
+    const name = String(req.body.name || '').trim().slice(0, 100)
+    const password = typeof req.body.password === 'string' ? req.body.password : ''
+    if (!name || !EMAIL_RE.test(email) || password.length < MIN_PASSWORD_LENGTH || password.length > 200) {
+      return res.status(400).json({ error: 'REGISTER_INVALID' })
+    }
     const users = router.db.get('users').value()
-    const exists = users.some((u) => u.email.toLowerCase() === email)
-    if (exists) return res.status(409).json({ error: 'EMAIL_TAKEN' })
+    if (users.some((u) => String(u.email).toLowerCase() === email)) return res.status(409).json({ error: 'EMAIL_TAKEN' })
 
-    const nextId = users.length ? Math.max(...users.map((u) => u.id)) + 1 : 1
-    const user = { id: nextId, name: String(name || '').trim(), email, password, role: 'customer', createdAt: new Date().toISOString() }
-
+    registrations.hit(req.ip)
+    const user = { id: nextIdOf('users'), name, email, password: hashPassword(password), role: 'customer', createdAt: new Date().toISOString() }
     router.db.get('users').push(user).write()
-
-    const { password: _, ...safe } = user
-    res.status(201).json(safe)
+    res.status(201).json(withToken(user))
   })
 
   // Demo orders live outside the real orders collection and never reserve stock.
@@ -573,8 +675,12 @@ async function start() {
     const id = Number(req.params.id)
     const current = router.db.get('users').find({ id }).value()
     if (!current) return res.status(404).json({ error: 'USER_NOT_FOUND' })
-    if (req.body.password && req.body.currentPassword !== current.password) {
+    const newPassword = req.body.password ? String(req.body.password) : ''
+    if (newPassword && !verifyPassword(req.body.currentPassword, current.password)) {
       return res.status(401).json({ error: 'INVALID_CURRENT_PASSWORD' })
+    }
+    if (newPassword && (newPassword.length < MIN_PASSWORD_LENGTH || newPassword.length > 200)) {
+      return res.status(400).json({ error: 'WEAK_PASSWORD' })
     }
 
     const email = String(req.body.email ?? current.email).trim().toLowerCase()
@@ -586,21 +692,20 @@ async function start() {
       name: String(req.body.name ?? current.name).trim(),
       email,
       phone: String(req.body.phone ?? current.phone ?? '').trim(),
-      ...(req.body.password ? { password: String(req.body.password) } : {}),
+      // A new password signs out every other device (their tokens carry the
+      // old sessionVersion); this one gets a fresh token below.
+      ...(newPassword ? { password: hashPassword(newPassword), sessionVersion: (current.sessionVersion || 0) + 1 } : {}),
     }
     router.db.get('users').find({ id }).assign(updated).write()
-    const { password: _, ...safeUser } = updated
-    res.json(safeUser)
+    res.json(newPassword ? withToken(updated) : safeUser(updated))
   })
 
   // ── POST /orders — custom: decrement variant stock ──
   server.post('/orders', (req, res) => {
-    const body = { ...req.body }
+    // Ordering requires an account (enforced by access control); the order
+    // always belongs to the signed-in user, whatever the body says.
+    const body = { ...req.body, userId: req.user.id }
     const isDemoOrder = Number(body.userId) === Number(demoUser.id)
-
-    // Ordering requires an account.
-    const customer = router.db.get('users').value().find((user) => Number(user.id) === Number(body.userId))
-    if (!body.userId || !customer) return res.status(401).json({ error: 'AUTH_REQUIRED' })
 
     // Recompute money server-side from catalog prices so neither the item
     // prices nor the promo discount can be forged by the client.

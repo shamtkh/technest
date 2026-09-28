@@ -13,7 +13,9 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action) {
-      state.user = action.payload
+      // Profile updates come back from the API without the session token
+      // (unless a password change issued a new one); keep the current one.
+      state.user = action.payload && { token: state.user?.token, ...action.payload }
     },
     logout(state) {
       state.user = null

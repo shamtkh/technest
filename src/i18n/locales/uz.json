@@ -170,6 +170,8 @@
   },
   "auth": {
     "accountDeleted": "Akkauntingiz o'chirildi. Siz tizimdan chiqarildingiz",
+    "sessionExpired": "Sessiya tugadi. Iltimos, qaytadan kiring",
+    "tooManyAttempts": "Urinishlar juda ko'p. 15 daqiqadan so'ng qayta urinib ko'ring",
     "loginTitle": "Hisobingizga kiring",
     "loginSubtitle": "TechNest xaridlarini davom ettiring",
     "registerTitle": "Ro'yxatdan o'ting",

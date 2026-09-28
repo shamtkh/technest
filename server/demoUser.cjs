@@ -1,3 +1,5 @@
+const { hashPassword, verifyPassword } = require('./auth.cjs')
+
 const DEFAULT_DEMO_EMAIL = 'demo@technest.uz'
 const DEFAULT_DEMO_PASSWORD = 'TechNestDemo2026!'
 
@@ -22,7 +24,8 @@ function ensureDemoUser(router) {
   if (existing) {
     router.db.get('users').find({ id: existing.id }).assign({
       name: 'TechNest Demo',
-      password,
+      // Re-hash only when DEMO_PASSWORD changed, not on every boot.
+      password: verifyPassword(password, existing.password) ? existing.password : hashPassword(password),
       role: 'demo',
     }).write()
     return router.db.get('users').find({ id: existing.id }).value()
@@ -33,7 +36,7 @@ function ensureDemoUser(router) {
     id: nextId,
     name: 'TechNest Demo',
     email,
-    password,
+    password: hashPassword(password),
     role: 'demo',
   }
   router.db.get('users').push(demoUser).write()

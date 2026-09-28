@@ -1,14 +1,26 @@
 const BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://127.0.0.1:3001')
 
+// Fired when the server rejects the session (expired, signed out elsewhere,
+// or the account was deleted); useAccountCheck signs the user out.
+export const SESSION_ENDED_EVENT = 'technest:session-ended'
+
+// The signed-in user's session token, kept in sync by store.js.
+let authToken = null
+export function setAuthToken(token) {
+  authToken = token || null
+}
+
 async function request(url, options = {}) {
   let res
   try {
     // Content-Type only when there's a body: on a GET it turns a simple
     // cross-origin request into one that needs a CORS preflight, i.e. an
     // extra round trip to the API before every read.
-    const headers = options.body
-      ? { 'Content-Type': 'application/json', ...options.headers }
-      : { ...options.headers }
+    const headers = {
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      ...options.headers,
+    }
     res = await fetch(`${BASE}${url}`, { ...options, headers })
   } catch {
     throw new Error('API_UNAVAILABLE')
@@ -17,6 +29,9 @@ async function request(url, options = {}) {
     const data = await res.json().catch(() => ({}))
     const error = new Error(data.error || `HTTP ${res.status}`)
     error.data = data
+    if (res.status === 401 && authToken && (data.error === 'AUTH_REQUIRED' || data.error === 'ACCOUNT_DELETED')) {
+      window.dispatchEvent(new CustomEvent(SESSION_ENDED_EVENT, { detail: data.error }))
+    }
     throw error
   }
   if (res.status === 204) return null
@@ -174,8 +189,7 @@ export const api = {
   },
 
   async clearConversation(userId) {
-    const messages = await request(`/messages?userId=${encodeURIComponent(userId)}`)
-    await Promise.all(messages.map((message) => request(`/messages/${message.id}`, { method: 'DELETE' })))
+    await request(`/messages/user/${encodeURIComponent(userId)}`, { method: 'DELETE' })
   },
 
   // ---------- wishlist / saved addresses ----------

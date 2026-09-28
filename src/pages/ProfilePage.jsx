@@ -36,8 +36,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!userId) return
     api.getMyOrders(userId).then(setOrders).catch(() => setOrders([]))
-    api.getUsers().then((users) => {
-      const freshUser = users.find((item) => String(item.id) === String(userId))
+    api.getUser(userId).then((freshUser) => {
       if (freshUser) {
         dispatch(setUser(freshUser))
         // Pick up wishlist changes made on the user's other devices.
@@ -79,7 +78,9 @@ export default function ProfilePage() {
           ? t('auth.emailTaken')
           : error.message === 'INVALID_CURRENT_PASSWORD'
             ? t('profile.invalidCurrentPassword')
-            : t('common.error'),
+            : error.message === 'WEAK_PASSWORD'
+              ? t('validation.minLength', { min: 6 })
+              : t('common.error'),
         'error'
       )
     } finally {

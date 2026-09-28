@@ -10,6 +10,7 @@ import {
   REGISTER,
 } from 'redux-persist'
 import storageModule from 'redux-persist/lib/storage'
+import { setAuthToken } from '../api/api'
 
 import authReducer from './slices/authSlice'
 import productReducer from './slices/productSlice'
@@ -48,3 +49,13 @@ export const store = configureStore({
 })
 
 export const persistor = persistStore(store)
+
+// Every API request carries the signed-in user's session token.
+let currentToken
+store.subscribe(() => {
+  const token = store.getState().auth.user?.token
+  if (token !== currentToken) {
+    currentToken = token
+    setAuthToken(token)
+  }
+})

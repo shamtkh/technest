@@ -61,7 +61,7 @@ export default function RegisterPage() {
 
         {error && (
           <p className="text-sm text-danger">
-            {error === 'EMAIL_TAKEN' ? t('auth.emailTaken') : t('common.error')}
+            {error === 'EMAIL_TAKEN' ? t('auth.emailTaken') : error === 'TOO_MANY_ATTEMPTS' ? t('auth.tooManyAttempts') : t('common.error')}
           </p>
         )}
 
