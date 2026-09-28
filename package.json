@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "concurrently --kill-others-on-fail --names client,server \"vite\" \"node server/index.cjs\"",
-    "server": "node server/index.cjs"
+    "server": "node server/index.cjs",
+    "deploy:api": "node scripts/deploy-api.mjs"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",

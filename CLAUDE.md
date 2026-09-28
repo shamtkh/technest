@@ -14,6 +14,7 @@ TechNest is a React 19 + Vite e-commerce storefront (phones/electronics) with a 
 - `npm run build` — production build via Vite.
 - `npm run preview` — preview the production build.
 - `npm run lint` — ESLint over the whole repo (flat config, `eslint.config.js`).
+- `npm run deploy:api` — deploys the pushed `HEAD` to the Render API service, waits for `live` and smoke-tests it (`-- --force` to redeploy a live commit). Needs `RENDER_API_KEY` in the gitignored `.env.local`. See **Deployment** below.
 - No test suite is configured in this repo.
 
 There is no `.env` requirement to run locally; `VITE_API_URL` optionally overrides the API base URL (defaults to `http://127.0.0.1:3001`, see `src/api/api.js`).
@@ -38,6 +39,8 @@ There is no `.env` requirement to run locally; `VITE_API_URL` optionally overrid
 `server/middleware.cjs` contains an older/alternate implementation of the same auth+orders routes using raw `fs` read/write instead of `router.db`; it is not required by `server/index.cjs` and is currently dead code — don't assume it runs.
 
 **Production persistence.** Render's free tier wipes local disk on every restart/redeploy. If `DATABASE_URL` (a Postgres connection string, e.g. from Neon) is set, `server/index.cjs` restores `db.json` from a single JSONB row on boot and re-saves the whole file after every successful non-GET request, regardless of which route handled it. Without `DATABASE_URL` (local dev) this is a no-op. Admin-uploaded product images are base64 data URIs embedded directly in `db.json` (see `src/core/handlemageChange.js`), so this same snapshot covers them too — no separate file storage needed.
+
+**Deployment.** Frontend on Vercel (builds from GitHub `main`); API on the Render web service `technest` (`srv-da6sh7c9v7es738aj8ag`, https://technest-yty1.onrender.com). Render's Auto-Deploy is on but pushes don't trigger it, so after pushing server changes run `npm run deploy:api` (`scripts/deploy-api.mjs`, Render REST API). The `/api` rewrite target in `vercel.json` (`technest-api.onrender.com`) is not this service — don't use it to check the backend.
 
 **Product stock model.** A product's real stock lives in `product.variants[]` (each variant has `storage`, `color`, `hex`, `stock`). The top-level `product.stock` field in `db.json` is stale/unused for display — `src/api/api.js` always recomputes `stock` client-side as the sum of variant stocks (`computeStock`) before returning products to the app. When adding stock-related logic, operate on variants, not the top-level field.
 
