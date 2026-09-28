@@ -21,7 +21,7 @@ import { useToast } from '../hooks/useToast'
 import { getProductFallbackImage } from '../utils/productImages'
 import GlassSelect from './GlassSelect'
 import api from '../api/api'
-import { FaBoxOpen, FaBoxesStacked, FaChartLine, FaClock, FaDollarSign, FaTriangleExclamation, FaUsers, FaXmark, FaPaperPlane, FaHeadset } from 'react-icons/fa6'
+import { FaBoxOpen, FaChartColumn, FaClipboardList, FaImages, FaTicket, FaXmark, FaPaperPlane, FaHeadset } from 'react-icons/fa6'
 import { AdminDashboardSkeleton } from './Skeleton'
 import ConfirmDialog from './ConfirmDialog'
 import { useScrollLock } from '../hooks/useScrollLock'
@@ -29,6 +29,8 @@ import SalesAnalytics from './admin/SalesAnalytics'
 import PromoCodesPanel from './admin/PromoCodesPanel'
 import BannersPanel from './admin/BannersPanel'
 import BulkStockImport from './admin/BulkStockImport'
+import AdminStats from './admin/AdminStats'
+import AdminTabs from './admin/AdminTabs'
 import { exportOrdersCsv } from '../utils/exports'
 
 const ORDER_STATUSES = [
@@ -555,17 +557,6 @@ export default function AdminDashboard() {
     return { ...status, label: t(`admin.${status.labelKey}`) }
   }
 
-  const statCards = [
-    { key: 'products', label: t('admin.statsProducts'), value: stats.total, color: '#3d7fff', icon: FaBoxOpen },
-    { key: 'stock', label: t('admin.statsStock'), value: stats.totalStock, color: '#16a34a', icon: FaBoxesStacked },
-    { key: 'lowStock', label: t('admin.statsLowStock'), value: stats.lowStock, color: '#f59e0b', icon: FaTriangleExclamation },
-    { key: 'outOfStock', label: t('admin.statsOutOfStock'), value: stats.outOfStock, color: '#ef4444', icon: FaXmark },
-    { key: 'orders', label: t('admin.statsOrders'), value: stats.totalOrders, color: '#8b5cf6', icon: FaChartLine },
-    { key: 'pending', label: t('admin.statsPending'), value: stats.pendingOrders, color: '#f59e0b', icon: FaClock },
-    { key: 'value', label: t('admin.statsValue'), value: `${formatPrice(stats.stockValue)} ${t('common.currency')}`, color: '#0f766e', icon: FaDollarSign },
-    { key: 'users', label: t('admin.statsUsers'), value: users.length, color: '#db2777', icon: FaUsers },
-  ]
-
   const selectedStatData = selectedStat === 'products'
     ? { title: t('admin.statsProducts'), rows: products.map((product) => `${product.name} · ${product.stock || 0} ${t('admin.units')}`) }
     : selectedStat === 'stock'
@@ -586,55 +577,26 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      {/* Stats row */}
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-        {statCards.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <button key={stat.key} type="button" onClick={() => setSelectedStat(stat.key)} className="group min-w-0 rounded-2xl border border-line bg-white p-4 text-left shadow-sm hover:-translate-y-0.5 hover:shadow-realistic">
-              <div className="flex items-center justify-between">
-                <div className="spec-strip text-steel">{stat.label}</div>
-                <Icon size={17} color={stat.color} aria-hidden="true" />
-              </div>
-              <div className="mt-2 break-words font-mono-tabular text-xl font-semibold xl:text-2xl" style={{ color: stat.color }}>{stat.value}</div>
-              <div className="mt-2 text-xs text-steel opacity-0 transition-opacity group-hover:opacity-100">{t('admin.more')} →</div>
-            </button>
-          )
-        })}
-      </div>
+      <AdminStats stats={stats} usersCount={users.length} onSelect={setSelectedStat} />
 
-      {/* Tab switcher */}
-      <div className="mb-5 flex flex-wrap gap-2">
-        {[
-          { key: 'products', label: t('admin.products'), badge: 0 },
-          { key: 'orders', label: `${t('admin.orders')}${newOrdersCount > 0 ? ` (+${newOrdersCount} ${t('admin.new')})` : ''}`, badge: newOrdersCount },
-          { key: 'analytics', label: t('admin.analytics'), badge: 0 },
-          { key: 'promo', label: t('promo.tab'), badge: 0 },
-          { key: 'banners', label: t('banners.tab'), badge: 0 },
-          { key: 'support', label: `${t('admin.support')}${adminUnreadCount > 0 ? ` (+${adminUnreadCount})` : ''}`, badge: adminUnreadCount },
-        ].map((tab_) => (
-          <button
-            key={tab_.key}
-            onClick={() => {
-              setTab(tab_.key)
-              if (tab_.key === 'orders') dispatch(resetNewOrdersCount())
-              if (tab_.key === 'support') dispatch(resetAdminUnreadCount())
-            }}
-            className="relative rounded-full px-5 py-2 text-sm font-semibold"
-            style={{
-              background: tab === tab_.key ? 'var(--color-ink)' : 'white',
-              color: tab === tab_.key ? 'white' : 'var(--color-ink-soft)',
-              border: '1px solid var(--color-line)',
-            }}
-          >
-            {tab_.label}
-            {tab_.badge > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-red-500 px-1 font-mono-tabular text-[10px] font-semibold text-white">
-                {tab_.badge}
-              </span>
-            )}
-          </button>
-        ))}
+      <div className="mb-5">
+        <AdminTabs
+          label={t('admin.title')}
+          active={tab}
+          onChange={(key) => {
+            setTab(key)
+            if (key === 'orders') dispatch(resetNewOrdersCount())
+            if (key === 'support') dispatch(resetAdminUnreadCount())
+          }}
+          tabs={[
+            { key: 'products', label: t('admin.products'), icon: FaBoxOpen },
+            { key: 'orders', label: t('admin.orders'), icon: FaClipboardList, badge: newOrdersCount },
+            { key: 'analytics', label: t('admin.analytics'), icon: FaChartColumn },
+            { key: 'promo', label: t('promo.tab'), icon: FaTicket },
+            { key: 'banners', label: t('banners.tab'), icon: FaImages },
+            { key: 'support', label: t('admin.support'), icon: FaHeadset, badge: adminUnreadCount },
+          ]}
+        />
       </div>
 
       {/* ── PRODUCTS TAB ── */}
