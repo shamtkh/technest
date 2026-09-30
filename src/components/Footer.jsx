@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import logo from '../assets/technest-logo-footer.png'
-import BrandLogo from './BrandLogo'
+import Logo from './Logo'
 import { FaTelegram, FaPhone, FaInstagram } from 'react-icons/fa6'
 import api from '../api/api'
 import { usePolling } from '../hooks/usePolling'
@@ -22,8 +21,8 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
-            <div className="mb-3 flex items-center gap-2">
-              <BrandLogo src={logo} alt={t('brand')} className="h-20 w-72" processCheckerboard={false} />
+            <div className="mb-5 flex items-center">
+              <Logo label={t('brand')} className="h-10 w-auto" />
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-steel">{t('footer.about')}</p>
           </div>

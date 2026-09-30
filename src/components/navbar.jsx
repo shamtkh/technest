@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next'
 import SearchBar from './searchBar'
 import { logout } from '../store/slices/authSlice'
 import { FaArrowRightFromBracket, FaBell, FaChevronRight, FaGaugeHigh, FaHouse, FaBagShopping, FaTableCellsLarge, FaClipboardList, FaUser, FaHeart } from 'react-icons/fa6'
-import logo from '../assets/technest-logo-navbar.png'
-import BrandLogo from './BrandLogo'
+import Logo from './Logo'
 import BurgerMenu from './BurgerMenu'
 import ConfirmDialog from './ConfirmDialog'
 import { useScrollLock } from '../hooks/useScrollLock'
@@ -60,8 +59,8 @@ export default function Navbar() {
     <>
       <header className="site-header sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
-        <Link to="/" className="mobile-navbar-brand flex items-center gap-2 shrink-0">
-          <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-logo h-11 w-35 lg:h-14 lg:w-51" />
+        <Link to="/" className="flex h-11 shrink-0 items-center text-ink lg:h-14">
+          <Logo label={t('brand')} className="h-7 w-auto lg:h-9" />
         </Link>
 
         <nav className="hidden items-center gap-6 lg:flex">
@@ -217,7 +216,7 @@ export default function Navbar() {
       >
         <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
           <div className="mobile-drawer-header">
-            <BrandLogo src={logo} alt={t('brand')} className="mobile-navbar-drawer-logo h-9 w-32 object-cover object-center" />
+            <Logo label={t('brand')} className="h-7 w-auto text-ink" />
             <BurgerMenu checked={mobileOpen} onChange={setMobileOpen} />
           </div>
 

@@ -10,11 +10,11 @@
 //   (users, orders, messages) is never cached. Banner images are
 //   content-versioned (?v=hash), so they're cache first.
 
-const VERSION = 'v2'
+const VERSION = 'v3'
 const SHELL_CACHE = `technest-shell-${VERSION}`
 const STATIC_CACHE = `technest-static-${VERSION}`
 const API_CACHE = `technest-api-${VERSION}`
-const SHELL_URLS = ['/', '/index.html', '/manifest.webmanifest', '/favicon.png', '/icons/icon-192.png']
+const SHELL_URLS = ['/', '/index.html', '/manifest.webmanifest', '/favicon.png', '/favicon.svg', '/icons/icon-192.png']
 const CATALOG_API = /^\/(products|categories|banners|reviews|supportSettings)(\/|\?|$)/
 
 self.addEventListener('install', (event) => {
