@@ -60,10 +60,10 @@ export default function Navbar() {
       <header className="site-header sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/" className="flex h-11 shrink-0 items-center text-ink lg:h-14">
-          <Logo label={t('brand')} className="h-7 w-auto lg:h-9" />
+          <Logo label={t('brand')} className="h-7 w-auto lg:h-8" />
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-6 lg:mx-6 lg:flex">
           <NavLink to="/" end className={linkClass}>{t('nav.home')}</NavLink>
           <NavLink to="/products" className={linkClass}>{t('nav.products')}</NavLink>
         </nav>

@@ -14,7 +14,7 @@ const VERSION = 'v3'
 const SHELL_CACHE = `technest-shell-${VERSION}`
 const STATIC_CACHE = `technest-static-${VERSION}`
 const API_CACHE = `technest-api-${VERSION}`
-const SHELL_URLS = ['/', '/index.html', '/manifest.webmanifest', '/favicon.png', '/favicon.svg', '/icons/icon-192.png']
+const SHELL_URLS = ['/', '/index.html', '/manifest.webmanifest', '/favicon.png', '/favicon.svg', '/icons/icon-192-v2.png']
 const CATALOG_API = /^\/(products|categories|banners|reviews|supportSettings)(\/|\?|$)/
 
 self.addEventListener('install', (event) => {
