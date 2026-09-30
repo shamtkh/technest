@@ -236,7 +236,19 @@
     "invalidCurrentPassword": "Текущий пароль неверный",
     "orders": "Последние заказы",
     "allOrders": "Все заказы",
-    "items": "тов."
+    "items": "тов.",
+    "roleAdmin": "Администратор",
+    "memberSince": "С нами с {{date}}",
+    "statOrders": "Заказов",
+    "statSpent": "Потрачено",
+    "statWishlist": "В избранном",
+    "statAddresses": "Адресов",
+    "activeOrder": "Текущий заказ",
+    "orderDetails": "Подробнее",
+    "security": "Безопасность",
+    "securityHint": "После смены пароля другие устройства выйдут из аккаунта",
+    "changePassword": "Сменить пароль",
+    "passwordChanged": "Пароль изменён"
   },
   "admin": {
     "title": "Админ-панель",

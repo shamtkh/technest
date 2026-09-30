@@ -236,7 +236,19 @@
     "invalidCurrentPassword": "Joriy parol noto'g'ri",
     "orders": "So'nggi buyurtmalar",
     "allOrders": "Barcha buyurtmalar",
-    "items": "ta"
+    "items": "ta",
+    "roleAdmin": "Administrator",
+    "memberSince": "Biz bilan {{date}} dan beri",
+    "statOrders": "Buyurtmalar",
+    "statSpent": "Sarflangan",
+    "statWishlist": "Sevimlilarda",
+    "statAddresses": "Manzillar",
+    "activeOrder": "Joriy buyurtma",
+    "orderDetails": "Batafsil",
+    "security": "Xavfsizlik",
+    "securityHint": "Parol o'zgartirilgach, boshqa qurilmalarda akkauntdan chiqiladi",
+    "changePassword": "Parolni o'zgartirish",
+    "passwordChanged": "Parol o'zgartirildi"
   },
   "admin": {
     "title": "Admin panel",

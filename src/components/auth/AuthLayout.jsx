@@ -2,9 +2,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { FaBoxOpen, FaHeart, FaHeadset, FaLocationDot } from 'react-icons/fa6'
 import { LogoMark } from '../Logo'
-
-const ORDER_STEPS = ['statusPending', 'statusAccepted', 'statusTransit', 'statusDelivered']
-const PREVIEW_STEP = 2
+import OrderSteps from '../OrderSteps'
+import { orderStatusLabel } from '../../utils/orderStatus'
 
 // Shared frame for /login and /register: a dark brand panel (what an account gives you)
 // next to the form, with a Sign in / Sign up switch on top of the form.
@@ -18,7 +17,7 @@ export default function AuthLayout({ mode, title, subtitle, children, footer }) 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-12">
       <div className="auth-card grid overflow-hidden rounded-[1.75rem] border border-line bg-white lg:grid-cols-[1.05fr_1fr]">
-        <aside className="auth-panel relative overflow-hidden px-6 py-7 text-white sm:px-10 lg:px-12 lg:py-12">
+        <aside className="brand-panel relative overflow-hidden px-6 py-7 text-white sm:px-10 lg:px-12 lg:py-12">
           <LogoMark className="pointer-events-none absolute -bottom-16 -right-10 h-80 w-auto text-white/4.5" />
 
           <div className="relative flex h-full flex-col">
@@ -99,23 +98,11 @@ function OrderPreview() {
     <div className="auth-preview max-w-md rounded-2xl border border-white/10 bg-white/6 p-5 backdrop-blur" aria-hidden="true">
       <div className="flex items-center justify-between gap-3">
         <span className="spec-strip text-white/50">{t('orders.orderNumber', { id: 1042 })}</span>
-        <span className="spec-strip rounded-full bg-accent/15 px-2.5 py-1 text-accent">{t(`admin.${ORDER_STEPS[PREVIEW_STEP]}`)}</span>
+        <span className="spec-strip rounded-full bg-accent/15 px-2.5 py-1 text-accent">{orderStatusLabel(t, 'transit')}</span>
       </div>
       <div className="mt-3 font-display text-lg font-semibold">iPhone 15 Pro</div>
       <div className="spec-strip text-white/50">256 GB · Natural Titanium</div>
-      <div className="mt-5 grid grid-cols-4 gap-1.5">
-        {ORDER_STEPS.map((step, index) => (
-          <span
-            key={step}
-            className={`auth-preview-step h-1.5 rounded-full ${index < PREVIEW_STEP ? 'bg-accent' : index === PREVIEW_STEP ? 'is-current bg-accent' : 'bg-white/10'}`}
-          />
-        ))}
-      </div>
-      <div className="mt-2 grid grid-cols-4 gap-1.5 spec-strip text-[0.65rem] text-white/40">
-        {ORDER_STEPS.map((step, index) => (
-          <span key={step} className={`truncate ${index === PREVIEW_STEP ? 'text-white/80' : ''}`}>{t(`admin.${step}`)}</span>
-        ))}
-      </div>
+      <OrderSteps status="transit" dark className="mt-5" />
     </div>
   )
 }

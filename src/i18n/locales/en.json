@@ -236,7 +236,19 @@
     "invalidCurrentPassword": "Current password is incorrect",
     "orders": "Recent orders",
     "allOrders": "All orders",
-    "items": "items"
+    "items": "items",
+    "roleAdmin": "Administrator",
+    "memberSince": "Member since {{date}}",
+    "statOrders": "Orders",
+    "statSpent": "Spent",
+    "statWishlist": "In wishlist",
+    "statAddresses": "Addresses",
+    "activeOrder": "Current order",
+    "orderDetails": "Details",
+    "security": "Security",
+    "securityHint": "Changing your password signs you out on your other devices",
+    "changePassword": "Change password",
+    "passwordChanged": "Password changed"
   },
   "admin": {
     "title": "Admin panel",

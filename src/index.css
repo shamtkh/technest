@@ -145,15 +145,15 @@ input:focus-visible { outline: none; }
   border-color: var(--color-steel);
 }
 
-/* ── Auth pages (login / register) ── */
+/* ── Auth pages (login / register); .brand-panel and .order-step-current are shared with the profile ── */
 .auth-card { box-shadow: var(--shadow-realistic-lg); }
-.auth-panel {
+.brand-panel {
   background:
     radial-gradient(120% 70% at 0% 0%, rgba(61, 127, 255, 0.3), transparent 55%),
     radial-gradient(80% 60% at 100% 100%, rgba(61, 127, 255, 0.12), transparent 60%),
     var(--color-ink);
 }
-.auth-panel::before {
+.brand-panel::before {
   position: absolute;
   inset: 0;
   content: "";
@@ -165,12 +165,12 @@ input:focus-visible { outline: none; }
   mask-image: radial-gradient(ellipse 80% 70% at 15% 0%, #000 15%, transparent 70%);
 }
 .auth-preview { animation: fadeInUp 0.7s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.auth-preview-step.is-current {
+.order-step-current {
   background: linear-gradient(90deg, var(--color-accent) 0%, #a9c6ff 50%, var(--color-accent) 100%);
   background-size: 200% 100%;
-  animation: authTransit 2.4s linear infinite;
+  animation: orderStepShimmer 2.4s linear infinite;
 }
-@keyframes authTransit {
+@keyframes orderStepShimmer {
   from { background-position: 100% 0; }
   to { background-position: -100% 0; }
 }
@@ -254,7 +254,7 @@ input:focus-visible { outline: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .auth-preview,
-  .auth-preview-step.is-current,
+  .order-step-current,
   .auth-switch-pill.to-register,
   .auth-switch-pill.to-login { animation: none; }
 }
