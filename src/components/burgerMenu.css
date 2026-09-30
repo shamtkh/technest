@@ -1,25 +1,30 @@
-/* Round button with two lines (the lower one shorter) that fold into an X when open. */
+/* Dark squircle with two white lines and a blue "pixel" after the short one.
+   Hover swaps the line lengths (the pixel jumps along); open folds the lines into
+   an X on the accent blue. */
 .burger-menu {
 	position: relative;
 	display: grid;
 	place-items: center;
-	width: 2.5rem;
-	height: 2.5rem;
+	width: 2.75rem;
+	height: 2.75rem;
 	flex-shrink: 0;
-	border: 1px solid var(--color-line);
-	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.85);
-	box-shadow: 0 4px 12px rgba(27, 55, 105, 0.06);
+	border-radius: 0.95rem;
+	background: linear-gradient(145deg, #232938 0%, var(--color-ink) 100%);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 8px 20px rgba(11, 14, 20, 0.22);
 	cursor: pointer;
 	user-select: none;
-	transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+	transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .burger-menu:active { transform: scale(0.94); }
 
 .burger-menu:has(input:focus-visible) {
-	border-color: var(--color-accent);
-	box-shadow: 0 0 0 3px rgba(61, 127, 255, 0.22);
+	box-shadow: 0 0 0 3px rgba(61, 127, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.burger-menu:has(input:checked) {
+	background: linear-gradient(145deg, #5b93ff 0%, var(--color-accent) 100%);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 8px 22px rgba(61, 127, 255, 0.35);
 }
 
 .burger-menu input {
@@ -31,33 +36,47 @@
 
 .burger-menu .checkmark {
 	position: relative;
-	width: 18px;
-	height: 12px;
+	width: 20px;
+	height: 14px;
 }
 
 .burger-menu .checkmark span {
 	position: absolute;
-	right: 0;
+	left: 0;
 	height: 2px;
 	border-radius: 2px;
-	background: var(--color-ink-soft);
+	background: white;
 	transition:
-		top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-		width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-		transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+		top 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		left 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		opacity 0.25s ease;
 }
 
-.burger-menu .checkmark span:nth-child(1) { top: 1px; width: 18px; }
-.burger-menu .checkmark span:nth-child(2) { top: 9px; width: 11px; }
+.burger-menu .checkmark span:nth-child(1) { top: 2px; width: 20px; }
+.burger-menu .checkmark span:nth-child(2) { top: 10px; width: 11px; }
+.burger-menu .checkmark .burger-dot {
+	top: 9px;
+	left: 15px;
+	width: 4px;
+	height: 4px;
+	border-radius: 1.5px;
+	background: #5b93ff;
+	box-shadow: 0 0 8px rgba(91, 147, 255, 0.85);
+}
 
 @media (hover: hover) {
-	.burger-menu:hover { border-color: var(--color-steel); }
-	.burger-menu:hover .checkmark span:nth-child(2) { width: 18px; }
+	.burger-menu:hover .checkmark span:nth-child(1) { width: 11px; }
+	.burger-menu:hover .checkmark span:nth-child(2) { width: 20px; }
+	.burger-menu:hover .checkmark .burger-dot { top: 1px; }
 }
 
-.burger-menu input:checked + .checkmark span { top: 5px; width: 18px; }
+.burger-menu input:checked + .checkmark span:nth-child(1),
+.burger-menu input:checked + .checkmark span:nth-child(2) { top: 6px; width: 20px; }
 .burger-menu input:checked + .checkmark span:nth-child(1) { transform: rotate(45deg); }
 .burger-menu input:checked + .checkmark span:nth-child(2) { transform: rotate(-45deg); }
+.burger-menu input:checked + .checkmark .burger-dot { opacity: 0; transform: scale(0); }
 
 @media (min-width: 1024px) {
 	.burger-menu {

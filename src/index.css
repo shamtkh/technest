@@ -662,6 +662,9 @@ body.confirm-dialog-open {
   opacity: 1;
   transform: translateX(0);
 }
+/* The drawer scrolls instead: a column flexbox would otherwise squash children that
+   clip their content (overflow: hidden) once the menu is taller than the screen. */
+.mobile-drawer > * { flex-shrink: 0; }
 .mobile-drawer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
 .drawer-category {
   display: block;
@@ -706,6 +709,7 @@ body.confirm-dialog-open {
 .drawer-link + .drawer-link { border-top: 1px solid var(--color-line); }
 .drawer-link:active { background: var(--color-paper); }
 .drawer-link.is-active { background: var(--color-accent-soft); color: var(--color-accent-dim); }
+.drawer-link.is-active .drawer-link-icon { background: var(--color-accent); color: white; }
 .drawer-link-icon {
   display: grid;
   width: 2rem;

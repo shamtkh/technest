@@ -8,9 +8,10 @@ export default function BurgerMenu({ checked, onChange }) {
 				checked={checked}
 				onChange={(event) => onChange(event.target.checked)}
 			/>
-			<span className="checkmark">
+			<span className="checkmark" aria-hidden="true">
 				<span />
 				<span />
+				<span className="burger-dot" />
 			</span>
 		</label>
 	)
