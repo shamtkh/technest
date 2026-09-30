@@ -25,7 +25,8 @@
     "adminShort": "Admin",
     "myOrders": "My orders",
     "accountHint": "Sign in to track your orders and keep your wishlist on every device.",
-    "searchShort": "Search products"
+    "searchShort": "Search products",
+    "drawerGuestTitle": "Sign in to TechNest"
   },
   "categories": {
     "all": "All",

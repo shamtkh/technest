@@ -13,7 +13,7 @@ import OrderSteps from '../components/OrderSteps'
 import { LogoMark } from '../components/Logo'
 import { AuthField, MatchHint, PasswordField } from '../components/auth/AuthFields'
 import { useToast } from '../hooks/useToast'
-import { formatPrice } from '../utils/format'
+import { formatPrice, initials } from '../utils/format'
 import { getProductImages } from '../utils/productImages'
 import { orderStatus, orderStatusLabel } from '../utils/orderStatus'
 import { validateForm, rules, translateError } from '../validations/validateForm'
@@ -182,16 +182,9 @@ function itemsSummary(order) {
 }
 
 function Avatar({ name, email }) {
-  const initials = (name || email || '?')
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((word) => [...word][0])
-    .join('')
-    .toUpperCase()
   return (
     <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-accent font-display text-2xl font-bold text-white shadow-[0_12px_32px_rgba(61,127,255,0.35)] sm:h-20 sm:w-20 sm:text-3xl" aria-hidden="true">
-      {initials}
+      {initials(name || email)}
     </div>
   )
 }

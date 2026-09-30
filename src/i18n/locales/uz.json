@@ -25,7 +25,8 @@
     "adminShort": "Admin",
     "myOrders": "Buyurtmalarim",
     "accountHint": "Buyurtmalarni kuzatish va sevimlilarni barcha qurilmalarda ko'rish uchun kiring.",
-    "searchShort": "Mahsulot qidirish"
+    "searchShort": "Mahsulot qidirish",
+    "drawerGuestTitle": "TechNest'ga kiring"
   },
   "categories": {
     "all": "Barchasi",

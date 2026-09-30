@@ -25,7 +25,8 @@
     "adminShort": "Админ",
     "myOrders": "Мои заказы",
     "accountHint": "Войдите, чтобы следить за заказами и видеть избранное на всех устройствах.",
-    "searchShort": "Поиск товаров"
+    "searchShort": "Поиск товаров",
+    "drawerGuestTitle": "Войдите в TechNest"
   },
   "categories": {
     "all": "Все",

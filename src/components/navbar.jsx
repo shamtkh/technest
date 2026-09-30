@@ -1,19 +1,28 @@
-import { useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import SearchBar from './searchBar'
 import { logout } from '../store/slices/authSlice'
-import { FaArrowRightFromBracket, FaBell, FaChevronRight, FaGaugeHigh, FaHouse, FaBagShopping, FaTableCellsLarge, FaClipboardList, FaUser, FaHeart } from 'react-icons/fa6'
-import Logo from './Logo'
+import { FaArrowRight, FaArrowRightFromBracket, FaBell, FaChevronRight, FaClock, FaGaugeHigh, FaHeadphones, FaHeadset, FaHouse, FaBagShopping, FaLaptop, FaMobileScreenButton, FaTableCellsLarge, FaClipboardList, FaUser, FaHeart } from 'react-icons/fa6'
+import Logo, { LogoMark } from './Logo'
 import BurgerMenu from './BurgerMenu'
 import ConfirmDialog from './ConfirmDialog'
 import { useScrollLock } from '../hooks/useScrollLock'
+import { initials } from '../utils/format'
+import { openSupport } from '../utils/support'
 
 const LANGS = [
   { code: 'uz', label: "UZ" },
   { code: 'ru', label: 'RU' },
   { code: 'en', label: 'EN' },
+]
+
+const DRAWER_CATEGORIES = [
+  { id: 'phones', icon: FaMobileScreenButton },
+  { id: 'laptops', icon: FaLaptop },
+  { id: 'accessories', icon: FaHeadphones },
+  { id: 'watches', icon: FaClock },
 ]
 
 export default function Navbar() {
@@ -24,6 +33,8 @@ export default function Navbar() {
   const cartCount = useSelector((s) => s.cart.items.reduce((sum, i) => sum + i.qty, 0))
   const newOrdersCount = useSelector((s) => s.orders.newOrdersCount)
   const wishlistCount = useSelector((s) => s.wishlist.ids.length)
+  const products = useSelector((s) => s.products.items)
+  const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
@@ -51,6 +62,13 @@ export default function Navbar() {
   }
 
   const closeDrawer = () => setMobileOpen(false)
+
+  const categoryCounts = useMemo(() => {
+    const counts = {}
+    for (const product of products) counts[product.category] = (counts[product.category] || 0) + 1
+    return counts
+  }, [products])
+  const activeCategory = location.pathname === '/products' ? new URLSearchParams(location.search).get('category') : null
 
   const linkClass = ({ isActive }) =>
     `text-sm font-medium transition-colors ${isActive ? 'text-ink-soft' : 'text-steel hover:text-ink-soft'}`
@@ -216,47 +234,87 @@ export default function Navbar() {
       >
         <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
           <div className="mobile-drawer-header">
-            <Logo label={t('brand')} className="h-7 w-auto text-ink" />
+            <Logo label={t('brand')} className="h-6 w-auto text-ink" />
             <BurgerMenu checked={mobileOpen} onChange={setMobileOpen} />
           </div>
 
-          <SearchBar compact onSubmit={closeDrawer} />
-
-          <div className="mt-5">
-            {user ? (
-              <Link to="/profile" onClick={closeDrawer} className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent-soft font-display text-base font-bold text-accent-dim">
-                  {(user.name || '?').trim().charAt(0).toUpperCase()}
+          {user ? (
+            <Link to="/profile" onClick={closeDrawer} className="brand-panel relative block overflow-hidden rounded-2xl p-4 text-white">
+              <LogoMark className="pointer-events-none absolute -bottom-6 -right-4 h-24 w-auto text-white/4.5" />
+              <span className="relative flex items-center gap-3">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-accent font-display text-lg font-bold shadow-[0_8px_24px_rgba(61,127,255,0.35)]">
+                  {initials(user.name || user.email)}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold text-ink-soft">{user.name}</span>
-                  <span className="block truncate text-xs text-steel">{user.email}</span>
+                  {isAdmin && <span className="spec-strip block uppercase text-accent">{t('profile.roleAdmin')}</span>}
+                  <span className="block truncate font-semibold">{user.name}</span>
+                  <span className="block truncate text-xs text-white/55">{user.email}</span>
                 </span>
-                <FaChevronRight size={12} className="shrink-0 text-steel" aria-hidden="true" />
-              </Link>
-            ) : (
-              <div className="rounded-2xl border border-line bg-white p-4">
-                <p className="text-sm leading-relaxed text-steel">{t('nav.accountHint')}</p>
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <Link to="/login" onClick={closeDrawer} className="rounded-full bg-ink py-2.5 text-center text-sm font-semibold text-white">{t('nav.login')}</Link>
-                  <Link to="/register" onClick={closeDrawer} className="rounded-full border border-line py-2.5 text-center text-sm font-semibold text-ink-soft">{t('nav.register')}</Link>
-                </div>
+                <FaChevronRight size={12} className="shrink-0 text-white/40" aria-hidden="true" />
+              </span>
+            </Link>
+          ) : (
+            <div className="brand-panel relative overflow-hidden rounded-2xl p-4 text-white">
+              <LogoMark className="pointer-events-none absolute -bottom-6 -right-4 h-24 w-auto text-white/4.5" />
+              <p className="relative font-display text-lg font-semibold">{t('nav.drawerGuestTitle')}</p>
+              <p className="relative mt-1 text-sm leading-relaxed text-white/60">{t('nav.accountHint')}</p>
+              <div className="relative mt-4 grid grid-cols-2 gap-2">
+                <Link to="/login" onClick={closeDrawer} className="rounded-full bg-accent py-2.5 text-center text-sm font-semibold text-white">{t('nav.login')}</Link>
+                <Link to="/register" onClick={closeDrawer} className="rounded-full border border-white/20 py-2.5 text-center text-sm font-semibold text-white">{t('nav.register')}</Link>
               </div>
-            )}
-          </div>
-
-          {user && (
-            <nav className="mt-2 flex flex-col gap-1" aria-label={t('nav.profile')}>
-              {isAdmin ? (
-                <DrawerLink to="/admin" icon={FaGaugeHigh} badge={newOrdersCount} onClick={closeDrawer}>{t('nav.admin')}</DrawerLink>
-              ) : (
-                <DrawerLink to="/orders" icon={FaClipboardList} onClick={closeDrawer}>{t('nav.myOrders')}</DrawerLink>
-              )}
-            </nav>
+            </div>
           )}
 
-          <div className="mobile-drawer-section mt-5">
-            <div className="mb-2 spec-strip uppercase text-steel">{t('nav.language')}</div>
+          <div className="mt-4">
+            <SearchBar compact onSubmit={closeDrawer} />
+          </div>
+
+          <section className="mt-6">
+            <div className="mb-2.5 flex items-center justify-between">
+              <span className="spec-strip uppercase text-steel">{t('nav.products')}</span>
+              <Link to="/products" onClick={closeDrawer} className="inline-flex items-center gap-1 text-xs font-semibold text-accent">
+                {t('categories.all')}
+                <FaArrowRight size={10} aria-hidden="true" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {DRAWER_CATEGORIES.map(({ id, icon: Icon }) => (
+                <Link
+                  key={id}
+                  to={`/products?category=${id}`}
+                  onClick={closeDrawer}
+                  className={`drawer-category ${activeCategory === id ? 'is-active' : ''}`}
+                >
+                  <span className="flex items-start justify-between">
+                    <span className="drawer-category-icon"><Icon size={15} aria-hidden="true" /></span>
+                    {categoryCounts[id] > 0 && <span className="spec-strip text-steel">{categoryCounts[id]}</span>}
+                  </span>
+                  <span className="mt-3 block truncate text-sm font-semibold">{t(`categories.${id}`)}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <nav className="drawer-group mt-4" aria-label={t('nav.profile')}>
+            {isAdmin ? (
+              <DrawerLink to="/admin" icon={FaGaugeHigh} badge={newOrdersCount} onClick={closeDrawer}>{t('nav.admin')}</DrawerLink>
+            ) : (
+              <>
+                {user && <DrawerLink to="/orders" icon={FaClipboardList} onClick={closeDrawer}>{t('nav.myOrders')}</DrawerLink>}
+                <button type="button" onClick={() => { closeDrawer(); openSupport() }} className="drawer-link">
+                  <span className="drawer-link-icon"><FaHeadset size={14} aria-hidden="true" /></span>
+                  <span className="min-w-0 flex-1 text-left">
+                    <span className="block truncate">{t('support.title')}</span>
+                    <span className="block text-xs font-normal leading-snug text-steel">{t('support.subtitle')}</span>
+                  </span>
+                  <FaChevronRight size={11} className="shrink-0 text-steel" aria-hidden="true" />
+                </button>
+              </>
+            )}
+          </nav>
+
+          <div className="mt-6 flex items-center justify-between gap-3">
+            <span className="spec-strip uppercase text-steel">{t('nav.language')}</span>
             <div className="language-switch w-fit">
               <span className="language-active-pill" style={{ transform: `translateX(${activeLanguageIndex * 100}%)` }} aria-hidden="true" />
               {LANGS.map((l) => (
@@ -274,14 +332,16 @@ export default function Navbar() {
           </div>
 
           {user && (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="mt-auto flex h-11 w-full items-center justify-center gap-2 rounded-full border border-line bg-white text-sm font-semibold text-danger"
-            >
-              <FaArrowRightFromBracket size={14} aria-hidden="true" />
-              {t('nav.logout')}
-            </button>
+            <div className="mt-auto pt-6">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-danger/20 bg-danger/5 text-sm font-semibold text-danger"
+              >
+                <FaArrowRightFromBracket size={14} aria-hidden="true" />
+                {t('nav.logout')}
+              </button>
+            </div>
           )}
         </aside>
       </div>
@@ -328,14 +388,11 @@ function TabLink({ to, end = false, icon: Icon, label, badge = 0, badgeTone = 'r
 
 function DrawerLink({ to, icon: Icon, badge = 0, onClick, children }) {
   return (
-    <NavLink
-      to={to}
-      onClick={onClick}
-      className={({ isActive }) => `flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors ${isActive ? 'bg-accent-soft text-accent-dim' : 'text-ink-soft active:bg-paper-dim'}`}
-    >
-      <Icon size={15} className="shrink-0 opacity-70" aria-hidden="true" />
+    <NavLink to={to} onClick={onClick} className={({ isActive }) => `drawer-link ${isActive ? 'is-active' : ''}`}>
+      <span className="drawer-link-icon"><Icon size={14} aria-hidden="true" /></span>
       <span className="min-w-0 flex-1 truncate">{children}</span>
       {badge > 0 && <span className="rounded-full bg-red-500 px-1.5 font-mono-tabular text-[10px] font-semibold text-white">{badge}</span>}
+      <FaChevronRight size={11} className="shrink-0 text-steel" aria-hidden="true" />
     </NavLink>
   )
 }

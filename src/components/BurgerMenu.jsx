@@ -11,7 +11,6 @@ export default function BurgerMenu({ checked, onChange }) {
 			<span className="checkmark">
 				<span />
 				<span />
-				<span />
 			</span>
 		</label>
 	)

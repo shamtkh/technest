@@ -10,6 +10,7 @@ import { useToast } from '../hooks/useToast'
 import api from '../api/api'
 import { FaXmark, FaTelegram, FaPhone, FaInstagram, FaPaperPlane, FaCommentDots, FaHeadset, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 import { usePolling } from '../hooks/usePolling'
+import { OPEN_SUPPORT_EVENT } from '../utils/support'
 
 export default function SupportWidget() {
   const { t, i18n } = useTranslation()
@@ -73,6 +74,12 @@ export default function SupportWidget() {
     localStorage.setItem(`technest_seen_support_${user.id}`, JSON.stringify(adminMessageIds))
     if (unreadCount > 0) dispatch(markMyMessagesRead())
   }, [dispatch, isAdmin, messages, open, unreadCount, user, view])
+
+  useEffect(() => {
+    const openFromElsewhere = () => setOpen(true)
+    window.addEventListener(OPEN_SUPPORT_EVENT, openFromElsewhere)
+    return () => window.removeEventListener(OPEN_SUPPORT_EVENT, openFromElsewhere)
+  }, [])
 
   useEffect(() => {
     function handlePointerDown(event) {
