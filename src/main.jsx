@@ -8,6 +8,7 @@ import './i18n'
 import { store, persistor } from './store/store'
 import App from './App.jsx'
 import { ToastProvider } from './components/ToastContext'
+import { watchForAppUpdates } from './utils/appUpdate'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -23,8 +24,11 @@ createRoot(document.getElementById('root')).render(
 
 // PWA: only in production builds — a service worker caching Vite's dev
 // modules would serve stale code during development.
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {})
-  })
+if (import.meta.env.PROD) {
+  watchForAppUpdates()
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+    })
+  }
 }
