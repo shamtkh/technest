@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { FaEnvelope, FaLock } from 'react-icons/fa6'
 import { loginThunk } from '../store/thunks/loginThunk'
 import { clearAuthError } from '../store/slices/authSlice'
 import { validateForm, rules, translateError } from '../validations/validateForm'
+import AuthLayout from '../components/auth/AuthLayout'
+import { AuthError, AuthField, AuthSubmit, PasswordField } from '../components/auth/AuthFields'
 
 export default function LoginPage() {
   const { t } = useTranslation()
@@ -19,6 +22,13 @@ export default function LoginPage() {
   useEffect(() => {
     dispatch(clearAuthError())
   }, [dispatch])
+
+  function update(field) {
+    return (e) => {
+      setForm({ ...form, [field]: e.target.value })
+      if (errors[field]) setErrors({ ...errors, [field]: '' })
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -39,53 +49,42 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16">
-      <h1 className="font-display text-2xl font-bold text-ink-soft">{t('auth.loginTitle')}</h1>
-      <p className="mt-1 text-sm text-steel">{t('auth.loginSubtitle')}</p>
+    <AuthLayout
+      mode="login"
+      title={t('auth.loginTitle')}
+      subtitle={t('auth.loginSubtitle')}
+      footer={
+        <>
+          {t('auth.noAccount')}{' '}
+          <Link to="/register" replace state={{ ...location.state, authSwitch: true }} className="font-medium text-accent hover:underline">{t('nav.register')}</Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} noValidate className="mt-7 space-y-4">
+        <AuthField
+          label={t('auth.email')}
+          icon={FaEnvelope}
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={form.email}
+          onChange={update('email')}
+          error={translateError(errors.email, t)}
+        />
+        <PasswordField
+          label={t('auth.password')}
+          icon={FaLock}
+          autoComplete="current-password"
+          value={form.password}
+          onChange={update('password')}
+          error={translateError(errors.password, t)}
+        />
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-        <Field label={t('auth.email')} error={translateError(errors.email, t)}>
-          <input type="email" className="input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        </Field>
-        <Field label={t('auth.password')} error={translateError(errors.password, t)}>
-          <input type="password" className="input" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-        </Field>
-
-        {error && (
-          <p className="text-sm text-danger">
-              {error === 'INVALID_CREDENTIALS'
-                ? t('auth.invalidCredentials')
-                : error === 'TOO_MANY_ATTEMPTS'
-                  ? t('auth.tooManyAttempts')
-                  : error === 'API_UNAVAILABLE'
-                  ? 'Сервер недоступен. Запустите backend и попробуйте снова.'
-                  : t('common.error')}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={status === 'loading'}
-          className="btn-glass w-full rounded-full bg-accent py-3 text-sm font-semibold text-white hover:bg-accent-dim disabled:opacity-60"
-        >
-          {status === 'loading' ? t('common.loading') : t('auth.loginBtn')}
-        </button>
+        <AuthError code={error} />
+        <div className="pt-1">
+          <AuthSubmit loading={status === 'loading'}>{t('auth.loginBtn')}</AuthSubmit>
+        </div>
       </form>
-
-      <p className="mt-6 text-center text-sm text-steel">
-        {t('auth.noAccount')}{' '}
-        <Link to="/register" state={location.state} className="font-medium text-accent hover:underline">{t('nav.register')}</Link>
-      </p>
-    </div>
-  )
-}
-
-function Field({ label, error, children }) {
-  return (
-    <label className="block">
-      <span className="mb-1 block text-xs font-medium text-steel">{label}</span>
-      {children}
-      {error && <span className="mt-1 block text-xs text-danger">{error}</span>}
-    </label>
+    </AuthLayout>
   )
 }

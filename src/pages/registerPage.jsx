@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { FaEnvelope, FaLock, FaUser } from 'react-icons/fa6'
 import { registerThunk } from '../store/thunks/registerThunk'
 import { clearAuthError } from '../store/slices/authSlice'
 import { validateForm, rules, translateError } from '../validations/validateForm'
+import AuthLayout from '../components/auth/AuthLayout'
+import { AuthError, AuthField, AuthSubmit, MatchHint, PasswordField } from '../components/auth/AuthFields'
 
 export default function RegisterPage() {
   const { t } = useTranslation()
@@ -19,6 +22,13 @@ export default function RegisterPage() {
   useEffect(() => {
     dispatch(clearAuthError())
   }, [dispatch])
+
+  function update(field) {
+    return (e) => {
+      setForm({ ...form, [field]: e.target.value })
+      if (errors[field]) setErrors({ ...errors, [field]: '' })
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -40,54 +50,63 @@ export default function RegisterPage() {
     }
   }
 
+  const passwordsMatch = form.confirmPassword && form.confirmPassword === form.password
+
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16">
-      <h1 className="font-display text-2xl font-bold text-ink-soft">{t('auth.registerTitle')}</h1>
-      <p className="mt-1 text-sm text-steel">{t('auth.registerSubtitle')}</p>
+    <AuthLayout
+      mode="register"
+      title={t('auth.registerTitle')}
+      subtitle={t('auth.registerSubtitle')}
+      footer={
+        <>
+          {t('auth.haveAccount')}{' '}
+          <Link to="/login" replace state={{ ...location.state, authSwitch: true }} className="font-medium text-accent hover:underline">{t('nav.login')}</Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} noValidate className="mt-7 space-y-4">
+        <AuthField
+          label={t('auth.name')}
+          icon={FaUser}
+          autoComplete="name"
+          value={form.name}
+          onChange={update('name')}
+          error={translateError(errors.name, t)}
+        />
+        <AuthField
+          label={t('auth.email')}
+          icon={FaEnvelope}
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={form.email}
+          onChange={update('email')}
+          error={translateError(errors.email, t)}
+        />
+        <PasswordField
+          label={t('auth.password')}
+          icon={FaLock}
+          autoComplete="new-password"
+          showStrength
+          value={form.password}
+          onChange={update('password')}
+          error={translateError(errors.password, t)}
+        />
+        <PasswordField
+          label={t('auth.confirmPassword')}
+          icon={FaLock}
+          autoComplete="new-password"
+          value={form.confirmPassword}
+          onChange={update('confirmPassword')}
+          error={translateError(errors.confirmPassword, t)}
+          hint={passwordsMatch ? <MatchHint /> : null}
+        />
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-        <Field label={t('auth.name')} error={translateError(errors.name, t)}>
-          <input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-        </Field>
-        <Field label={t('auth.email')} error={translateError(errors.email, t)}>
-          <input type="email" className="input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        </Field>
-        <Field label={t('auth.password')} error={translateError(errors.password, t)}>
-          <input type="password" className="input" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-        </Field>
-        <Field label={t('auth.confirmPassword')} error={translateError(errors.confirmPassword, t)}>
-          <input type="password" className="input" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} />
-        </Field>
-
-        {error && (
-          <p className="text-sm text-danger">
-            {error === 'EMAIL_TAKEN' ? t('auth.emailTaken') : error === 'TOO_MANY_ATTEMPTS' ? t('auth.tooManyAttempts') : t('common.error')}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={status === 'loading'}
-          className="btn-glass w-full rounded-full bg-accent py-3 text-sm font-semibold text-white hover:bg-accent-dim disabled:opacity-60"
-        >
-          {status === 'loading' ? t('common.loading') : t('auth.registerBtn')}
-        </button>
+        <AuthError code={error} />
+        <div className="pt-1">
+          <AuthSubmit loading={status === 'loading'}>{t('auth.registerBtn')}</AuthSubmit>
+        </div>
       </form>
-
-      <p className="mt-6 text-center text-sm text-steel">
-        {t('auth.haveAccount')}{' '}
-        <Link to="/login" state={location.state} className="font-medium text-accent hover:underline">{t('nav.login')}</Link>
-      </p>
-    </div>
-  )
-}
-
-function Field({ label, error, children }) {
-  return (
-    <label className="block">
-      <span className="mb-1 block text-xs font-medium text-steel">{label}</span>
-      {children}
-      {error && <span className="mt-1 block text-xs text-danger">{error}</span>}
-    </label>
+    </AuthLayout>
   )
 }

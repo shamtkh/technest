@@ -145,6 +145,120 @@ input:focus-visible { outline: none; }
   border-color: var(--color-steel);
 }
 
+/* ── Auth pages (login / register) ── */
+.auth-card { box-shadow: var(--shadow-realistic-lg); }
+.auth-panel {
+  background:
+    radial-gradient(120% 70% at 0% 0%, rgba(61, 127, 255, 0.3), transparent 55%),
+    radial-gradient(80% 60% at 100% 100%, rgba(61, 127, 255, 0.12), transparent 60%),
+    var(--color-ink);
+}
+.auth-panel::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(ellipse 80% 70% at 15% 0%, #000 15%, transparent 70%);
+}
+.auth-preview { animation: fadeInUp 0.7s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.auth-preview-step.is-current {
+  background: linear-gradient(90deg, var(--color-accent) 0%, #a9c6ff 50%, var(--color-accent) 100%);
+  background-size: 200% 100%;
+  animation: authTransit 2.4s linear infinite;
+}
+@keyframes authTransit {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+.auth-switch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 2.9rem;
+  padding: 0.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: var(--color-paper);
+}
+.auth-switch-pill {
+  position: absolute;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  width: calc((100% - 0.5rem) / 2);
+  border-radius: 999px;
+  background: white;
+  box-shadow: 0 1px 2px rgba(15, 18, 26, 0.08), 0 6px 16px rgba(27, 55, 105, 0.1);
+}
+.auth-switch-pill.is-register { transform: translateX(100%); }
+.auth-switch-pill.to-register { animation: authPillToRegister 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.auth-switch-pill.to-login { animation: authPillToLogin 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes authPillToRegister { from { transform: translateX(0); } to { transform: translateX(100%); } }
+@keyframes authPillToLogin { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.auth-switch-option {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--color-steel);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+.auth-switch-option:hover,
+.auth-switch-option.is-active { color: var(--color-ink-soft); }
+
+.input.auth-input {
+  height: 3rem;
+  padding-left: 2.6rem;
+  border-color: transparent;
+  border-radius: 0.85rem;
+  background: var(--color-paper);
+  font-size: 0.9rem;
+}
+.input.auth-input.has-trailing { padding-right: 3rem; }
+.input.auth-input::placeholder { color: #a3aab8; }
+/* Edge adds its own reveal button to password fields; ours replaces it. */
+.input.auth-input::-ms-reveal,
+.input.auth-input::-ms-clear { display: none; }
+.input.auth-input:hover:not(:focus) { border-color: var(--color-line); }
+.input.auth-input.is-invalid { border-color: rgba(255, 90, 95, 0.55); background: white; }
+.input.auth-input:focus {
+  border-color: var(--color-accent);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(61, 127, 255, 0.12);
+}
+.input.auth-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100px #eef3ff inset;
+  -webkit-text-fill-color: var(--color-ink-soft);
+}
+.auth-icon { transition: color 0.2s ease; }
+.auth-field-control:focus-within .auth-icon { color: var(--color-accent); }
+
+.auth-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: white;
+  border-radius: 999px;
+  animation: authSpin 0.7s linear infinite;
+}
+@keyframes authSpin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-preview,
+  .auth-preview-step.is-current,
+  .auth-switch-pill.to-register,
+  .auth-switch-pill.to-login { animation: none; }
+}
+
 .variant-color-picker {
   flex: 0 0 2.75rem;
   width: 2.75rem;
